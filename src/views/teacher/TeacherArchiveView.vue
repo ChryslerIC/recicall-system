@@ -11,7 +11,6 @@
           >
             <img :src="imgRectangle13" alt="" class="block h-full w-full" />
           </button>
-
           <img :src="imgStar1" alt="" class="ml-4 mt-1 h-[40px] w-[44px] sm:ml-6 sm:mt-2 sm:h-[48px] sm:w-[53px] lg:ml-[31px] lg:mt-[15px] lg:h-[55px] lg:w-[61px]" />
           <p class="ml-3 mt-1 text-[28px] leading-none font-black tracking-[-0.03em] sm:ml-4 sm:mt-2 sm:text-[34px] lg:ml-[22px] lg:mt-[18px] lg:text-[40px]">ReciCall</p>
         </div>
@@ -31,13 +30,16 @@
           :class="isSidebarExpanded ? 'w-[220px] px-[12px]' : 'w-[72px]'"
         >
           <div class="flex flex-col gap-[18px]">
-            <div
-              class="flex h-[63px] w-full items-center rounded-[17px] bg-[rgba(46,130,239,0.25)]"
+            <button
+              type="button"
+              class="flex h-[63px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
               :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center'"
+              aria-label="Classes"
+              @click="router.push('/teacher')"
             >
               <img :src="imgRectangle14" alt="" class="h-[36px] w-[45px] shrink-0" />
-              <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-semibold text-[#174ca0]">Classes</span>
-            </div>
+              <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Classes</span>
+            </button>
             <button
               type="button"
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
@@ -47,16 +49,13 @@
               <img :src="imgRectangle15" alt="" class="h-[40px] w-[38px] shrink-0" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[15px] font-medium text-[#3a3a3a]">Predictive Analytics</span>
             </button>
-            <button
-              type="button"
-              class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
-              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
-              aria-label="Archive"
-              @click="router.push('/teacher/archive')"
+            <div
+              class="flex h-[63px] w-full items-center rounded-[17px] bg-[rgba(46,130,239,0.25)]"
+              :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center'"
             >
               <img :src="imgRectangle16" alt="" class="h-[40px] w-[38px] shrink-0" />
-              <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Archive</span>
-            </button>
+              <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-semibold text-[#174ca0]">Archive</span>
+            </div>
           </div>
 
           <div class="flex flex-col gap-[18px]">
@@ -83,41 +82,38 @@
         </aside>
 
         <main class="min-w-0 flex-1 lg:pl-[28px] lg:pr-[27px] lg:pt-[13px]">
-          <section class="min-h-[653px] rounded-[28px] border-2 border-[#2e82ef] bg-white px-4 pb-8 pt-6 sm:px-7 sm:pt-8 lg:rounded-[52px] lg:px-[39px] lg:pb-[36px] lg:pt-[47px]">
+          <section class="min-h-[653px] rounded-[28px] border-2 border-[#2e82ef] bg-white px-5 pb-8 pt-6 sm:px-7 sm:pt-8 lg:rounded-[52px] lg:px-[39px] lg:pb-[36px] lg:pt-[47px]">
             <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <h1 class="text-[32px] leading-none font-bold sm:text-[40px]">My Classes</h1>
-                <p class="mt-[8px] text-[18px] leading-none font-medium sm:text-[20px]">Lorem ipsum lorem ipsum</p>
+                <h1 class="text-[40px] leading-none font-bold">Archived Classes</h1>
+                <p class="mt-[8px] text-[20px] leading-none font-medium">Archived classes are stored here first.</p>
               </div>
 
-              <button
-                type="button"
-                class="mt-[2px] flex h-[72px] w-full max-w-[298px] items-center rounded-[33.5px] bg-[#1188f8] pl-[24px] pr-[18px] sm:h-[78px] sm:pl-[32px] sm:pr-[21px]"
-                @click="openModal"
-              >
-                <img :src="imgRectangle39" alt="" class="h-[42px] w-[46px] sm:h-[48px] sm:w-[53px]" />
-                <span class="ml-[7px] text-[20px] font-semibold text-white sm:text-[24px]">Add New Class</span>
+              <button type="button" class="mt-[2px] flex h-[78px] w-[250px] items-center rounded-[33.5px] bg-[#1188f8] pl-[32px] pr-[21px]" @click="router.push('/teacher')">
+                <span class="grid h-[48px] w-[48px] place-items-center rounded-full bg-white text-[#1188f8]">
+                  <svg class="h-[26px] w-[26px]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M10.25 6.75 5 12l5.25 5.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" />
+                    <path d="M19 12H5.5" stroke="currentColor" stroke-linecap="round" stroke-width="2.4" />
+                  </svg>
+                </span>
+                <span class="ml-[10px] text-[24px] font-semibold text-white">Back to Classes</span>
               </button>
             </div>
 
-            <div v-if="isLoading" class="mt-10 text-[18px] font-medium text-[#5d5d5d]">Loading classes...</div>
+            <div v-if="isLoading" class="mt-10 text-[18px] font-medium text-[#5d5d5d]">Loading archived classes...</div>
 
-            <div
-              v-else-if="classes.length === 0"
-              class="mt-10 rounded-[24px] border border-[#d9e8fb] bg-[#fbfdff] px-6 py-8 text-[18px] font-medium text-[#5d5d5d]"
-            >
-              No active classes yet. Add your first class to get started.
+            <div v-else-if="classes.length === 0" class="mt-10 rounded-[24px] border border-[#d9e8fb] bg-[#fbfdff] px-6 py-8 text-[18px] font-medium text-[#5d5d5d]">
+              No archived classes yet.
             </div>
 
-            <div v-else class="mt-[39px] grid grid-cols-1 gap-x-[19px] gap-y-[22px] md:grid-cols-2 xl:flex xl:flex-wrap xl:gap-x-[19px] xl:gap-y-[22px]">
+            <div v-else class="mt-[39px] grid justify-items-start gap-x-[19px] gap-y-[22px] md:grid-cols-2 xl:flex xl:flex-wrap xl:gap-x-[19px] xl:gap-y-[22px]">
               <article
                 v-for="classItem in classes"
                 :key="classItem.id"
-                class="relative h-[260px] w-full cursor-pointer rounded-[20px] border-2 border-[#bdbdbd] bg-white transition-transform hover:-translate-y-0.5"
+                class="relative h-[260px] w-full overflow-hidden rounded-[20px] border-2 border-[#bdbdbd] bg-white opacity-95"
                 :style="{ width: classCardWidth(classItem) }"
-                @click="openClassroom(classItem.id)"
               >
-                <div class="relative mx-[5px] mt-[6px] h-[173px] overflow-visible rounded-[17px]" :style="{ backgroundImage: classItem.gradient }">
+                <div class="relative mx-[5px] mt-[6px] h-[173px] overflow-hidden rounded-[17px]" :style="{ backgroundImage: classItem.gradient }">
                   <div class="absolute inset-x-0 bottom-0 h-[20px]" :style="{ backgroundImage: classItem.gradient }" />
 
                   <template v-if="classItem.gradientId === 'blue'">
@@ -126,13 +122,11 @@
                     <img :src="imgPolygon6" alt="" class="absolute right-[15px] top-[138px] h-[46px] w-[6px]" />
                     <img :src="imgPolygon7" alt="" class="absolute right-[5px] top-[72px] h-[81px] w-[15px]" />
                   </template>
-
                   <template v-else-if="classItem.gradientId === 'green'">
                     <img :src="imgVector1" alt="" class="absolute right-[-1px] top-[80px] h-[71px] w-[112px]" />
                     <img :src="imgVector2" alt="" class="absolute right-[1px] top-[114px] h-[38px] w-[118px]" />
                     <img :src="imgVector3" alt="" class="absolute right-[59px] top-[117px] h-[35px] w-[71px]" />
                   </template>
-
                   <template v-else>
                     <img :src="imgGroup9" alt="" class="absolute right-[-30px] top-[66px] h-[133px] w-[160px]" />
                   </template>
@@ -148,32 +142,21 @@
 
                   <div
                     v-if="openOptionsId === classItem.id"
-                    class="absolute right-[8px] top-[34px] z-30 w-[176px] rounded-[14px] border border-[#d8d8d8] bg-white py-2 shadow-[0_10px_24px_rgba(0,0,0,0.12)]"
+                    class="absolute right-[14px] top-[48px] z-30 w-[176px] rounded-[14px] border border-[#d8d8d8] bg-white py-2 shadow-[0_10px_24px_rgba(0,0,0,0.12)]"
                   >
-                    <div class="px-4 pb-1">
-                      <p class="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#777]">Join code</p>
-                      <p class="mt-1 text-[16px] font-bold leading-none text-[#1188f8]">{{ classItem.joinCode }}</p>
-                    </div>
                     <button
                       type="button"
-                      class="block w-full px-4 py-[7px] text-left text-[14px] font-medium text-black hover:bg-[#f6f6f6]"
-                      @click.stop="copyJoinCode(classItem.joinCode)"
+                      class="block w-full px-4 py-2 text-left text-[15px] font-medium text-black hover:bg-[#f6f6f6]"
+                      @click.stop="restoreClass(classItem.id)"
                     >
-                      {{ copiedJoinCode === classItem.joinCode ? 'Copied' : 'Copy Join Code' }}
+                      Restore Class
                     </button>
                     <button
                       type="button"
-                      class="block w-full px-4 py-[7px] text-left text-[14px] font-medium text-black hover:bg-[#f6f6f6]"
-                      @click.stop="startEditingClass(classItem)"
+                      class="block w-full px-4 py-2 text-left text-[15px] font-medium text-[#b81717] hover:bg-[#fff3f3]"
+                      @click.stop="permanentlyDeleteClass(classItem.id)"
                     >
-                      Edit Class
-                    </button>
-                    <button
-                      type="button"
-                      class="block w-full px-4 py-[7px] text-left text-[14px] font-medium text-[#b81717] hover:bg-[#fff3f3]"
-                      @click.stop="archiveClass(classItem.id)"
-                    >
-                      Delete Class
+                      Delete Permanently
                     </button>
                   </div>
 
@@ -181,19 +164,19 @@
                   <p class="relative z-10 mt-[10px] pl-[16px] text-[24px] leading-none font-medium text-white">
                     {{ classItem.gradeLevel }} | {{ classItem.subject }}
                   </p>
-                  <p class="relative z-10 mt-[24px] pl-[15px] text-[18px] leading-none font-medium text-white">{{ classItem.scheduleLabel }} • {{ classItem.time }}</p>
+                  <p class="relative z-10 mt-[24px] pl-[15px] text-[18px] leading-none font-medium text-white">
+                    {{ classItem.scheduleLabel }} • {{ classItem.time }}
+                  </p>
                 </div>
 
                 <div class="mt-[10px] flex gap-[13px] px-[10px]">
-                  <div class="h-[58px] rounded-[11px] bg-[#f6f6f6] px-[11px] py-[5px]" :style="{ width: `${classItem.statsWidth}px` }" @click.stop>
+                  <div class="h-[58px] rounded-[11px] bg-[#f6f6f6] px-[11px] py-[5px]" :style="{ width: `${classItem.statsWidth}px` }">
                     <p class="text-[20px] leading-none font-medium text-[#161616]">Students</p>
                     <p class="mt-[8px] text-[20px] leading-none font-semibold text-[#1188f8]">{{ classItem.students }}</p>
                   </div>
-                  <div class="h-[58px] rounded-[11px] bg-[#f6f6f6] px-[11px] py-[5px]" :style="{ width: `${classItem.engagementWidth}px` }" @click.stop>
+                  <div class="h-[58px] rounded-[11px] bg-[#f6f6f6] px-[11px] py-[5px]" :style="{ width: `${classItem.engagementWidth}px` }">
                     <p class="text-[18px] leading-none font-medium text-[#161616]">Engagement</p>
-                    <p class="mt-[8px] text-[20px] leading-none font-semibold" :class="engagementClass(classItem.engagement)">
-                      {{ classItem.engagement }}
-                    </p>
+                    <p class="mt-[8px] text-[20px] leading-none font-semibold" :class="engagementClass(classItem.engagement)">{{ classItem.engagement }}</p>
                   </div>
                 </div>
               </article>
@@ -204,13 +187,13 @@
 
       <div class="px-4 pb-6 sm:px-6 lg:hidden">
         <div class="flex items-center justify-center gap-8 rounded-[20px] border border-[#d9e8fb] bg-white px-4 py-3 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
-          <button type="button" class="grid h-10 w-10 place-items-center rounded-[12px] bg-[rgba(46,130,239,0.25)]" aria-label="Dashboard">
+          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Classes" @click="router.push('/teacher')">
             <img :src="imgRectangle14" alt="" class="h-[24px] w-[30px]" />
           </button>
           <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Predictive analytics">
             <img :src="imgRectangle15" alt="" class="h-[28px] w-[26px]" />
           </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Archive" @click="router.push('/teacher/archive')">
+          <button type="button" class="grid h-10 w-10 place-items-center rounded-[12px] bg-[rgba(46,130,239,0.25)]" aria-label="Archive">
             <img :src="imgRectangle16" alt="" class="h-[28px] w-[26px]" />
           </button>
           <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Settings">
@@ -271,120 +254,19 @@
           </div>
         </div>
       </transition>
-
-      <transition name="fade">
-        <div
-          v-if="isModalOpen"
-          class="fixed inset-0 z-20 flex items-center justify-center bg-[rgba(224,224,224,0.44)] px-4 py-8 backdrop-blur-[1px]"
-          @click.self="closeModal"
-        >
-          <div class="w-full max-w-[551px] rounded-[22px] bg-white px-6 py-5 shadow-[0_4px_39.3px_2px_rgba(0,0,0,0.2)]">
-            <div class="flex items-start justify-between border-b border-[#d7d7d7] pb-4">
-              <div>
-                <h2 class="text-[40px] leading-none font-semibold">Class Details</h2>
-                <p class="mt-2 text-[20px] font-medium">
-                  {{ editingClassId ? 'Update the class info below' : 'To start new class, Enter info below' }}
-                </p>
-              </div>
-              <button type="button" class="text-[34px] leading-none" aria-label="Close modal" @click="closeModal">x</button>
-            </div>
-
-            <form class="space-y-3 pt-4" @submit.prevent="handleSaveClass">
-              <label class="block">
-                <span class="mb-1 block text-[16px] font-semibold">Class Name</span>
-                <input
-                  v-model.trim="newClass.classLabel"
-                  type="text"
-                  placeholder="Enter Class"
-                  class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
-                />
-              </label>
-
-              <label class="block">
-                <span class="mb-1 block text-[16px] font-semibold">Subject Name</span>
-                <input
-                  v-model.trim="newClass.subject"
-                  type="text"
-                  placeholder="Enter Subject"
-                  class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
-                />
-              </label>
-
-              <label class="block">
-                <span class="mb-1 block text-[16px] font-semibold">Grade Level</span>
-                <input
-                  v-model.trim="newClass.gradeLevel"
-                  type="text"
-                  placeholder="Enter Grade Level"
-                  class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
-                />
-              </label>
-
-              <div class="grid grid-cols-2 gap-4">
-                <label class="block">
-                  <span class="mb-1 block text-[16px] font-semibold">Time</span>
-                  <input
-                    v-model.trim="newClass.time"
-                    type="text"
-                    placeholder="Enter Time"
-                    class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
-                  />
-                </label>
-
-                <label class="block">
-                  <span class="mb-1 block text-[16px] font-semibold">Schedule</span>
-                  <input
-                    v-model.trim="newClass.schedule"
-                    type="text"
-                    placeholder="Enter Schedule"
-                    class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
-                  />
-                </label>
-              </div>
-
-              <div>
-                <span class="mb-3 block text-[16px] font-semibold">Background</span>
-                <div class="flex gap-5">
-                  <button
-                    v-for="option in gradientOptions"
-                    :key="option.id"
-                    type="button"
-                    class="h-12 w-[106px] rounded-[17px] border-[3px]"
-                    :class="newClass.gradientId === option.id ? 'border-black' : 'border-transparent'"
-                    :style="{ backgroundImage: option.gradient }"
-                    @click="newClass.gradientId = option.id"
-                  />
-                </div>
-              </div>
-
-              <p v-if="formError" class="text-sm font-medium text-red-600">{{ formError }}</p>
-
-              <div class="flex justify-end gap-4 pt-2">
-                <button type="button" class="h-[57px] w-[151px] rounded-[33.5px] bg-[#c5c5c5] text-[20px] font-bold" @click="closeModal">
-                  Cancel
-                </button>
-                <button type="submit" class="h-[57px] w-[151px] rounded-[33.5px] bg-[#1188f8] text-[20px] font-bold text-white">
-                  {{ editingClassId ? 'Save' : 'Create' }}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </transition>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth } from '../../config/firebase'
 import { logoutUser, updateCurrentUserAccount } from '../../services/authService'
 import {
-  archiveTeacherClass,
-  createTeacherClass,
   getTeacherClasses,
-  updateTeacherClass,
+  permanentlyDeleteTeacherClass,
+  restoreTeacherClass,
 } from '../../services/teacherService'
 import { getUserById, upsertUserProfile } from '../../services/userService'
 
@@ -410,113 +292,37 @@ const imgGroup9 = 'https://www.figma.com/api/mcp/asset/3e5b546e-9946-4ce2-8abe-3
 
 const router = useRouter()
 
-const gradientOptions = [
-  {
-    id: 'blue',
+const gradientConfig = {
+  blue: {
     gradient: 'linear-gradient(90deg, rgb(37, 122, 255) 0%, rgb(36, 118, 247) 44.712%, rgb(29, 96, 201) 90.385%, rgb(22, 73, 153) 100%)',
-    engagement: 'High',
+    ellipsisAsset: imgRectangle25,
   },
-  {
-    id: 'green',
+  green: {
     gradient: 'linear-gradient(90deg, rgb(29, 201, 49) 0%, rgb(6, 196, 28) 15.865%, rgb(89, 234, 99) 87.019%, rgb(85, 232, 96) 92.308%)',
-    engagement: 'Low',
+    ellipsisAsset: imgRectangle26,
   },
-  {
-    id: 'yellow',
+  yellow: {
     gradient: 'linear-gradient(90deg, rgb(228, 206, 40) 0%, rgb(253, 228, 66) 36.058%, rgb(255, 238, 47) 76.442%, rgb(237, 211, 42) 100%)',
-    engagement: 'Moderate',
+    ellipsisAsset: imgRectangle26,
   },
-]
-
-const defaultClasses = [
-  {
-    classLabel: 'Class 1',
-    gradeLevel: 'Grade 6',
-    subject: 'Araling Panlipunan',
-    scheduleLabel: 'Monday / Tuesday',
-    time: '10 AM - 12 PM',
-    engagement: 'High',
-    gradientId: 'blue',
-    students: 35,
-    sortOrder: 1,
-  },
-  {
-    classLabel: 'Class 2',
-    gradeLevel: 'Grade 6',
-    subject: 'Science',
-    scheduleLabel: 'Monday / Tuesday',
-    time: '10 AM - 12 PM',
-    engagement: 'Low',
-    gradientId: 'green',
-    students: 35,
-    sortOrder: 2,
-  },
-  {
-    classLabel: 'Class 3',
-    gradeLevel: 'Grade 6',
-    subject: 'Math',
-    scheduleLabel: 'Monday / Tuesday',
-    time: '10 AM - 12 PM',
-    engagement: 'Moderate',
-    gradientId: 'yellow',
-    students: 35,
-    sortOrder: 3,
-  },
-]
+}
 
 const teacherName = ref('Maam. Anderson')
 const teacherRole = ref('High School Teacher')
 const teacherPhoto = ref(imgProfile)
-const teacherId = ref('')
 const isLoading = ref(true)
 const isLoggingOut = ref(false)
 const isSidebarExpanded = ref(false)
-const isModalOpen = ref(false)
 const isProfileModalOpen = ref(false)
 const isSavingProfile = ref(false)
-const formError = ref('')
 const profileError = ref('')
 const profileSuccess = ref('')
-const openOptionsId = ref(null)
-const editingClassId = ref(null)
-const copiedJoinCode = ref('')
 const profileName = ref('')
 const profilePhotoFile = ref(null)
 const profilePreviewUrl = ref('')
+const openOptionsId = ref(null)
+const teacherId = ref('')
 const classes = ref([])
-
-const createInitialClassState = () => ({
-  classLabel: '',
-  subject: '',
-  gradeLevel: '',
-  time: '',
-  schedule: '',
-  gradientId: 'blue',
-})
-
-const newClass = reactive(createInitialClassState())
-
-const mapClassToCard = (classItem) => {
-  const isBlue = classItem.gradientId === 'blue'
-  const gradientOption = gradientOptions.find((option) => option.id === classItem.gradientId) || gradientOptions[0]
-
-  return {
-    ...classItem,
-    students: classItem.students ?? 35,
-    engagement: classItem.engagement || gradientOption.engagement,
-    gradient: gradientOption.gradient,
-    ellipsisAsset: isBlue ? imgRectangle25 : imgRectangle26,
-    width: isBlue ? 396.347 : 400,
-    statsWidth: isBlue ? 140.482 : 142.391,
-    engagementWidth: isBlue ? 139.41 : 141.304,
-  }
-}
-
-const resetForm = () => {
-  Object.assign(newClass, createInitialClassState())
-  formError.value = ''
-  editingClassId.value = null
-}
 
 const engagementClass = (engagement) => {
   if (engagement === 'High') return 'text-[#1188f8]'
@@ -526,37 +332,34 @@ const engagementClass = (engagement) => {
 
 const classCardWidth = (classItem) => {
   if (typeof window !== 'undefined' && window.innerWidth < 768) return '100%'
-  if (typeof window !== 'undefined' && window.innerWidth < 1280) return '100%'
+  if (typeof window !== 'undefined' && window.innerWidth < 1280) return 'min(100%, 400px)'
   return `${classItem.width}px`
 }
 
-const seedDefaultClasses = async () => {
-  const activeClasses = await getTeacherClasses(teacherId.value, { archived: false })
-  const archivedClasses = await getTeacherClasses(teacherId.value, { archived: true })
+const mapClassToCard = (classItem) => {
+  const config = gradientConfig[classItem.gradientId] || gradientConfig.blue
 
-  if (activeClasses.length > 0 || archivedClasses.length > 0) {
-    return activeClasses
+  return {
+    ...classItem,
+    students: classItem.students ?? 35,
+    gradient: config.gradient,
+    ellipsisAsset: config.ellipsisAsset,
+    width: classItem.gradientId === 'blue' ? 396.347 : 400,
+    statsWidth: classItem.gradientId === 'blue' ? 140.482 : 142.391,
+    engagementWidth: classItem.gradientId === 'blue' ? 139.41 : 141.304,
   }
-
-  for (const classItem of defaultClasses) {
-    await createTeacherClass(teacherId.value, classItem)
-  }
-
-  return getTeacherClasses(teacherId.value, { archived: false })
 }
 
-const loadClasses = async () => {
+const loadArchivedClasses = async () => {
   if (!teacherId.value) return
-
   isLoading.value = true
-  const activeClasses = await seedDefaultClasses()
-  classes.value = activeClasses.map(mapClassToCard)
+  const archivedClasses = await getTeacherClasses(teacherId.value, { archived: true })
+  classes.value = archivedClasses.map(mapClassToCard)
   isLoading.value = false
 }
 
-const openModal = () => {
-  openOptionsId.value = null
-  isModalOpen.value = true
+const toggleOptions = (classId) => {
+  openOptionsId.value = openOptionsId.value === classId ? null : classId
 }
 
 const openProfileModal = () => {
@@ -574,64 +377,6 @@ const closeProfileModal = () => {
   profileSuccess.value = ''
   profilePhotoFile.value = null
   profilePreviewUrl.value = ''
-}
-
-const closeModal = () => {
-  isModalOpen.value = false
-  resetForm()
-}
-
-const toggleOptions = (classId) => {
-  openOptionsId.value = openOptionsId.value === classId ? null : classId
-}
-
-const legacyCopyText = (value) => {
-  const textArea = document.createElement('textarea')
-  textArea.value = value
-  textArea.setAttribute('readonly', '')
-  textArea.style.position = 'fixed'
-  textArea.style.opacity = '0'
-  textArea.style.pointerEvents = 'none'
-  document.body.appendChild(textArea)
-  textArea.focus()
-  textArea.select()
-
-  let copied = false
-  try {
-    copied = document.execCommand('copy')
-  } catch (error) {
-    console.error(error)
-  }
-
-  document.body.removeChild(textArea)
-  return copied
-}
-
-const copyJoinCode = async (joinCode) => {
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(joinCode)
-    } else if (!legacyCopyText(joinCode)) {
-      throw new Error('Clipboard copy is unavailable')
-    }
-
-    copiedJoinCode.value = joinCode
-    window.setTimeout(() => {
-      if (copiedJoinCode.value === joinCode) copiedJoinCode.value = ''
-    }, 1800)
-  } catch (error) {
-    console.error(error)
-    if (legacyCopyText(joinCode)) {
-      copiedJoinCode.value = joinCode
-      window.setTimeout(() => {
-        if (copiedJoinCode.value === joinCode) copiedJoinCode.value = ''
-      }, 1800)
-    }
-  }
-}
-
-const openClassroom = (classId) => {
-  router.push(`/teacher/class/${classId}`)
 }
 
 const handleProfileImageChange = (event) => {
@@ -682,62 +427,16 @@ const saveProfileChanges = async () => {
   }
 }
 
-const startEditingClass = (classItem) => {
+const restoreClass = async (classId) => {
+  await restoreTeacherClass(teacherId.value, classId)
   openOptionsId.value = null
-  editingClassId.value = classItem.id
-  newClass.classLabel = classItem.classLabel
-  newClass.subject = classItem.subject
-  newClass.gradeLevel = classItem.gradeLevel
-  newClass.time = classItem.time
-  newClass.schedule = classItem.scheduleLabel
-  newClass.gradientId = classItem.gradientId || 'blue'
-  isModalOpen.value = true
+  await loadArchivedClasses()
 }
 
-const archiveClass = async (classId) => {
-  await archiveTeacherClass(teacherId.value, classId)
+const permanentlyDeleteClass = async (classId) => {
+  await permanentlyDeleteTeacherClass(teacherId.value, classId)
   openOptionsId.value = null
-  await loadClasses()
-}
-
-const handleSaveClass = async () => {
-  formError.value = ''
-
-  if (!newClass.classLabel || !newClass.subject || !newClass.gradeLevel || !newClass.time) {
-    formError.value = 'Complete the required class details first.'
-    return
-  }
-
-  const option = gradientOptions.find((item) => item.id === newClass.gradientId) || gradientOptions[0]
-
-  if (editingClassId.value) {
-    await updateTeacherClass(teacherId.value, editingClassId.value, {
-      classLabel: newClass.classLabel,
-      gradeLevel: newClass.gradeLevel,
-      subject: newClass.subject,
-      scheduleLabel: newClass.schedule || 'Monday / Tuesday',
-      time: newClass.time,
-      engagement: option.engagement,
-      gradientId: option.id,
-    })
-    await loadClasses()
-    closeModal()
-    return
-  }
-
-  await createTeacherClass(teacherId.value, {
-    classLabel: newClass.classLabel,
-    gradeLevel: newClass.gradeLevel,
-    subject: newClass.subject,
-    scheduleLabel: newClass.schedule || 'Monday / Tuesday',
-    time: newClass.time,
-    students: 35,
-    engagement: option.engagement,
-    gradientId: option.id,
-    sortOrder: classes.value.length + 1,
-  })
-  await loadClasses()
-  closeModal()
+  await loadArchivedClasses()
 }
 
 const handleLogout = async () => {
@@ -747,8 +446,6 @@ const handleLogout = async () => {
   try {
     await logoutUser()
     router.push('/')
-  } catch (error) {
-    console.error(error)
   } finally {
     isLoggingOut.value = false
   }
@@ -766,7 +463,7 @@ onMounted(async () => {
   else if (user.photoURL) teacherPhoto.value = user.photoURL
   profileName.value = teacherName.value
 
-  await loadClasses()
+  await loadArchivedClasses()
 })
 </script>
 

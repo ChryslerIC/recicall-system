@@ -16,3 +16,8 @@ export const createUserProfile = async (uid, userData) => {
   const userRef = doc(db, 'users', uid)
   await setDoc(userRef, userData)
 }
+
+export const upsertUserProfile = async (uid, userData) => {
+  const userRef = doc(db, 'users', uid)
+  await setDoc(userRef, userData, { merge: true })
+}
