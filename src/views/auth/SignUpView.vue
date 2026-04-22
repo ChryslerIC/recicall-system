@@ -1,15 +1,37 @@
 <template>
   <AuthShell
     v-model="selectedRole"
-    title="Welcome Back"
-    subtitle="Step into your digital learning space."
-    prompt-text="Don't have an account?"
-    prompt-action="Sign up"
-    prompt-link="/signup"
+    title="Welcome"
+    subtitle="Create your digital learning space."
+    prompt-text="Already have an account?"
+    prompt-action="Log in"
+    prompt-link="/"
     :google-disabled="isSubmitting"
     @google="handleGoogleAuth"
   >
-    <form class="space-y-4" @submit.prevent="handleLogin">
+    <form class="space-y-4" @submit.prevent="handleSignUp">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <label class="block">
+          <span class="sr-only">First Name</span>
+          <input
+            v-model.trim="firstName"
+            type="text"
+            placeholder="First Name"
+            class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium text-black outline-none transition placeholder:text-[#777] focus:border-[#1188f8]"
+          />
+        </label>
+
+        <label class="block">
+          <span class="sr-only">Last Name</span>
+          <input
+            v-model.trim="lastName"
+            type="text"
+            placeholder="Last Name"
+            class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium text-black outline-none transition placeholder:text-[#777] focus:border-[#1188f8]"
+          />
+        </label>
+      </div>
+
       <label class="block">
         <span class="sr-only">Email or Username</span>
         <div class="flex h-14 items-center rounded-[15px] border border-black px-4">
@@ -53,17 +75,6 @@
         </div>
       </label>
 
-      <div class="flex items-center justify-between gap-4 pt-1">
-        <label class="flex items-center gap-2 text-[14px] font-medium text-black">
-          <input v-model="rememberMe" type="checkbox" class="h-4 w-4 rounded-full border-black text-[#1188f8]" />
-          <span>Remember me</span>
-        </label>
-
-        <button type="button" class="text-[14px] font-medium text-[#3abef6]">
-          Forgot Password?
-        </button>
-      </div>
-
       <p v-if="errorMessage" class="text-sm font-medium text-red-600">
         {{ errorMessage }}
       </p>
@@ -73,7 +84,7 @@
         class="mt-2 flex h-[61px] w-full items-center justify-center rounded-full bg-[#1188f8] text-[20px] font-extrabold text-white shadow-[0_9px_8.8px_0_rgba(17,136,248,0.3)] transition hover:bg-[#0c78dd] disabled:cursor-not-allowed disabled:opacity-70"
         :disabled="isSubmitting"
       >
-        {{ isSubmitting ? 'Logging in...' : 'Log In' }}
+        {{ isSubmitting ? 'Creating account...' : 'Sign up' }}
       </button>
     </form>
   </AuthShell>
@@ -83,15 +94,16 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AuthShell from '../../components/auth/AuthShell.vue'
-import { loginUser, logoutUser, signInWithGoogle } from '../../services/authService'
-import { getUserById, upsertUserProfile } from '../../services/userService'
+import { logoutUser, registerUser, signInWithGoogle } from '../../services/authService'
+import { createUserProfile, getUserById, upsertUserProfile } from '../../services/userService'
 
 const router = useRouter()
 
+const firstName = ref('')
+const lastName = ref('')
 const email = ref('')
 const password = ref('')
 const selectedRole = ref('teacher')
-const rememberMe = ref(false)
 const showPassword = ref(false)
 const isSubmitting = ref(false)
 const errorMessage = ref('')
@@ -110,28 +122,32 @@ const routeByRole = (role) => {
   errorMessage.value = 'Invalid user role.'
 }
 
-const handleLogin = async () => {
+const handleSignUp = async () => {
   errorMessage.value = ''
+
+  if (!firstName.value || !lastName.value || !email.value || !password.value) {
+    errorMessage.value = 'Complete all fields before creating an account.'
+    return
+  }
+
   isSubmitting.value = true
 
   try {
-    const userCredential = await loginUser(email.value, password.value)
+    const userCredential = await registerUser(email.value, password.value)
     const uid = userCredential.user.uid
-    const userProfile = await getUserById(uid)
 
-    if (!userProfile) {
-      errorMessage.value = 'User profile not found in Firestore.'
-      return
-    }
+    await createUserProfile(uid, {
+      firstName: firstName.value,
+      lastName: lastName.value,
+      email: email.value,
+      role: selectedRole.value,
+      displayName: `${firstName.value} ${lastName.value}`.trim(),
+      createdAt: new Date().toISOString(),
+    })
 
-    if (userProfile.role !== selectedRole.value) {
-      errorMessage.value = `This account is registered as a ${userProfile.role}.`
-      return
-    }
-
-    routeByRole(userProfile.role)
+    routeByRole(selectedRole.value)
   } catch (error) {
-    errorMessage.value = 'Invalid email or password.'
+    errorMessage.value = 'Unable to create account. Check your details and try again.'
     console.error(error)
   } finally {
     isSubmitting.value = false
@@ -150,7 +166,7 @@ const handleGoogleAuth = async () => {
     if (existingProfile?.role) {
       if (existingProfile.role !== selectedRole.value) {
         await logoutUser()
-        errorMessage.value = `This Google account is registered as a ${existingProfile.role}.`
+        errorMessage.value = `This Google account is already registered as a ${existingProfile.role}.`
         return
       }
 
@@ -158,22 +174,23 @@ const handleGoogleAuth = async () => {
       return
     }
 
-    const [firstName = '', ...rest] = (user.displayName || '').trim().split(/\s+/)
-    const lastName = rest.join(' ')
+    const [first = '', ...rest] = (user.displayName || '').trim().split(/\s+/)
+    const derivedFirstName = firstName.value || first
+    const derivedLastName = lastName.value || rest.join(' ')
 
     await upsertUserProfile(user.uid, {
-      firstName,
-      lastName,
-      email: user.email || '',
+      firstName: derivedFirstName,
+      lastName: derivedLastName,
+      email: user.email || email.value,
       role: selectedRole.value,
-      displayName: user.displayName || `${firstName} ${lastName}`.trim(),
+      displayName: user.displayName || `${derivedFirstName} ${derivedLastName}`.trim(),
       photoURL: user.photoURL || '',
       createdAt: new Date().toISOString(),
     })
 
     routeByRole(selectedRole.value)
   } catch (error) {
-    errorMessage.value = 'Google sign-in was not completed.'
+    errorMessage.value = 'Google sign-up was not completed.'
     console.error(error)
   } finally {
     isSubmitting.value = false
