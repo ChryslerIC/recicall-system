@@ -9,9 +9,9 @@
             aria-label="Toggle sidebar"
             @click="isSidebarExpanded = !isSidebarExpanded"
           >
-            <img :src="imgRectangle13" alt="" class="block h-full w-full" />
+            <img :src="imgMenu" alt="" class="block h-full w-full" />
           </button>
-          <img :src="imgStar1" alt="" class="ml-4 mt-1 h-[40px] w-[44px] sm:ml-6 sm:mt-2 sm:h-[48px] sm:w-[53px] lg:ml-[31px] lg:mt-[15px] lg:h-[55px] lg:w-[61px]" />
+          <img :src="imgStar" alt="" class="ml-4 mt-1 h-[40px] w-[44px] object-contain sm:ml-6 sm:mt-2 sm:h-[48px] sm:w-[53px] lg:ml-[31px] lg:mt-[15px] lg:h-[55px] lg:w-[61px]" />
           <p class="ml-3 mt-1 text-[28px] leading-none font-black tracking-[-0.03em] sm:ml-4 sm:mt-2 sm:text-[34px] lg:ml-[22px] lg:mt-[18px] lg:text-[40px]">ReciCall</p>
         </div>
 
@@ -20,7 +20,7 @@
             <p class="text-[14px] leading-none font-bold sm:text-[16px] lg:text-[20px]">{{ teacherName }}</p>
             <p class="mt-[2px] text-[11px] leading-none font-medium sm:text-[13px] lg:mt-[4px] lg:text-[15px]">{{ teacherRole }}</p>
           </div>
-          <img :src="teacherPhoto" alt="" class="h-[52px] w-[52px] rounded-full object-cover sm:h-[62px] sm:w-[62px] lg:h-[78px] lg:w-[78px]" />
+          <img :src="teacherPhoto" alt="" class="h-[52px] w-[52px] rounded-full object-cover sm:h-[62px] sm:w-[62px] lg:h-[78px] lg:w-[78px]" @error="ensureProfileFallback" />
         </button>
       </header>
 
@@ -37,7 +37,7 @@
               aria-label="Classes"
               @click="router.push('/teacher')"
             >
-              <img :src="imgRectangle14" alt="" class="h-[36px] w-[45px] shrink-0" />
+              <img :src="imgClasses" alt="" class="h-[36px] w-[45px] shrink-0" :style="inactiveNavIconStyle" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Classes</span>
             </button>
             <button
@@ -45,15 +45,16 @@
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
               :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
               aria-label="Predictive analytics"
+              @click="openPredictiveAnalytics"
             >
-              <img :src="imgRectangle15" alt="" class="h-[40px] w-[38px] shrink-0" />
+              <img :src="imgAnalytics" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[15px] font-medium text-[#3a3a3a]">Predictive Analytics</span>
             </button>
             <div
               class="flex h-[63px] w-full items-center rounded-[17px] bg-[rgba(46,130,239,0.25)]"
               :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center'"
             >
-              <img :src="imgRectangle16" alt="" class="h-[40px] w-[38px] shrink-0" />
+              <img :src="imgArchive" alt="" class="h-[40px] w-[38px] shrink-0" :style="activeNavIconStyle" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-semibold text-[#174ca0]">Archive</span>
             </div>
           </div>
@@ -64,8 +65,9 @@
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
               :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
               aria-label="Settings"
+              @click="openProfileModal"
             >
-              <img :src="imgRectangle18" alt="" class="h-[40px] w-[38px] shrink-0" />
+              <img :src="imgSettings" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Settings</span>
             </button>
             <button
@@ -75,7 +77,7 @@
               aria-label="Logout"
               @click="handleLogout"
             >
-              <img :src="imgRectangle17" alt="" class="h-[40px] w-[38px] shrink-0" />
+              <img :src="imgLogout" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Logout</span>
             </button>
           </div>
@@ -117,18 +119,23 @@
                   <div class="absolute inset-x-0 bottom-0 h-[20px]" :style="{ backgroundImage: classItem.gradient }" />
 
                   <template v-if="classItem.gradientId === 'blue'">
-                    <img :src="imgPolygon4" alt="" class="absolute right-[28px] top-[67px] h-[91px] w-[34px]" />
-                    <img :src="imgPolygon5" alt="" class="absolute right-[15px] top-[121px] h-[61px] w-[20px]" />
-                    <img :src="imgPolygon6" alt="" class="absolute right-[15px] top-[138px] h-[46px] w-[6px]" />
-                    <img :src="imgPolygon7" alt="" class="absolute right-[5px] top-[72px] h-[81px] w-[15px]" />
+                    <div class="absolute right-[28px] top-[67px] h-[91px] w-[34px] bg-[rgba(19,67,145,0.72)] [clip-path:polygon(100%_0,0_82%,100%_100%)]" />
+                    <div class="absolute right-[15px] top-[121px] h-[61px] w-[20px] bg-[rgba(22,92,182,0.8)] [clip-path:polygon(100%_0,0_66%,100%_100%)]" />
+                    <div class="absolute right-[15px] top-[138px] h-[46px] w-[6px] bg-[rgba(13,73,165,0.85)] [clip-path:polygon(100%_0,0_100%,100%_100%)]" />
+                    <div class="absolute right-[5px] top-[72px] h-[81px] w-[15px] bg-[rgba(18,86,173,0.78)] [clip-path:polygon(100%_0,0_100%,100%_84%)]" />
                   </template>
                   <template v-else-if="classItem.gradientId === 'green'">
-                    <img :src="imgVector1" alt="" class="absolute right-[-1px] top-[80px] h-[71px] w-[112px]" />
-                    <img :src="imgVector2" alt="" class="absolute right-[1px] top-[114px] h-[38px] w-[118px]" />
-                    <img :src="imgVector3" alt="" class="absolute right-[59px] top-[117px] h-[35px] w-[71px]" />
+                    <div class="absolute right-[0px] top-[80px] h-[71px] w-[112px] bg-[rgba(33,170,41,0.48)] [clip-path:polygon(100%_4%,100%_100%,0_100%,26%_64%,39%_67%,51%_47%,62%_49%,79%_17%,89%_22%)]" />
+                    <div class="absolute right-[1px] top-[116px] h-[38px] w-[118px] bg-[rgba(44,192,55,0.58)] [clip-path:polygon(100%_8%,100%_100%,0_100%,18%_42%,30%_40%,52%_68%,76%_24%,89%_35%)]" />
+                    <div class="absolute right-[30px] top-[119px] h-[35px] w-[71px] bg-[rgba(35,155,44,0.65)] [clip-path:polygon(100%_0,100%_100%,0_100%,28%_28%,44%_40%,63%_0)]" />
                   </template>
                   <template v-else>
-                    <img :src="imgGroup9" alt="" class="absolute right-[-30px] top-[66px] h-[133px] w-[160px]" />
+                    <div class="absolute right-[4px] top-[86px] h-[88px] w-[96px]">
+                      <div class="absolute right-[26px] top-[0] h-[46px] w-[46px] rounded-full bg-[rgba(255,243,97,0.22)]" />
+                      <div class="absolute right-[66px] top-[18px] h-[14px] w-[14px] rounded-full bg-[rgba(255,243,97,0.28)]" />
+                      <div class="absolute right-[58px] top-[39px] h-[8px] w-[8px] rounded-full bg-[rgba(255,243,97,0.28)]" />
+                      <div class="absolute right-[0px] top-[40px] h-[50px] w-[80px] bg-[rgba(242,214,34,0.34)] [clip-path:polygon(100%_0,100%_100%,0_100%,20%_44%)]" />
+                    </div>
                   </template>
 
                   <button
@@ -137,7 +144,7 @@
                     :aria-label="`Open options for ${classItem.classLabel}`"
                     @click.stop="toggleOptions(classItem.id)"
                   >
-                    <img :src="classItem.ellipsisAsset" alt="" class="h-[39px] w-[35px]" />
+                    <img :src="imgEllipsisWhite" alt="" class="h-[39px] w-[35px]" />
                   </button>
 
                   <div
@@ -165,7 +172,7 @@
                     {{ classItem.gradeLevel }} | {{ classItem.subject }}
                   </p>
                   <p class="relative z-10 mt-[24px] pl-[15px] text-[18px] leading-none font-medium text-white">
-                    {{ classItem.scheduleLabel }} • {{ classItem.time }}
+                    {{ classItem.scheduleLabel }} &bull; {{ classItem.time }}
                   </p>
                 </div>
 
@@ -188,22 +195,31 @@
       <div class="px-4 pb-6 sm:px-6 lg:hidden">
         <div class="flex items-center justify-center gap-8 rounded-[20px] border border-[#d9e8fb] bg-white px-4 py-3 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
           <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Classes" @click="router.push('/teacher')">
-            <img :src="imgRectangle14" alt="" class="h-[24px] w-[30px]" />
+            <img :src="imgClasses" alt="" class="h-[24px] w-[30px]" :style="inactiveNavIconStyle" />
           </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Predictive analytics">
-            <img :src="imgRectangle15" alt="" class="h-[28px] w-[26px]" />
+          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Predictive analytics" @click="openPredictiveAnalytics">
+            <img :src="imgAnalytics" alt="" class="h-[28px] w-[26px]" :style="inactiveNavIconStyle" />
           </button>
           <button type="button" class="grid h-10 w-10 place-items-center rounded-[12px] bg-[rgba(46,130,239,0.25)]" aria-label="Archive">
-            <img :src="imgRectangle16" alt="" class="h-[28px] w-[26px]" />
+            <img :src="imgArchive" alt="" class="h-[28px] w-[26px]" :style="activeNavIconStyle" />
           </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Settings">
-            <img :src="imgRectangle18" alt="" class="h-[28px] w-[26px]" />
+          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Settings" @click="openProfileModal">
+            <img :src="imgSettings" alt="" class="h-[28px] w-[26px]" :style="inactiveNavIconStyle" />
           </button>
           <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Logout" @click="handleLogout">
-            <img :src="imgRectangle17" alt="" class="h-[28px] w-[26px]" />
+            <img :src="imgLogout" alt="" class="h-[28px] w-[26px]" :style="inactiveNavIconStyle" />
           </button>
         </div>
       </div>
+
+      <AnalyticsClassPickerModal
+        :open="isAnalyticsClassPickerOpen"
+        :classes="analyticsClasses"
+        :loading="isLoadingAnalyticsClasses"
+        empty-message="No active classes available. Restore or create a class first before opening analytics."
+        @close="closeAnalyticsClassPicker"
+        @select="handleAnalyticsClassSelect"
+      />
 
       <transition name="fade">
         <div
@@ -215,18 +231,14 @@
             <div class="flex items-start justify-between border-b border-[#d7d7d7] pb-4">
               <div>
                 <h2 class="text-[40px] leading-none font-semibold">Edit Profile</h2>
-                <p class="mt-2 text-[20px] font-medium">Update your display name and profile picture.</p>
+                <p class="mt-2 text-[20px] font-medium">Update your display name and choose a preset avatar.</p>
               </div>
               <button type="button" class="text-[34px] leading-none" aria-label="Close profile modal" @click="closeProfileModal">x</button>
             </div>
 
             <form class="space-y-4 pt-5" @submit.prevent="saveProfileChanges">
               <div class="flex items-center gap-4">
-                <img :src="profilePreviewUrl || teacherPhoto" alt="" class="h-[88px] w-[88px] rounded-full border border-[#d7d7d7] object-cover" />
-                <label class="inline-flex h-[48px] cursor-pointer items-center rounded-[24px] bg-[#1188f8] px-5 text-[16px] font-semibold text-white">
-                  Upload Photo
-                  <input type="file" accept="image/*" class="hidden" @change="handleProfileImageChange" />
-                </label>
+                <img :src="profilePreviewSrc" alt="" class="h-[88px] w-[88px] rounded-full border border-[#d7d7d7] object-cover" />
               </div>
 
               <label class="block">
@@ -238,6 +250,27 @@
                   class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
                 />
               </label>
+
+              <div>
+                <div class="flex items-center justify-between gap-4">
+                  <p class="text-[16px] font-semibold">Preset Avatars</p>
+                  <p class="text-[13px] text-[#666]">Choose one avatar to use across the app.</p>
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <button
+                    v-for="avatar in teacherAvatarOptions"
+                    :key="avatar.key"
+                    type="button"
+                    class="rounded-[18px] border px-3 py-3 text-center transition"
+                    :class="profileAvatarKey === avatar.key ? 'border-[#1188f8] bg-[#eef6ff] shadow-[0_0_0_2px_rgba(17,136,248,0.12)]' : 'border-[#d7d7d7] bg-[#fafafa] hover:border-[#1188f8]'"
+                    :disabled="isSavingProfile"
+                    @click="selectTeacherAvatarPreset(avatar.key)"
+                  >
+                    <img :src="avatar.src" :alt="avatar.label" class="mx-auto h-[64px] w-[64px] rounded-full object-cover" />
+                    <p class="mt-3 text-[13px] font-semibold text-black">{{ avatar.label }}</p>
+                  </button>
+                </div>
+              </div>
 
               <p v-if="profileError" class="text-sm font-medium text-red-600">{{ profileError }}</p>
               <p v-if="profileSuccess" class="text-sm font-medium text-green-600">{{ profileSuccess }}</p>
@@ -259,8 +292,9 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import AnalyticsClassPickerModal from '../../components/teacher/AnalyticsClassPickerModal.vue'
 import { auth } from '../../config/firebase'
 import { logoutUser, updateCurrentUserAccount } from '../../services/authService'
 import {
@@ -269,60 +303,60 @@ import {
   restoreTeacherClass,
 } from '../../services/teacherService'
 import { getUserById, upsertUserProfile } from '../../services/userService'
-
-const imgRectangle15 = 'https://www.figma.com/api/mcp/asset/df7b5442-a853-4bd6-bec2-b0a6ba5fb15b'
-const imgRectangle16 = 'https://www.figma.com/api/mcp/asset/522713bb-6825-496b-ab34-8e0eabdc4c1e'
-const imgRectangle17 = 'https://www.figma.com/api/mcp/asset/baa30f51-4cc3-4864-b3aa-5408485c374e'
-const imgRectangle18 = 'https://www.figma.com/api/mcp/asset/2b1b1c20-903a-4546-a524-9824522a11ad'
-const imgProfile = 'https://www.figma.com/api/mcp/asset/dfa0d238-70e4-44c2-84ee-3602f12c86e8'
-const imgRectangle13 = 'https://www.figma.com/api/mcp/asset/222edfa1-d9d2-4ebf-8ce7-30458f9c9917'
-const imgRectangle14 = 'https://www.figma.com/api/mcp/asset/92b4af93-7a63-4ee9-905b-af2e55eefccd'
-const imgRectangle39 = 'https://www.figma.com/api/mcp/asset/4fe4b9af-60f8-4513-957b-679facc7dc51'
-const imgRectangle25 = 'https://www.figma.com/api/mcp/asset/895af646-bc7f-425a-8c59-8482fe1aefad'
-const imgRectangle26 = 'https://www.figma.com/api/mcp/asset/56f13170-2366-4af1-b31d-9d54661462bd'
-const imgStar1 = 'https://www.figma.com/api/mcp/asset/048facac-2585-4879-9736-a9225fbd7404'
-const imgPolygon4 = 'https://www.figma.com/api/mcp/asset/19c7b1ca-b4bb-4061-b21b-07239b5ea14e'
-const imgPolygon5 = 'https://www.figma.com/api/mcp/asset/dc5f99b5-f878-4528-a61e-4a07c7c0f7ec'
-const imgPolygon6 = 'https://www.figma.com/api/mcp/asset/a2b6e496-d96c-4e62-9d8b-a48447a1cf52'
-const imgPolygon7 = 'https://www.figma.com/api/mcp/asset/3e8b338c-f9b2-420c-afaf-603b456d1afe'
-const imgVector1 = 'https://www.figma.com/api/mcp/asset/dee16b01-b5f8-4529-b523-e84c3cc100fa'
-const imgVector2 = 'https://www.figma.com/api/mcp/asset/d88a3308-7632-4b61-947d-d6fab4ee370d'
-const imgVector3 = 'https://www.figma.com/api/mcp/asset/5a866683-4a62-4558-be89-3e05ee8958d4'
-const imgGroup9 = 'https://www.figma.com/api/mcp/asset/3e5b546e-9946-4ce2-8abe-39392c4ec512'
+import imgAnalytics from '../../assets/icons/recicall-analytics.svg'
+import imgArchive from '../../assets/icons/recicall-archive.svg'
+import imgClasses from '../../assets/icons/recicall-classes.svg'
+import imgEllipsisWhite from '../../assets/icons/recicall-ellipsis-white.svg'
+import imgLogout from '../../assets/icons/recicall-logout.svg'
+import imgMenu from '../../assets/icons/recicall-menu.svg'
+import imgProfile from '../../assets/icons/recicall-profile.svg'
+import imgSettings from '../../assets/icons/recicall-settings.svg'
+import imgStar from '../../assets/icons/recicall-logo.png'
+import { activeNavIconStyle, inactiveNavIconStyle } from '../../utils/navIconStyles'
+import { defaultTeacherAvatarKey, resolveTeacherAvatar, sanitizeTeacherAvatarKey, teacherAvatarOptions } from '../../utils/teacherAvatarOptions'
 
 const router = useRouter()
 
 const gradientConfig = {
   blue: {
     gradient: 'linear-gradient(90deg, rgb(37, 122, 255) 0%, rgb(36, 118, 247) 44.712%, rgb(29, 96, 201) 90.385%, rgb(22, 73, 153) 100%)',
-    ellipsisAsset: imgRectangle25,
   },
   green: {
     gradient: 'linear-gradient(90deg, rgb(29, 201, 49) 0%, rgb(6, 196, 28) 15.865%, rgb(89, 234, 99) 87.019%, rgb(85, 232, 96) 92.308%)',
-    ellipsisAsset: imgRectangle26,
   },
   yellow: {
     gradient: 'linear-gradient(90deg, rgb(228, 206, 40) 0%, rgb(253, 228, 66) 36.058%, rgb(255, 238, 47) 76.442%, rgb(237, 211, 42) 100%)',
-    ellipsisAsset: imgRectangle26,
   },
 }
 
 const teacherName = ref('Maam. Anderson')
 const teacherRole = ref('High School Teacher')
-const teacherPhoto = ref(imgProfile)
+const teacherAvatarKey = ref(defaultTeacherAvatarKey)
 const isLoading = ref(true)
 const isLoggingOut = ref(false)
 const isSidebarExpanded = ref(false)
+const isAnalyticsClassPickerOpen = ref(false)
+const isLoadingAnalyticsClasses = ref(false)
 const isProfileModalOpen = ref(false)
 const isSavingProfile = ref(false)
 const profileError = ref('')
 const profileSuccess = ref('')
 const profileName = ref('')
-const profilePhotoFile = ref(null)
-const profilePreviewUrl = ref('')
+const profileAvatarKey = ref(defaultTeacherAvatarKey)
 const openOptionsId = ref(null)
 const teacherId = ref('')
 const classes = ref([])
+const analyticsClasses = ref([])
+const teacherPhoto = computed(() =>
+  resolveTeacherAvatar(teacherAvatarKey.value, ''),
+)
+const profilePreviewSrc = computed(() =>
+  resolveTeacherAvatar(profileAvatarKey.value || defaultTeacherAvatarKey, ''),
+)
+
+const ensureProfileFallback = (event) => {
+  event.target.src = imgProfile
+}
 
 const engagementClass = (engagement) => {
   if (engagement === 'High') return 'text-[#1188f8]'
@@ -343,7 +377,6 @@ const mapClassToCard = (classItem) => {
     ...classItem,
     students: classItem.students ?? 35,
     gradient: config.gradient,
-    ellipsisAsset: config.ellipsisAsset,
     width: classItem.gradientId === 'blue' ? 396.347 : 400,
     statsWidth: classItem.gradientId === 'blue' ? 140.482 : 142.391,
     engagementWidth: classItem.gradientId === 'blue' ? 139.41 : 141.304,
@@ -358,6 +391,18 @@ const loadArchivedClasses = async () => {
   isLoading.value = false
 }
 
+const loadActiveAnalyticsClasses = async () => {
+  if (!teacherId.value) return
+
+  isLoadingAnalyticsClasses.value = true
+  try {
+    const activeClasses = await getTeacherClasses(teacherId.value, { archived: false })
+    analyticsClasses.value = activeClasses.map(mapClassToCard)
+  } finally {
+    isLoadingAnalyticsClasses.value = false
+  }
+}
+
 const toggleOptions = (classId) => {
   openOptionsId.value = openOptionsId.value === classId ? null : classId
 }
@@ -366,8 +411,7 @@ const openProfileModal = () => {
   profileError.value = ''
   profileSuccess.value = ''
   profileName.value = teacherName.value
-  profilePhotoFile.value = null
-  profilePreviewUrl.value = ''
+  profileAvatarKey.value = teacherAvatarKey.value || defaultTeacherAvatarKey
   isProfileModalOpen.value = true
 }
 
@@ -375,16 +419,29 @@ const closeProfileModal = () => {
   isProfileModalOpen.value = false
   profileError.value = ''
   profileSuccess.value = ''
-  profilePhotoFile.value = null
-  profilePreviewUrl.value = ''
 }
 
-const handleProfileImageChange = (event) => {
-  const [file] = event.target.files || []
-  if (!file) return
+const openPredictiveAnalytics = async () => {
+  isAnalyticsClassPickerOpen.value = true
+  await loadActiveAnalyticsClasses()
+}
 
-  profilePhotoFile.value = file
-  profilePreviewUrl.value = URL.createObjectURL(file)
+const closeAnalyticsClassPicker = () => {
+  isAnalyticsClassPickerOpen.value = false
+}
+
+const handleAnalyticsClassSelect = (classItem) => {
+  if (!classItem?.id) return
+
+  closeAnalyticsClassPicker()
+  router.push({
+    path: `/teacher/class/${classItem.id}`,
+    query: { tab: 'analytics' },
+  })
+}
+
+const selectTeacherAvatarPreset = (avatarKey) => {
+  profileAvatarKey.value = avatarKey
 }
 
 const saveProfileChanges = async () => {
@@ -401,16 +458,19 @@ const saveProfileChanges = async () => {
   try {
     const updatedProfile = await updateCurrentUserAccount({
       displayName: profileName.value.trim(),
-      photoFile: profilePhotoFile.value,
+      photoURL: '',
     })
 
+    const nextAvatarKey = sanitizeTeacherAvatarKey(profileAvatarKey.value)
     await upsertUserProfile(teacherId.value, {
       displayName: updatedProfile.displayName,
-      photoURL: updatedProfile.photoURL,
+      avatarKey: nextAvatarKey,
+      photoURL: '',
+      avatarPromptSeen: true,
     })
 
     teacherName.value = updatedProfile.displayName || teacherName.value
-    teacherPhoto.value = updatedProfile.photoURL || imgProfile
+    teacherAvatarKey.value = nextAvatarKey
     profileSuccess.value = updatedProfile.photoUploadError
       ? 'Display name updated. Photo upload did not complete.'
       : 'Profile updated successfully.'
@@ -459,8 +519,7 @@ onMounted(async () => {
   const profile = await getUserById(user.uid)
   if (profile?.displayName) teacherName.value = profile.displayName
   else if (user.displayName) teacherName.value = user.displayName
-  if (profile?.photoURL) teacherPhoto.value = profile.photoURL
-  else if (user.photoURL) teacherPhoto.value = user.photoURL
+  teacherAvatarKey.value = sanitizeTeacherAvatarKey(profile?.avatarKey)
   profileName.value = teacherName.value
 
   await loadArchivedClasses()

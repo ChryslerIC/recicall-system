@@ -55,7 +55,9 @@ export const enrollStudentInClass = async (studentId, classData, studentProfile 
     displayName: studentProfile.displayName,
     gradeLevel: studentProfile.gradeLevel,
     photoURL: studentProfile.photoURL,
+    avatarKey: studentProfile.avatarKey,
     email: studentProfile.email,
+    studentNumber: studentProfile.studentNumber,
     joinedAt: serverTimestamp(),
   })
 
@@ -88,6 +90,33 @@ export const enrollStudentInClass = async (studentId, classData, studentProfile 
   )
 
   return { alreadyJoined: false }
+}
+
+export const syncStudentProfileAcrossClasses = async (studentId, studentProfile = {}) => {
+  const enrolledClassesSnapshot = await getDocs(studentClassesCollection(studentId))
+  const mirroredStudentPayload = removeUndefinedValues({
+    studentId,
+    displayName: studentProfile.displayName,
+    gradeLevel: studentProfile.gradeLevel,
+    photoURL: studentProfile.photoURL,
+    avatarKey: studentProfile.avatarKey,
+    email: studentProfile.email,
+    studentNumber: studentProfile.studentNumber,
+    updatedAt: serverTimestamp(),
+  })
+
+  await Promise.all(
+    enrolledClassesSnapshot.docs.map(async (classDoc) => {
+      const classData = classDoc.data()
+      if (!classData.teacherId) return
+
+      await setDoc(
+        teacherClassStudentRef(classData.teacherId, classDoc.id, studentId),
+        mirroredStudentPayload,
+        { merge: true },
+      )
+    }),
+  )
 }
 
 export const leaveStudentClass = async (studentId, classId) => {

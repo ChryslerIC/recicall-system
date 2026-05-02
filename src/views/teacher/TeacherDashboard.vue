@@ -9,10 +9,10 @@
             aria-label="Toggle sidebar"
             @click="isSidebarExpanded = !isSidebarExpanded"
           >
-            <img :src="imgRectangle13" alt="" class="block h-full w-full" />
+            <img :src="imgMenu" alt="" class="block h-full w-full" />
           </button>
 
-          <img :src="imgStar1" alt="" class="ml-4 mt-1 h-[40px] w-[44px] sm:ml-6 sm:mt-2 sm:h-[48px] sm:w-[53px] lg:ml-[31px] lg:mt-[15px] lg:h-[55px] lg:w-[61px]" />
+          <img :src="imgStar" alt="" class="ml-4 mt-1 h-[40px] w-[44px] object-contain sm:ml-6 sm:mt-2 sm:h-[48px] sm:w-[53px] lg:ml-[31px] lg:mt-[15px] lg:h-[55px] lg:w-[61px]" />
           <p class="ml-3 mt-1 text-[28px] leading-none font-black tracking-[-0.03em] sm:ml-4 sm:mt-2 sm:text-[34px] lg:ml-[22px] lg:mt-[18px] lg:text-[40px]">ReciCall</p>
         </div>
 
@@ -21,7 +21,7 @@
             <p class="text-[14px] leading-none font-bold sm:text-[16px] lg:text-[20px]">{{ teacherName }}</p>
             <p class="mt-[2px] text-[11px] leading-none font-medium sm:text-[13px] lg:mt-[4px] lg:text-[15px]">{{ teacherRole }}</p>
           </div>
-          <img :src="teacherPhoto" alt="" class="h-[52px] w-[52px] rounded-full object-cover sm:h-[62px] sm:w-[62px] lg:h-[78px] lg:w-[78px]" />
+          <img :src="teacherPhoto" alt="" class="h-[52px] w-[52px] rounded-full object-cover sm:h-[62px] sm:w-[62px] lg:h-[78px] lg:w-[78px]" @error="ensureProfileFallback" />
         </button>
       </header>
 
@@ -35,7 +35,7 @@
               class="flex h-[63px] w-full items-center rounded-[17px] bg-[rgba(46,130,239,0.25)]"
               :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center'"
             >
-              <img :src="imgRectangle14" alt="" class="h-[36px] w-[45px] shrink-0" />
+              <img :src="imgClasses" alt="" class="h-[36px] w-[45px] shrink-0" :style="activeNavIconStyle" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-semibold text-[#174ca0]">Classes</span>
             </div>
             <button
@@ -43,8 +43,9 @@
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
               :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
               aria-label="Predictive analytics"
+              @click="openPredictiveAnalytics"
             >
-              <img :src="imgRectangle15" alt="" class="h-[40px] w-[38px] shrink-0" />
+              <img :src="imgAnalytics" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[15px] font-medium text-[#3a3a3a]">Predictive Analytics</span>
             </button>
             <button
@@ -54,7 +55,7 @@
               aria-label="Archive"
               @click="router.push('/teacher/archive')"
             >
-              <img :src="imgRectangle16" alt="" class="h-[40px] w-[38px] shrink-0" />
+              <img :src="imgArchive" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Archive</span>
             </button>
           </div>
@@ -65,8 +66,9 @@
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
               :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
               aria-label="Settings"
+              @click="openProfileModal"
             >
-              <img :src="imgRectangle18" alt="" class="h-[40px] w-[38px] shrink-0" />
+              <img :src="imgSettings" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Settings</span>
             </button>
             <button
@@ -76,7 +78,7 @@
               aria-label="Logout"
               @click="handleLogout"
             >
-              <img :src="imgRectangle17" alt="" class="h-[40px] w-[38px] shrink-0" />
+              <img :src="imgLogout" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Logout</span>
             </button>
           </div>
@@ -87,18 +89,23 @@
             <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
               <div>
                 <h1 class="text-[32px] leading-none font-bold sm:text-[40px]">My Classes</h1>
-                <p class="mt-[8px] text-[18px] leading-none font-medium sm:text-[20px]">Lorem ipsum lorem ipsum</p>
+                <p class="mt-[8px] text-[18px] leading-tight font-medium sm:text-[20px]">{{ dashboardSubtitle }}</p>
               </div>
 
               <button
-                type="button"
-                class="mt-[2px] flex h-[72px] w-full max-w-[298px] items-center rounded-[33.5px] bg-[#1188f8] pl-[24px] pr-[18px] sm:h-[78px] sm:pl-[32px] sm:pr-[21px]"
-                @click="openModal"
-              >
-                <img :src="imgRectangle39" alt="" class="h-[42px] w-[46px] sm:h-[48px] sm:w-[53px]" />
-                <span class="ml-[7px] text-[20px] font-semibold text-white sm:text-[24px]">Add New Class</span>
-              </button>
-            </div>
+              type="button"
+              class="mt-[2px] flex h-[72px] w-full max-w-[298px] items-center rounded-[33.5px] bg-[#1188f8] pl-[24px] pr-[18px] sm:h-[78px] sm:pl-[32px] sm:pr-[21px]"
+              @click="openModal"
+            >
+              <span class="grid h-[42px] w-[46px] place-items-center rounded-full bg-white sm:h-[48px] sm:w-[53px]">
+                <svg viewBox="0 0 53 48" class="h-[24px] w-[24px] sm:h-[28px] sm:w-[28px]" fill="none" aria-hidden="true">
+                  <path d="M26.5 10V38" stroke="#1188F8" stroke-width="5" stroke-linecap="round" />
+                  <path d="M12.5 24H40.5" stroke="#1188F8" stroke-width="5" stroke-linecap="round" />
+                </svg>
+              </span>
+              <span class="ml-[7px] text-[20px] font-semibold text-white sm:text-[24px]">Add New Class</span>
+            </button>
+          </div>
 
             <div v-if="isLoading" class="mt-10 text-[18px] font-medium text-[#5d5d5d]">Loading classes...</div>
 
@@ -121,20 +128,25 @@
                   <div class="absolute inset-x-0 bottom-0 h-[20px]" :style="{ backgroundImage: classItem.gradient }" />
 
                   <template v-if="classItem.gradientId === 'blue'">
-                    <img :src="imgPolygon4" alt="" class="absolute right-[28px] top-[67px] h-[91px] w-[34px]" />
-                    <img :src="imgPolygon5" alt="" class="absolute right-[15px] top-[121px] h-[61px] w-[20px]" />
-                    <img :src="imgPolygon6" alt="" class="absolute right-[15px] top-[138px] h-[46px] w-[6px]" />
-                    <img :src="imgPolygon7" alt="" class="absolute right-[5px] top-[72px] h-[81px] w-[15px]" />
+                    <div class="absolute right-[28px] top-[67px] h-[91px] w-[34px] bg-[rgba(19,67,145,0.72)] [clip-path:polygon(100%_0,0_82%,100%_100%)]" />
+                    <div class="absolute right-[15px] top-[121px] h-[61px] w-[20px] bg-[rgba(22,92,182,0.8)] [clip-path:polygon(100%_0,0_66%,100%_100%)]" />
+                    <div class="absolute right-[15px] top-[138px] h-[46px] w-[6px] bg-[rgba(13,73,165,0.85)] [clip-path:polygon(100%_0,0_100%,100%_100%)]" />
+                    <div class="absolute right-[5px] top-[72px] h-[81px] w-[15px] bg-[rgba(18,86,173,0.78)] [clip-path:polygon(100%_0,0_100%,100%_84%)]" />
                   </template>
 
                   <template v-else-if="classItem.gradientId === 'green'">
-                    <img :src="imgVector1" alt="" class="absolute right-[-1px] top-[80px] h-[71px] w-[112px]" />
-                    <img :src="imgVector2" alt="" class="absolute right-[1px] top-[114px] h-[38px] w-[118px]" />
-                    <img :src="imgVector3" alt="" class="absolute right-[59px] top-[117px] h-[35px] w-[71px]" />
+                    <div class="absolute right-[0px] top-[80px] h-[71px] w-[112px] bg-[rgba(33,170,41,0.48)] [clip-path:polygon(100%_4%,100%_100%,0_100%,26%_64%,39%_67%,51%_47%,62%_49%,79%_17%,89%_22%)]" />
+                    <div class="absolute right-[1px] top-[116px] h-[38px] w-[118px] bg-[rgba(44,192,55,0.58)] [clip-path:polygon(100%_8%,100%_100%,0_100%,18%_42%,30%_40%,52%_68%,76%_24%,89%_35%)]" />
+                    <div class="absolute right-[30px] top-[119px] h-[35px] w-[71px] bg-[rgba(35,155,44,0.65)] [clip-path:polygon(100%_0,100%_100%,0_100%,28%_28%,44%_40%,63%_0)]" />
                   </template>
 
                   <template v-else>
-                    <img :src="imgGroup9" alt="" class="absolute right-[-30px] top-[66px] h-[133px] w-[160px]" />
+                    <div class="absolute right-[4px] top-[86px] h-[88px] w-[96px]">
+                      <div class="absolute right-[26px] top-[0] h-[46px] w-[46px] rounded-full bg-[rgba(255,243,97,0.22)]" />
+                      <div class="absolute right-[66px] top-[18px] h-[14px] w-[14px] rounded-full bg-[rgba(255,243,97,0.28)]" />
+                      <div class="absolute right-[58px] top-[39px] h-[8px] w-[8px] rounded-full bg-[rgba(255,243,97,0.28)]" />
+                      <div class="absolute right-[0px] top-[40px] h-[50px] w-[80px] bg-[rgba(242,214,34,0.34)] [clip-path:polygon(100%_0,100%_100%,0_100%,20%_44%)]" />
+                    </div>
                   </template>
 
                   <button
@@ -143,7 +155,7 @@
                     :aria-label="`Open options for ${classItem.classLabel}`"
                     @click.stop="toggleOptions(classItem.id)"
                   >
-                    <img :src="classItem.ellipsisAsset" alt="" class="h-[39px] w-[35px]" />
+                    <img :src="imgEllipsisWhite" alt="" class="h-[39px] w-[35px]" />
                   </button>
 
                   <div
@@ -181,7 +193,7 @@
                   <p class="relative z-10 mt-[10px] pl-[16px] text-[24px] leading-none font-medium text-white">
                     {{ classItem.gradeLevel }} | {{ classItem.subject }}
                   </p>
-                  <p class="relative z-10 mt-[24px] pl-[15px] text-[18px] leading-none font-medium text-white">{{ classItem.scheduleLabel }} • {{ classItem.time }}</p>
+                  <p class="relative z-10 mt-[24px] pl-[15px] text-[18px] leading-none font-medium text-white">{{ classItem.scheduleLabel }} &bull; {{ classItem.time }}</p>
                 </div>
 
                 <div class="mt-[10px] flex gap-[13px] px-[10px]">
@@ -205,22 +217,48 @@
       <div class="px-4 pb-6 sm:px-6 lg:hidden">
         <div class="flex items-center justify-center gap-8 rounded-[20px] border border-[#d9e8fb] bg-white px-4 py-3 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
           <button type="button" class="grid h-10 w-10 place-items-center rounded-[12px] bg-[rgba(46,130,239,0.25)]" aria-label="Dashboard">
-            <img :src="imgRectangle14" alt="" class="h-[24px] w-[30px]" />
+            <img :src="imgClasses" alt="" class="h-[24px] w-[30px]" :style="activeNavIconStyle" />
           </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Predictive analytics">
-            <img :src="imgRectangle15" alt="" class="h-[28px] w-[26px]" />
+          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Predictive analytics" @click="openPredictiveAnalytics">
+            <img :src="imgAnalytics" alt="" class="h-[28px] w-[26px]" :style="inactiveNavIconStyle" />
           </button>
           <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Archive" @click="router.push('/teacher/archive')">
-            <img :src="imgRectangle16" alt="" class="h-[28px] w-[26px]" />
+            <img :src="imgArchive" alt="" class="h-[28px] w-[26px]" :style="inactiveNavIconStyle" />
           </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Settings">
-            <img :src="imgRectangle18" alt="" class="h-[28px] w-[26px]" />
+          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Settings" @click="openProfileModal">
+            <img :src="imgSettings" alt="" class="h-[28px] w-[26px]" :style="inactiveNavIconStyle" />
           </button>
           <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Logout" @click="handleLogout">
-            <img :src="imgRectangle17" alt="" class="h-[28px] w-[26px]" />
+            <img :src="imgLogout" alt="" class="h-[28px] w-[26px]" :style="inactiveNavIconStyle" />
           </button>
         </div>
       </div>
+
+      <AnalyticsClassPickerModal
+        :open="isAnalyticsClassPickerOpen"
+        :classes="classes"
+        :loading="isLoading"
+        empty-message="No active classes yet. Add a class first before opening analytics."
+        @close="closeAnalyticsClassPicker"
+        @select="handleAnalyticsClassSelect"
+      />
+
+      <AvatarSuggestionModal
+        :open="isAvatarPromptOpen"
+        title="Pick Your Teacher Avatar"
+        description="Choose the avatar you want students to see with your classes and classroom profile."
+        preview-label="Teacher avatar preview"
+        preview-hint="You can change this later anytime from Settings."
+        :preview-src="promptAvatarPreview"
+        :options="teacherAvatarOptions"
+        :selected-key="promptAvatarKey"
+        :error="avatarPromptError"
+        :saving="isSavingAvatarPrompt"
+        @close="dismissAvatarPrompt"
+        @later="dismissAvatarPrompt"
+        @save="saveAvatarPrompt"
+        @update:selected-key="promptAvatarKey = $event"
+      />
 
       <transition name="fade">
         <div
@@ -232,18 +270,14 @@
             <div class="flex items-start justify-between border-b border-[#d7d7d7] pb-4">
               <div>
                 <h2 class="text-[40px] leading-none font-semibold">Edit Profile</h2>
-                <p class="mt-2 text-[20px] font-medium">Update your display name and profile picture.</p>
+                <p class="mt-2 text-[20px] font-medium">Update your display name and choose a preset avatar.</p>
               </div>
               <button type="button" class="text-[34px] leading-none" aria-label="Close profile modal" @click="closeProfileModal">x</button>
             </div>
 
             <form class="space-y-4 pt-5" @submit.prevent="saveProfileChanges">
               <div class="flex items-center gap-4">
-                <img :src="profilePreviewUrl || teacherPhoto" alt="" class="h-[88px] w-[88px] rounded-full border border-[#d7d7d7] object-cover" />
-                <label class="inline-flex h-[48px] cursor-pointer items-center rounded-[24px] bg-[#1188f8] px-5 text-[16px] font-semibold text-white">
-                  Upload Photo
-                  <input type="file" accept="image/*" class="hidden" @change="handleProfileImageChange" />
-                </label>
+                <img :src="profilePreviewSrc" alt="" class="h-[88px] w-[88px] rounded-full border border-[#d7d7d7] object-cover" />
               </div>
 
               <label class="block">
@@ -255,6 +289,27 @@
                   class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
                 />
               </label>
+
+              <div>
+                <div class="flex items-center justify-between gap-4">
+                  <p class="text-[16px] font-semibold">Preset Avatars</p>
+                  <p class="text-[13px] text-[#666]">Choose one avatar to use across the app.</p>
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <button
+                    v-for="avatar in teacherAvatarOptions"
+                    :key="avatar.key"
+                    type="button"
+                    class="rounded-[18px] border px-3 py-3 text-center transition"
+                    :class="profileAvatarKey === avatar.key ? 'border-[#1188f8] bg-[#eef6ff] shadow-[0_0_0_2px_rgba(17,136,248,0.12)]' : 'border-[#d7d7d7] bg-[#fafafa] hover:border-[#1188f8]'"
+                    :disabled="isSavingProfile"
+                    @click="selectTeacherAvatarPreset(avatar.key)"
+                  >
+                    <img :src="avatar.src" :alt="avatar.label" class="mx-auto h-[64px] w-[64px] rounded-full object-cover" />
+                    <p class="mt-3 text-[13px] font-semibold text-black">{{ avatar.label }}</p>
+                  </button>
+                </div>
+              </div>
 
               <p v-if="profileError" class="text-sm font-medium text-red-600">{{ profileError }}</p>
               <p v-if="profileSuccess" class="text-sm font-medium text-green-600">{{ profileSuccess }}</p>
@@ -275,28 +330,31 @@
       <transition name="fade">
         <div
           v-if="isModalOpen"
-          class="fixed inset-0 z-20 flex items-center justify-center bg-[rgba(224,224,224,0.44)] px-4 py-8 backdrop-blur-[1px]"
+          class="fixed inset-0 z-20 flex items-start justify-center overflow-y-auto bg-[rgba(224,224,224,0.44)] px-3 py-3 backdrop-blur-[1px] sm:px-4 sm:py-8 sm:items-center"
           @click.self="closeModal"
         >
-          <div class="w-full max-w-[551px] rounded-[22px] bg-white px-6 py-5 shadow-[0_4px_39.3px_2px_rgba(0,0,0,0.2)]">
-            <div class="flex items-start justify-between border-b border-[#d7d7d7] pb-4">
-              <div>
-                <h2 class="text-[40px] leading-none font-semibold">Class Details</h2>
-                <p class="mt-2 text-[20px] font-medium">
+          <div class="w-full max-w-[551px] max-h-[calc(100vh-1.5rem)] overflow-y-auto rounded-[22px] bg-white px-4 py-4 shadow-[0_4px_39.3px_2px_rgba(0,0,0,0.2)] sm:max-h-[calc(100vh-4rem)] sm:px-6 sm:py-5">
+            <div class="flex items-start justify-between gap-3 border-b border-[#d7d7d7] pb-4">
+              <div class="min-w-0">
+                <h2 class="text-[28px] leading-none font-semibold sm:text-[40px]">Class Details</h2>
+                <p class="mt-2 text-[16px] font-medium sm:text-[20px]">
                   {{ editingClassId ? 'Update the class info below' : 'To start new class, Enter info below' }}
                 </p>
               </div>
-              <button type="button" class="text-[34px] leading-none" aria-label="Close modal" @click="closeModal">x</button>
+              <button type="button" class="shrink-0 text-[28px] leading-none sm:text-[34px]" aria-label="Close modal" @click="closeModal">x</button>
             </div>
 
-            <form class="space-y-3 pt-4" @submit.prevent="handleSaveClass">
+            <form class="space-y-4 pt-4" @submit.prevent="handleSaveClass">
               <label class="block">
                 <span class="mb-1 block text-[16px] font-semibold">Class Name</span>
                 <input
                   v-model.trim="newClass.classLabel"
                   type="text"
-                  placeholder="Enter Class"
-                  class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
+                  name="class-name"
+                  placeholder="Enter class name"
+                  :class="classDetailInputClass"
+                  autocomplete="off"
+                  required
                 />
               </label>
 
@@ -305,8 +363,11 @@
                 <input
                   v-model.trim="newClass.subject"
                   type="text"
-                  placeholder="Enter Subject"
-                  class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
+                  name="subject-name"
+                  placeholder="Enter subject name"
+                  :class="classDetailInputClass"
+                  autocomplete="off"
+                  required
                 />
               </label>
 
@@ -315,36 +376,87 @@
                 <input
                   v-model.trim="newClass.gradeLevel"
                   type="text"
-                  placeholder="Enter Grade Level"
-                  class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
+                  name="grade-level"
+                  placeholder="Enter grade level"
+                  :class="classDetailInputClass"
+                  autocomplete="off"
+                  required
                 />
               </label>
 
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label class="block">
-                  <span class="mb-1 block text-[16px] font-semibold">Time</span>
-                  <input
-                    v-model.trim="newClass.time"
-                    type="text"
-                    placeholder="Enter Time"
-                    class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
-                  />
+                  <span class="mb-1 block text-[16px] font-semibold">Start Time</span>
+                  <div class="relative">
+                    <select
+                      v-model="newClass.startTime"
+                      name="start-time"
+                      :class="classDetailSelectClass"
+                      required
+                      @change="handleStartTimeChange"
+                    >
+                      <option value="" disabled>Select start time</option>
+                      <option v-for="option in timeOptions" :key="`start-${option.value}`" :value="option.value">
+                        {{ option.label }}
+                      </option>
+                    </select>
+                    <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-[#4b4b4b]">
+                      <svg viewBox="0 0 20 20" class="h-4 w-4 fill-current" aria-hidden="true">
+                        <path d="M5.5 7.5 10 12l4.5-4.5" />
+                      </svg>
+                    </span>
+                  </div>
                 </label>
 
                 <label class="block">
-                  <span class="mb-1 block text-[16px] font-semibold">Schedule</span>
-                  <input
-                    v-model.trim="newClass.schedule"
-                    type="text"
-                    placeholder="Enter Schedule"
-                    class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
-                  />
+                  <span class="mb-1 block text-[16px] font-semibold">End Time</span>
+                  <div class="relative">
+                    <select
+                      v-model="newClass.endTime"
+                      name="end-time"
+                      :class="classDetailSelectClass"
+                      required
+                      :disabled="!newClass.startTime"
+                    >
+                      <option value="" disabled>{{ newClass.startTime ? 'Select end time' : 'Choose start time first' }}</option>
+                      <option v-for="option in availableEndTimeOptions" :key="`end-${option.value}`" :value="option.value">
+                        {{ option.label }}
+                      </option>
+                    </select>
+                    <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-[#4b4b4b]">
+                      <svg viewBox="0 0 20 20" class="h-4 w-4 fill-current" aria-hidden="true">
+                        <path d="M5.5 7.5 10 12l4.5-4.5" />
+                      </svg>
+                    </span>
+                  </div>
                 </label>
               </div>
 
               <div>
+                <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                  <span class="block text-[16px] font-semibold">Schedule Days</span>
+                  <span class="text-[13px] font-medium text-[#666]">
+                    {{ scheduleSummaryLabel || 'Select at least one day' }}
+                  </span>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <button
+                    v-for="day in dayOptions"
+                    :key="day"
+                    type="button"
+                    class="min-w-[94px] rounded-full border px-4 py-2 text-[14px] font-semibold transition"
+                    :class="newClass.scheduleDays.includes(day) ? 'border-[#1188f8] bg-[#1188f8] text-white' : 'border-[#cfcfcf] bg-white text-[#333] hover:border-[#1188f8]'"
+                    :aria-pressed="newClass.scheduleDays.includes(day)"
+                    @click="toggleScheduleDay(day)"
+                  >
+                    {{ day }}
+                  </button>
+                </div>
+              </div>
+
+              <div>
                 <span class="mb-3 block text-[16px] font-semibold">Background</span>
-                <div class="flex gap-5">
+                <div class="flex flex-wrap gap-3 sm:gap-5">
                   <button
                     v-for="option in gradientOptions"
                     :key="option.id"
@@ -359,11 +471,15 @@
 
               <p v-if="formError" class="text-sm font-medium text-red-600">{{ formError }}</p>
 
-              <div class="flex justify-end gap-4 pt-2">
-                <button type="button" class="h-[57px] w-[151px] rounded-[33.5px] bg-[#c5c5c5] text-[20px] font-bold" @click="closeModal">
+              <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end sm:gap-4">
+                <button type="button" class="h-[57px] w-full rounded-[33.5px] bg-[#c5c5c5] text-[20px] font-bold sm:w-[151px]" @click="closeModal">
                   Cancel
                 </button>
-                <button type="submit" class="h-[57px] w-[151px] rounded-[33.5px] bg-[#1188f8] text-[20px] font-bold text-white">
+                <button
+                  type="submit"
+                  class="h-[57px] w-full rounded-[33.5px] bg-[#1188f8] text-[20px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-[151px]"
+                  :disabled="isClassFormIncomplete"
+                >
                   {{ editingClassId ? 'Save' : 'Create' }}
                 </button>
               </div>
@@ -376,8 +492,10 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import AvatarSuggestionModal from '../../components/profile/AvatarSuggestionModal.vue'
+import AnalyticsClassPickerModal from '../../components/teacher/AnalyticsClassPickerModal.vue'
 import { auth } from '../../config/firebase'
 import { logoutUser, updateCurrentUserAccount } from '../../services/authService'
 import {
@@ -387,26 +505,17 @@ import {
   updateTeacherClass,
 } from '../../services/teacherService'
 import { getUserById, upsertUserProfile } from '../../services/userService'
-
-const imgRectangle15 = 'https://www.figma.com/api/mcp/asset/df7b5442-a853-4bd6-bec2-b0a6ba5fb15b'
-const imgRectangle16 = 'https://www.figma.com/api/mcp/asset/522713bb-6825-496b-ab34-8e0eabdc4c1e'
-const imgRectangle17 = 'https://www.figma.com/api/mcp/asset/baa30f51-4cc3-4864-b3aa-5408485c374e'
-const imgRectangle18 = 'https://www.figma.com/api/mcp/asset/2b1b1c20-903a-4546-a524-9824522a11ad'
-const imgProfile = 'https://www.figma.com/api/mcp/asset/dfa0d238-70e4-44c2-84ee-3602f12c86e8'
-const imgRectangle13 = 'https://www.figma.com/api/mcp/asset/222edfa1-d9d2-4ebf-8ce7-30458f9c9917'
-const imgRectangle14 = 'https://www.figma.com/api/mcp/asset/92b4af93-7a63-4ee9-905b-af2e55eefccd'
-const imgRectangle39 = 'https://www.figma.com/api/mcp/asset/4fe4b9af-60f8-4513-957b-679facc7dc51'
-const imgRectangle25 = 'https://www.figma.com/api/mcp/asset/895af646-bc7f-425a-8c59-8482fe1aefad'
-const imgRectangle26 = 'https://www.figma.com/api/mcp/asset/56f13170-2366-4af1-b31d-9d54661462bd'
-const imgStar1 = 'https://www.figma.com/api/mcp/asset/048facac-2585-4879-9736-a9225fbd7404'
-const imgPolygon4 = 'https://www.figma.com/api/mcp/asset/19c7b1ca-b4bb-4061-b21b-07239b5ea14e'
-const imgPolygon5 = 'https://www.figma.com/api/mcp/asset/dc5f99b5-f878-4528-a61e-4a07c7c0f7ec'
-const imgPolygon6 = 'https://www.figma.com/api/mcp/asset/a2b6e496-d96c-4e62-9d8b-a48447a1cf52'
-const imgPolygon7 = 'https://www.figma.com/api/mcp/asset/3e8b338c-f9b2-420c-afaf-603b456d1afe'
-const imgVector1 = 'https://www.figma.com/api/mcp/asset/dee16b01-b5f8-4529-b523-e84c3cc100fa'
-const imgVector2 = 'https://www.figma.com/api/mcp/asset/d88a3308-7632-4b61-947d-d6fab4ee370d'
-const imgVector3 = 'https://www.figma.com/api/mcp/asset/5a866683-4a62-4558-be89-3e05ee8958d4'
-const imgGroup9 = 'https://www.figma.com/api/mcp/asset/3e5b546e-9946-4ce2-8abe-39392c4ec512'
+import imgAnalytics from '../../assets/icons/recicall-analytics.svg'
+import imgArchive from '../../assets/icons/recicall-archive.svg'
+import imgClasses from '../../assets/icons/recicall-classes.svg'
+import imgEllipsisWhite from '../../assets/icons/recicall-ellipsis-white.svg'
+import imgLogout from '../../assets/icons/recicall-logout.svg'
+import imgMenu from '../../assets/icons/recicall-menu.svg'
+import imgProfile from '../../assets/icons/recicall-profile.svg'
+import imgSettings from '../../assets/icons/recicall-settings.svg'
+import imgStar from '../../assets/icons/recicall-logo.png'
+import { activeNavIconStyle, inactiveNavIconStyle } from '../../utils/navIconStyles'
+import { defaultTeacherAvatarKey, resolveTeacherAvatar, sanitizeTeacherAvatarKey, teacherAvatarOptions } from '../../utils/teacherAvatarOptions'
 
 const router = useRouter()
 
@@ -427,6 +536,27 @@ const gradientOptions = [
     engagement: 'Moderate',
   },
 ]
+
+const dayOptions = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+const buildTimeOptions = () => {
+  const options = []
+
+  for (let minutes = 6 * 60; minutes <= 20 * 60; minutes += 30) {
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    const value = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`
+    const suffix = hours >= 12 ? 'PM' : 'AM'
+    const normalizedHour = hours % 12 || 12
+    const label = `${normalizedHour}:${String(mins).padStart(2, '0')} ${suffix}`
+
+    options.push({ value, label })
+  }
+
+  return options
+}
+
+const timeOptions = buildTimeOptions()
 
 const defaultClasses = [
   {
@@ -466,35 +596,149 @@ const defaultClasses = [
 
 const teacherName = ref('Maam. Anderson')
 const teacherRole = ref('High School Teacher')
-const teacherPhoto = ref(imgProfile)
+const teacherAvatarKey = ref(defaultTeacherAvatarKey)
 const teacherId = ref('')
 const isLoading = ref(true)
 const isLoggingOut = ref(false)
 const isSidebarExpanded = ref(false)
 const isModalOpen = ref(false)
+const isAnalyticsClassPickerOpen = ref(false)
+const isAvatarPromptOpen = ref(false)
 const isProfileModalOpen = ref(false)
+const isSavingAvatarPrompt = ref(false)
 const isSavingProfile = ref(false)
 const formError = ref('')
+const avatarPromptError = ref('')
 const profileError = ref('')
 const profileSuccess = ref('')
 const openOptionsId = ref(null)
 const editingClassId = ref(null)
 const copiedJoinCode = ref('')
+const promptAvatarKey = ref(defaultTeacherAvatarKey)
 const profileName = ref('')
-const profilePhotoFile = ref(null)
-const profilePreviewUrl = ref('')
+const profileAvatarKey = ref(defaultTeacherAvatarKey)
 const classes = ref([])
+const currentDateTime = ref(new Date())
+let dashboardClockTimer = null
+const classDetailInputClass = 'h-14 w-full rounded-[18px] border border-[#1b1b1b] bg-white px-4 text-[16px] font-medium text-black outline-none transition focus:border-[#1188f8] focus:ring-2 focus:ring-[#b7dcff] placeholder:text-[#8a8a8a]'
+const classDetailSelectClass = `${classDetailInputClass} appearance-none pr-11`
+
+const dashboardGreeting = computed(() => {
+  const currentHour = currentDateTime.value.getHours()
+
+  if (currentHour < 12) return 'Good morning'
+  if (currentHour < 18) return 'Good afternoon'
+  return 'Good evening'
+})
+
+const liveDateTimeLabel = computed(() =>
+  currentDateTime.value.toLocaleString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
+  }),
+)
+
+const dashboardSubtitle = computed(() => `${dashboardGreeting.value} | ${liveDateTimeLabel.value}`)
+const teacherPhoto = computed(() =>
+  resolveTeacherAvatar(teacherAvatarKey.value, ''),
+)
+const promptAvatarPreview = computed(() =>
+  resolveTeacherAvatar(promptAvatarKey.value, ''),
+)
+const profilePreviewSrc = computed(() =>
+  resolveTeacherAvatar(profileAvatarKey.value || defaultTeacherAvatarKey, ''),
+)
+const isClassFormIncomplete = computed(
+  () =>
+    !newClass.classLabel.trim() ||
+    !newClass.subject.trim() ||
+    !newClass.gradeLevel.trim() ||
+    !newClass.startTime ||
+    !newClass.endTime ||
+    !newClass.scheduleDays.length,
+)
+
+const ensureProfileFallback = (event) => {
+  event.target.src = imgProfile
+}
 
 const createInitialClassState = () => ({
   classLabel: '',
   subject: '',
   gradeLevel: '',
-  time: '',
-  schedule: '',
+  startTime: '',
+  endTime: '',
+  scheduleDays: [],
   gradientId: 'blue',
 })
 
 const newClass = reactive(createInitialClassState())
+
+const availableEndTimeOptions = computed(() =>
+  timeOptions.filter((option) => !newClass.startTime || option.value > newClass.startTime),
+)
+
+const scheduleSummaryLabel = computed(() => formatScheduleLabel(newClass.scheduleDays))
+
+const formatScheduleLabel = (days = []) =>
+  dayOptions.filter((day) => days.includes(day)).join(' / ')
+
+const parseScheduleDaysFromLabel = (value = '') =>
+  dayOptions.filter((day) => new RegExp(`\\b${day}\\b`, 'i').test(value))
+
+const formatTimeLabel = (value = '') =>
+  timeOptions.find((option) => option.value === value)?.label || ''
+
+const buildTimeRangeLabel = (startTime = '', endTime = '') => {
+  const startLabel = formatTimeLabel(startTime)
+  const endLabel = formatTimeLabel(endTime)
+
+  return startLabel && endLabel ? `${startLabel} - ${endLabel}` : ''
+}
+
+const parseTimeValue = (value = '') => {
+  const match = value.trim().match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i)
+  if (!match) return ''
+
+  const hours = Number(match[1])
+  const minutes = Number(match[2] || '0')
+  const meridiem = match[3].toUpperCase()
+
+  if (!hours || hours > 12 || minutes > 59) return ''
+
+  let normalizedHours = hours % 12
+  if (meridiem === 'PM') normalizedHours += 12
+
+  return `${String(normalizedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+}
+
+const parseTimeRangeLabel = (value = '') => {
+  const [startLabel = '', endLabel = ''] = value.split('-').map((item) => item.trim())
+  return {
+    startTime: parseTimeValue(startLabel),
+    endTime: parseTimeValue(endLabel),
+  }
+}
+
+const handleStartTimeChange = () => {
+  if (newClass.endTime && newClass.endTime <= newClass.startTime) {
+    newClass.endTime = ''
+  }
+}
+
+const toggleScheduleDay = (day) => {
+  if (newClass.scheduleDays.includes(day)) {
+    newClass.scheduleDays = newClass.scheduleDays.filter((item) => item !== day)
+    return
+  }
+
+  newClass.scheduleDays = dayOptions.filter((item) => [...newClass.scheduleDays, day].includes(item))
+}
 
 const mapClassToCard = (classItem) => {
   const isBlue = classItem.gradientId === 'blue'
@@ -505,7 +749,6 @@ const mapClassToCard = (classItem) => {
     students: classItem.students ?? 35,
     engagement: classItem.engagement || gradientOption.engagement,
     gradient: gradientOption.gradient,
-    ellipsisAsset: isBlue ? imgRectangle25 : imgRectangle26,
     width: isBlue ? 396.347 : 400,
     statsWidth: isBlue ? 140.482 : 142.391,
     engagementWidth: isBlue ? 139.41 : 141.304,
@@ -528,6 +771,20 @@ const classCardWidth = (classItem) => {
   if (typeof window !== 'undefined' && window.innerWidth < 768) return '100%'
   if (typeof window !== 'undefined' && window.innerWidth < 1280) return '100%'
   return `${classItem.width}px`
+}
+
+const startDashboardClock = () => {
+  currentDateTime.value = new Date()
+  dashboardClockTimer = window.setInterval(() => {
+    currentDateTime.value = new Date()
+  }, 1000)
+}
+
+const stopDashboardClock = () => {
+  if (!dashboardClockTimer) return
+
+  window.clearInterval(dashboardClockTimer)
+  dashboardClockTimer = null
 }
 
 const seedDefaultClasses = async () => {
@@ -563,8 +820,7 @@ const openProfileModal = () => {
   profileError.value = ''
   profileSuccess.value = ''
   profileName.value = teacherName.value
-  profilePhotoFile.value = null
-  profilePreviewUrl.value = ''
+  profileAvatarKey.value = teacherAvatarKey.value || defaultTeacherAvatarKey
   isProfileModalOpen.value = true
 }
 
@@ -572,8 +828,6 @@ const closeProfileModal = () => {
   isProfileModalOpen.value = false
   profileError.value = ''
   profileSuccess.value = ''
-  profilePhotoFile.value = null
-  profilePreviewUrl.value = ''
 }
 
 const closeModal = () => {
@@ -634,12 +888,72 @@ const openClassroom = (classId) => {
   router.push(`/teacher/class/${classId}`)
 }
 
-const handleProfileImageChange = (event) => {
-  const [file] = event.target.files || []
-  if (!file) return
+const openPredictiveAnalytics = () => {
+  isAnalyticsClassPickerOpen.value = true
+}
 
-  profilePhotoFile.value = file
-  profilePreviewUrl.value = URL.createObjectURL(file)
+const closeAnalyticsClassPicker = () => {
+  isAnalyticsClassPickerOpen.value = false
+}
+
+const handleAnalyticsClassSelect = (classItem) => {
+  if (!classItem?.id) return
+
+  closeAnalyticsClassPicker()
+  router.push({
+    path: `/teacher/class/${classItem.id}`,
+    query: { tab: 'analytics' },
+  })
+}
+
+const closeAvatarPrompt = () => {
+  isAvatarPromptOpen.value = false
+  avatarPromptError.value = ''
+}
+
+const dismissAvatarPrompt = async () => {
+  if (isSavingAvatarPrompt.value || !teacherId.value) return
+
+  isSavingAvatarPrompt.value = true
+  avatarPromptError.value = ''
+
+  try {
+    await upsertUserProfile(teacherId.value, { avatarPromptSeen: true })
+    closeAvatarPrompt()
+  } catch (error) {
+    console.error(error)
+    avatarPromptError.value = 'Unable to dismiss the avatar suggestion right now.'
+  } finally {
+    isSavingAvatarPrompt.value = false
+  }
+}
+
+const saveAvatarPrompt = async () => {
+  if (isSavingAvatarPrompt.value || !teacherId.value) return
+
+  isSavingAvatarPrompt.value = true
+  avatarPromptError.value = ''
+
+  try {
+    const nextAvatarKey = sanitizeTeacherAvatarKey(promptAvatarKey.value)
+    await upsertUserProfile(teacherId.value, {
+      avatarKey: nextAvatarKey,
+      photoURL: '',
+      avatarPromptSeen: true,
+    })
+
+    teacherAvatarKey.value = nextAvatarKey
+    closeAvatarPrompt()
+  } catch (error) {
+    console.error(error)
+    avatarPromptError.value = 'Unable to save your avatar right now.'
+  } finally {
+    isSavingAvatarPrompt.value = false
+  }
+}
+
+const selectTeacherAvatarPreset = (avatarKey) => {
+  profileAvatarKey.value = avatarKey
 }
 
 const saveProfileChanges = async () => {
@@ -656,16 +970,19 @@ const saveProfileChanges = async () => {
   try {
     const updatedProfile = await updateCurrentUserAccount({
       displayName: profileName.value.trim(),
-      photoFile: profilePhotoFile.value,
+      photoURL: '',
     })
 
+    const nextAvatarKey = sanitizeTeacherAvatarKey(profileAvatarKey.value)
     await upsertUserProfile(teacherId.value, {
       displayName: updatedProfile.displayName,
-      photoURL: updatedProfile.photoURL,
+      avatarKey: nextAvatarKey,
+      photoURL: '',
+      avatarPromptSeen: true,
     })
 
     teacherName.value = updatedProfile.displayName || teacherName.value
-    teacherPhoto.value = updatedProfile.photoURL || imgProfile
+    teacherAvatarKey.value = nextAvatarKey
     profileSuccess.value = updatedProfile.photoUploadError
       ? 'Display name updated. Photo upload did not complete.'
       : 'Profile updated successfully.'
@@ -685,11 +1002,13 @@ const saveProfileChanges = async () => {
 const startEditingClass = (classItem) => {
   openOptionsId.value = null
   editingClassId.value = classItem.id
+  const parsedTimeRange = parseTimeRangeLabel(classItem.time)
   newClass.classLabel = classItem.classLabel
   newClass.subject = classItem.subject
   newClass.gradeLevel = classItem.gradeLevel
-  newClass.time = classItem.time
-  newClass.schedule = classItem.scheduleLabel
+  newClass.startTime = parsedTimeRange.startTime
+  newClass.endTime = parsedTimeRange.endTime
+  newClass.scheduleDays = parseScheduleDaysFromLabel(classItem.scheduleLabel)
   newClass.gradientId = classItem.gradientId || 'blue'
   isModalOpen.value = true
 }
@@ -703,11 +1022,13 @@ const archiveClass = async (classId) => {
 const handleSaveClass = async () => {
   formError.value = ''
 
-  if (!newClass.classLabel || !newClass.subject || !newClass.gradeLevel || !newClass.time) {
-    formError.value = 'Complete the required class details first.'
+  if (isClassFormIncomplete.value) {
+    formError.value = 'Complete all required class details first.'
     return
   }
 
+  const scheduleLabel = formatScheduleLabel(newClass.scheduleDays)
+  const timeLabel = buildTimeRangeLabel(newClass.startTime, newClass.endTime)
   const option = gradientOptions.find((item) => item.id === newClass.gradientId) || gradientOptions[0]
 
   if (editingClassId.value) {
@@ -715,8 +1036,8 @@ const handleSaveClass = async () => {
       classLabel: newClass.classLabel,
       gradeLevel: newClass.gradeLevel,
       subject: newClass.subject,
-      scheduleLabel: newClass.schedule || 'Monday / Tuesday',
-      time: newClass.time,
+      scheduleLabel,
+      time: timeLabel,
       engagement: option.engagement,
       gradientId: option.id,
     })
@@ -729,8 +1050,8 @@ const handleSaveClass = async () => {
     classLabel: newClass.classLabel,
     gradeLevel: newClass.gradeLevel,
     subject: newClass.subject,
-    scheduleLabel: newClass.schedule || 'Monday / Tuesday',
-    time: newClass.time,
+    scheduleLabel,
+    time: timeLabel,
     students: 35,
     engagement: option.engagement,
     gradientId: option.id,
@@ -755,6 +1076,8 @@ const handleLogout = async () => {
 }
 
 onMounted(async () => {
+  startDashboardClock()
+
   const user = auth.currentUser
   if (!user) return
 
@@ -762,11 +1085,18 @@ onMounted(async () => {
   const profile = await getUserById(user.uid)
   if (profile?.displayName) teacherName.value = profile.displayName
   else if (user.displayName) teacherName.value = user.displayName
-  if (profile?.photoURL) teacherPhoto.value = profile.photoURL
-  else if (user.photoURL) teacherPhoto.value = user.photoURL
+  teacherAvatarKey.value = sanitizeTeacherAvatarKey(profile?.avatarKey)
+  promptAvatarKey.value = teacherAvatarKey.value || defaultTeacherAvatarKey
   profileName.value = teacherName.value
+  if (profile?.avatarPromptSeen === false) {
+    isAvatarPromptOpen.value = true
+  }
 
   await loadClasses()
+})
+
+onBeforeUnmount(() => {
+  stopDashboardClock()
 })
 </script>
 
