@@ -3,41 +3,78 @@
     <div class="w-full">
       <header class="flex items-start justify-between px-4 pt-4 sm:px-6 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
-          <button type="button" class="mt-2 h-[32px] w-[34px] sm:mt-4 sm:h-[36px] sm:w-[38px] lg:mt-[22px] lg:h-[41px] lg:w-[43px]" aria-label="Menu">
-            <img :src="imgRectangle13" alt="" class="block h-full w-full" />
+          <button
+            type="button"
+            class="mt-2 h-[32px] w-[34px] sm:mt-4 sm:h-[36px] sm:w-[38px] lg:mt-[22px] lg:h-[41px] lg:w-[43px]"
+            aria-label="Toggle sidebar"
+            @click="isSidebarExpanded = !isSidebarExpanded"
+          >
+            <img :src="imgMenu" alt="" class="block h-full w-full" />
           </button>
 
-          <img :src="imgStar1" alt="" class="ml-4 mt-1 h-[40px] w-[44px] sm:ml-6 sm:mt-2 sm:h-[48px] sm:w-[53px] lg:ml-[31px] lg:mt-[15px] lg:h-[55px] lg:w-[61px]" />
+          <img :src="imgStar" alt="" class="ml-4 mt-1 h-[40px] w-[44px] object-contain sm:ml-6 sm:mt-2 sm:h-[48px] sm:w-[53px] lg:ml-[31px] lg:mt-[15px] lg:h-[55px] lg:w-[61px]" />
           <p class="ml-3 mt-1 text-[28px] leading-none font-black tracking-[-0.03em] sm:ml-4 sm:mt-2 sm:text-[34px] lg:ml-[22px] lg:mt-[18px] lg:text-[40px]">ReciCall</p>
         </div>
 
         <div class="ml-4 flex items-start gap-4 sm:gap-5 lg:mr-[34px] lg:gap-[24px]">
           <button type="button" class="mt-1 sm:mt-2 lg:mt-[18px]" aria-label="Notifications">
-            <span class="block bg-black h-[52px] w-[40px] sm:h-[56px] sm:w-[44px] lg:h-[55px] lg:w-[70px]" :style="bellMaskStyle" />
+            <img
+              :src="imgBell"
+              alt=""
+              class="block h-[52px] w-[40px] object-contain sm:h-[56px] sm:w-[44px] lg:h-[55px] lg:w-[70px]"
+            />
           </button>
-          <button type="button" class="mt-0 sm:mt-1 lg:mt-[12px]" aria-label="Profile">
-            <img :src="imgProfile" alt="" class="h-[48px] w-[49px] sm:h-[56px] sm:w-[57px] lg:h-[63px] lg:w-[64px]" />
+          <button type="button" class="mt-0 sm:mt-1 lg:mt-[12px]" aria-label="Profile" @click="openStudentSettings">
+            <img :src="studentAvatarSrc" alt="" class="h-[48px] w-[49px] rounded-full object-cover sm:h-[56px] sm:w-[57px] lg:h-[63px] lg:w-[64px]" />
           </button>
         </div>
       </header>
 
       <div class="flex gap-4 px-4 pb-4 pt-2 sm:px-6 lg:gap-0 lg:px-0">
-        <aside class="hidden w-[72px] shrink-0 flex-col justify-between pb-[40px] pt-[77px] lg:ml-[7px] lg:flex lg:h-[650px]">
-          <div class="flex flex-col items-center gap-[24px]">
-            <div class="grid h-[63px] w-[80px] place-items-center rounded-[17px] bg-[rgba(46,130,239,0.25)]">
-              <img :src="imgRectangle14" alt="" class="h-[36px] w-[45px]" />
+        <aside
+          class="hidden shrink-0 flex-col justify-between pb-[40px] pt-[77px] transition-[width,padding] duration-200 lg:ml-[7px] lg:flex lg:h-[650px]"
+          :class="isSidebarExpanded ? 'w-[220px] px-[12px]' : 'w-[72px]'"
+        >
+          <div class="flex flex-col gap-[18px]">
+            <div
+              class="flex h-[63px] w-full items-center rounded-[17px] bg-[rgba(46,130,239,0.25)]"
+              :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center'"
+            >
+              <img :src="imgRectangle14" alt="" class="h-[36px] w-[45px] shrink-0" :style="activeNavIconStyle" />
+              <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-semibold text-[#174ca0]">Classes</span>
             </div>
-            <button type="button" class="grid h-[54px] w-[42px] place-items-center" aria-label="Student ID" @click="router.push('/student/id')">
-              <img :src="imgRectangle77" alt="" class="h-[54px] w-[42px]" />
+            <button
+              type="button"
+              class="flex h-[63px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
+              :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center'"
+              aria-label="Student ID"
+              @click="router.push('/student/id')"
+            >
+              <img :src="imgRectangle77" alt="" class="h-[54px] w-[42px] shrink-0" />
+              <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Student ID</span>
             </button>
           </div>
 
-          <div class="flex flex-col items-center gap-[28px]">
-            <button type="button" class="grid h-[40px] w-[38px] place-items-center" aria-label="Settings">
-              <img :src="imgRectangle18" alt="" class="h-[40px] w-[38px]" />
+          <div class="flex flex-col gap-[18px]">
+            <button
+              type="button"
+              class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
+              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
+              aria-label="Settings"
+              @click="openStudentSettings"
+            >
+              <img :src="imgRectangle18" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
+              <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Settings</span>
             </button>
-            <button type="button" class="grid h-[40px] w-[38px] place-items-center" aria-label="Logout" @click="handleLogout">
-              <img :src="imgRectangle17" alt="" class="h-[40px] w-[38px]" />
+            <button
+              type="button"
+              class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(255,84,84,0.08)]"
+              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
+              aria-label="Logout"
+              @click="handleLogout"
+            >
+              <img :src="imgRectangle17" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
+              <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Logout</span>
             </button>
           </div>
         </aside>
@@ -47,11 +84,16 @@
             <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
               <div>
                 <h1 class="text-[32px] leading-none font-bold sm:text-[40px]">My Classes</h1>
-                <p class="mt-[8px] text-[18px] leading-none font-medium sm:text-[20px]">Lorem ipsum lorem ipsum</p>
+                <p class="mt-[8px] text-[18px] leading-tight font-medium sm:text-[20px]">{{ dashboardSubtitle }}</p>
               </div>
 
               <button type="button" class="mt-[2px] flex h-[72px] w-full max-w-[249px] items-center rounded-[33.5px] bg-[#1188f8] pl-[24px] pr-[18px] sm:h-[78px] sm:pl-[32px] sm:pr-[21px]" @click="openJoinModal">
-                <img :src="imgRectangle39" alt="" class="h-[42px] w-[46px] sm:h-[48px] sm:w-[53px]" />
+                <span class="grid h-[42px] w-[46px] place-items-center rounded-full bg-white sm:h-[48px] sm:w-[53px]">
+                  <svg viewBox="0 0 53 48" class="h-[24px] w-[24px] sm:h-[28px] sm:w-[28px]" fill="none" aria-hidden="true">
+                    <path d="M26.5 10V38" stroke="#1188F8" stroke-width="5" stroke-linecap="round" />
+                    <path d="M12.5 24H40.5" stroke="#1188F8" stroke-width="5" stroke-linecap="round" />
+                  </svg>
+                </span>
                 <span class="ml-[7px] text-[20px] font-semibold text-white sm:text-[24px]">Join Class</span>
               </button>
             </div>
@@ -69,8 +111,9 @@
               <article
                 v-for="classItem in classes"
                 :key="classItem.id"
-                class="relative h-[260px] w-full overflow-hidden rounded-[20px] border-2 border-[#bdbdbd] bg-white"
+                class="relative h-[260px] w-full cursor-pointer overflow-hidden rounded-[20px] border-2 border-[#bdbdbd] bg-white transition-shadow hover:shadow-[0_10px_24px_rgba(0,0,0,0.12)]"
                 :style="{ width: classCardWidth(classItem) }"
+                @click="openClassroom(classItem.id)"
               >
                 <div class="relative mx-[5px] mt-[6px] h-[173px] overflow-hidden rounded-[17px]" :style="{ backgroundImage: classItem.gradient }">
                   <div class="absolute inset-x-0 bottom-0 h-[20px]" :style="{ backgroundImage: classItem.gradient }" />
@@ -98,7 +141,7 @@
                     :aria-label="`Open options for ${classItem.subject}`"
                     @click.stop="toggleOptions(classItem.id)"
                   >
-                    <img :src="classItem.ellipsisAsset" alt="" class="h-[39px] w-[35px]" />
+                    <img :src="imgVerticalDots" alt="" class="h-[39px] w-[35px]" />
                   </button>
 
                   <div
@@ -118,12 +161,12 @@
                   <p class="relative z-10 mt-[10px] pl-[16px] text-[24px] leading-none font-medium text-white">
                     {{ classItem.gradeLevel }} | {{ classItem.classLabel }}
                   </p>
-                  <p class="relative z-10 mt-[24px] pl-[15px] text-[18px] leading-none font-medium text-white">{{ classItem.scheduleLabel }} • {{ classItem.time }}</p>
+                  <p class="relative z-10 mt-[24px] pl-[15px] text-[18px] leading-none font-medium text-white">{{ classItem.scheduleLabel }} &bull; {{ classItem.time }}</p>
                 </div>
 
                 <div class="mt-[10px] px-[10px]">
                   <div class="flex h-[61px] w-full items-start rounded-[11px] bg-[#f6f6f6] px-[10px] py-[9px]">
-                    <img :src="imgProfile" alt="" class="h-[40px] w-[38px] shrink-0" />
+                    <img :src="classItem.teacherAvatarSrc" alt="" class="h-[40px] w-[38px] shrink-0 rounded-full object-cover" />
                     <div class="ml-[9px] min-w-0">
                       <p class="truncate text-[20px] leading-none font-bold text-black">{{ classItem.teacherName }}</p>
                       <p class="mt-[6px] text-[15px] leading-none font-medium text-black">{{ classItem.teacherRole }}</p>
@@ -139,19 +182,36 @@
       <div class="px-4 pb-6 sm:px-6 lg:hidden">
         <div class="flex items-center justify-center gap-8 rounded-[20px] border border-[#d9e8fb] bg-white px-4 py-3 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
           <button type="button" class="grid h-10 w-10 place-items-center rounded-[12px] bg-[rgba(46,130,239,0.25)]" aria-label="Dashboard">
-            <img :src="imgRectangle14" alt="" class="h-[24px] w-[30px]" />
+            <img :src="imgRectangle14" alt="" class="h-[24px] w-[30px]" :style="activeNavIconStyle" />
           </button>
           <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Student ID" @click="router.push('/student/id')">
             <img :src="imgRectangle77" alt="" class="h-[26px] w-[20px]" />
           </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Settings">
-            <img :src="imgRectangle18" alt="" class="h-[24px] w-[24px]" />
+          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Settings" @click="openStudentSettings">
+            <img :src="imgRectangle18" alt="" class="h-[24px] w-[24px]" :style="inactiveNavIconStyle" />
           </button>
           <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Logout" @click="handleLogout">
-            <img :src="imgRectangle17" alt="" class="h-[24px] w-[24px]" />
+            <img :src="imgRectangle17" alt="" class="h-[24px] w-[24px]" :style="inactiveNavIconStyle" />
           </button>
         </div>
       </div>
+
+      <AvatarSuggestionModal
+        :open="isAvatarPromptOpen"
+        title="Pick Your Student Avatar"
+        description="Choose the avatar you want your classmates and teacher to see beside your name."
+        preview-label="Student avatar preview"
+        preview-hint="This will appear on your profile, your class list, and your teacher's class list."
+        :preview-src="promptAvatarPreview"
+        :options="studentAvatarOptions"
+        :selected-key="promptAvatarKey"
+        :error="avatarPromptError"
+        :saving="isSavingAvatarPrompt"
+        @close="dismissAvatarPrompt"
+        @later="dismissAvatarPrompt"
+        @save="saveAvatarPrompt"
+        @update:selected-key="promptAvatarKey = $event"
+      />
 
       <transition name="fade">
         <div
@@ -203,32 +263,47 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import AvatarSuggestionModal from '../../components/profile/AvatarSuggestionModal.vue'
 import { auth } from '../../config/firebase'
 import { logoutUser } from '../../services/authService'
-import { enrollStudentInClass, findTeacherClassByJoinCode, getStudentClasses, leaveStudentClass } from '../../services/studentService'
-import { getUserById } from '../../services/userService'
+import { enrollStudentInClass, findTeacherClassByJoinCode, getStudentClasses, leaveStudentClass, syncStudentProfileAcrossClasses } from '../../services/studentService'
+import { getUserById, upsertUserProfile } from '../../services/userService'
+import imgRectangle17 from '../../assets/icons/recicall-logout.svg'
+import imgRectangle18 from '../../assets/icons/recicall-settings.svg'
+import imgRectangle14 from '../../assets/icons/recicall-classes.svg'
+import imgRectangle77 from '../../assets/icons/recicall-student-id.svg'
+import imgMenu from '../../assets/icons/recicall-menu.svg'
+import imgStar from '../../assets/icons/recicall-logo.png'
+import imgBell from '../../assets/icons/notification-bell-svgrepo-com.svg'
+import { activeNavIconStyle, inactiveNavIconStyle } from '../../utils/navIconStyles'
+import { defaultStudentAvatarKey, resolveStudentAvatar, studentAvatarOptions } from '../../utils/studentAvatarOptions'
+import { resolveTeacherAvatar } from '../../utils/teacherAvatarOptions'
 
-const imgRectangle17 = 'https://www.figma.com/api/mcp/asset/96dfb1f1-e25d-42c2-be80-a75b53d920d3'
-const imgRectangle18 = 'https://www.figma.com/api/mcp/asset/0dc91600-d96a-49c2-9172-f7fb72506cdd'
-const imgProfile = 'https://www.figma.com/api/mcp/asset/c6a4171f-9fb7-4abc-9c63-6bddb572190d'
-const imgRectangle13 = 'https://www.figma.com/api/mcp/asset/7df93e1c-0a05-4f5a-b2e8-23ed5bb22fb1'
-const imgRectangle14 = 'https://www.figma.com/api/mcp/asset/2a18f610-c6bf-4f7e-b225-19b9a2536c9e'
-const imgRectangle39 = 'https://www.figma.com/api/mcp/asset/fda8cf8b-cd9d-4004-abc9-a22ed7f49020'
-const imgRectangle25 = 'https://www.figma.com/api/mcp/asset/c7ac4ffd-df3e-45db-8cd2-49d33bfebdc1'
-const imgRectangle26 = 'https://www.figma.com/api/mcp/asset/270fc865-72f7-4e1c-afc3-1c851617a303'
-const imgRectangle76 = 'https://www.figma.com/api/mcp/asset/99acbd4b-0070-43fa-936e-548703c52a26'
-const imgRectangle77 = 'https://www.figma.com/api/mcp/asset/3f38a4f3-e264-4751-a907-21c133c3983b'
-const imgStar1 = 'https://www.figma.com/api/mcp/asset/a39ebbfd-86f8-48c4-b462-cffba3cc2ecf'
-const imgPolygon4 = 'https://www.figma.com/api/mcp/asset/233e1b53-39df-45b3-8174-189f3e3fba58'
-const imgPolygon5 = 'https://www.figma.com/api/mcp/asset/511e62a6-9e9b-40e9-a538-32dcd7f99276'
-const imgPolygon6 = 'https://www.figma.com/api/mcp/asset/47575bb6-5778-4d8f-94fb-2c7afd9f75df'
-const imgPolygon7 = 'https://www.figma.com/api/mcp/asset/34f279ce-cb5d-48e1-8455-affc747be9fe'
-const imgVector1 = 'https://www.figma.com/api/mcp/asset/1d6100ef-1f83-49e0-9eb4-7683dbffd71e'
-const imgVector2 = 'https://www.figma.com/api/mcp/asset/5e826f6a-fc15-477e-81fa-4987354e6aab'
-const imgVector3 = 'https://www.figma.com/api/mcp/asset/58d4c442-8e4f-4608-9d2b-5fced21d2207'
-const imgGroup9 = 'https://www.figma.com/api/mcp/asset/d3c8089f-c2cb-47a8-811d-770046bf226a'
+const svgDataUri = (svg) => `data:image/svg+xml;utf8,${encodeURIComponent(svg.trim())}`
+const imgPolygon4 = svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 91"><path d="M34 0 0 74 34 91V0Z" fill="rgba(19,67,145,0.72)"/></svg>`)
+const imgPolygon5 = svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 61"><path d="M20 0 0 40 20 61V0Z" fill="rgba(22,92,182,0.8)"/></svg>`)
+const imgPolygon6 = svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 46"><path d="M6 0 0 46H6V0Z" fill="rgba(13,73,165,0.85)"/></svg>`)
+const imgPolygon7 = svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 81"><path d="M15 0 0 81 15 68V0Z" fill="rgba(18,86,173,0.78)"/></svg>`)
+const imgVector1 = svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 71"><path d="M112 3v68H0V54l29-8 14 2 15-14 11 2 18-24 12 5 13-14Z" fill="rgba(33,170,41,0.48)"/></svg>`)
+const imgVector2 = svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 118 38"><path d="M118 3v35H0V24l21-8 14-2 26 11 27-19 13 6 17-9Z" fill="rgba(44,192,55,0.58)"/></svg>`)
+const imgVector3 = svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 35"><path d="M71 0v35H0l20-16 11 7 14-26 10 7 16-7Z" fill="rgba(35,155,44,0.65)"/></svg>`)
+const imgGroup9 = svgDataUri(`
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 133" fill="none">
+    <circle cx="93" cy="34" r="34" fill="rgba(255,243,97,0.28)"/>
+    <circle cx="46" cy="56" r="9" fill="rgba(255,243,97,0.34)"/>
+    <circle cx="56" cy="82" r="5" fill="rgba(255,243,97,0.34)"/>
+    <path d="M160 40v50H80l16-22h64Z" fill="rgba(242,214,34,0.34)"/>
+  </svg>
+`)
+const imgVerticalDots = svgDataUri(`
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 39" fill="none">
+    <circle cx="17.5" cy="7" r="5" fill="#fff"/>
+    <circle cx="17.5" cy="19.5" r="5" fill="#fff"/>
+    <circle cx="17.5" cy="32" r="5" fill="#fff"/>
+  </svg>
+`)
 
 const router = useRouter()
 const isLoggingOut = ref(false)
@@ -239,20 +314,47 @@ const joinCode = ref('')
 const joinError = ref('')
 const joinSuccess = ref('')
 const openOptionsId = ref(null)
+const isSidebarExpanded = ref(false)
 const studentId = ref('')
 const studentProfile = ref(null)
 const classes = ref([])
+const currentDateTime = ref(new Date())
+const isAvatarPromptOpen = ref(false)
+const isSavingAvatarPrompt = ref(false)
+const avatarPromptError = ref('')
+const promptAvatarKey = ref(defaultStudentAvatarKey)
+let dashboardClockTimer = null
 
-const bellMaskStyle = {
-  maskImage: `url('${imgRectangle76}')`,
-  WebkitMaskImage: `url('${imgRectangle76}')`,
-  maskRepeat: 'no-repeat',
-  WebkitMaskRepeat: 'no-repeat',
-  maskPosition: 'center',
-  WebkitMaskPosition: 'center',
-  maskSize: 'contain',
-  WebkitMaskSize: 'contain',
-}
+const dashboardGreeting = computed(() => {
+  const currentHour = currentDateTime.value.getHours()
+
+  if (currentHour < 12) return 'Good morning'
+  if (currentHour < 18) return 'Good afternoon'
+  return 'Good evening'
+})
+
+const liveDateTimeLabel = computed(() =>
+  currentDateTime.value.toLocaleString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
+  }),
+)
+
+const dashboardSubtitle = computed(() => `${dashboardGreeting.value} | ${liveDateTimeLabel.value}`)
+const studentAvatarSrc = computed(() =>
+  resolveStudentAvatar(
+    studentProfile.value?.avatarKey,
+    studentProfile.value?.photoURL || '',
+  ),
+)
+const promptAvatarPreview = computed(() =>
+  resolveStudentAvatar(promptAvatarKey.value, studentProfile.value?.photoURL || ''),
+)
 
 const gradientMap = {
   blue: 'linear-gradient(90deg, rgb(37, 122, 255) 0%, rgb(36, 118, 247) 44.712%, rgb(29, 96, 201) 90.385%, rgb(22, 73, 153) 100%)',
@@ -269,7 +371,7 @@ const mapClassToCard = (classItem) => {
     gradient: classItem.gradient || gradientMap[gradientId] || gradientMap.blue,
     teacherName: classItem.teacherName || 'Maam. Anderson',
     teacherRole: classItem.teacherRole || 'High School Teacher',
-    ellipsisAsset: gradientId === 'blue' ? imgRectangle25 : imgRectangle26,
+    teacherAvatarSrc: resolveTeacherAvatar(classItem.teacherAvatarKey, ''),
     width: gradientId === 'blue' ? 396.347 : 400,
   }
 }
@@ -278,6 +380,20 @@ const classCardWidth = (classItem) => {
   if (typeof window !== 'undefined' && window.innerWidth < 768) return '100%'
   if (typeof window !== 'undefined' && window.innerWidth < 1280) return '100%'
   return `${classItem.width}px`
+}
+
+const startDashboardClock = () => {
+  currentDateTime.value = new Date()
+  dashboardClockTimer = window.setInterval(() => {
+    currentDateTime.value = new Date()
+  }, 1000)
+}
+
+const stopDashboardClock = () => {
+  if (!dashboardClockTimer) return
+
+  window.clearInterval(dashboardClockTimer)
+  dashboardClockTimer = null
 }
 
 const loadStudentClasses = async () => {
@@ -299,11 +415,75 @@ const loadStudentClasses = async () => {
           latestTeacherProfile?.roleLabel ||
           (latestTeacherProfile?.role === 'teacher' ? 'High School Teacher' : latestTeacherProfile?.role) ||
           classItem.teacherRole,
+        teacherAvatarKey: latestTeacherProfile?.avatarKey || classItem.teacherAvatarKey,
         teacherPhotoURL: latestTeacherProfile?.photoURL || classItem.teacherPhotoURL,
       })
     }),
   )
   isLoading.value = false
+}
+
+const closeAvatarPrompt = () => {
+  isAvatarPromptOpen.value = false
+  avatarPromptError.value = ''
+}
+
+const dismissAvatarPrompt = async () => {
+  if (isSavingAvatarPrompt.value || !studentId.value) return
+
+  isSavingAvatarPrompt.value = true
+  avatarPromptError.value = ''
+
+  try {
+    await upsertUserProfile(studentId.value, { avatarPromptSeen: true })
+    studentProfile.value = {
+      ...(studentProfile.value || {}),
+      avatarPromptSeen: true,
+    }
+    closeAvatarPrompt()
+  } catch (error) {
+    console.error(error)
+    avatarPromptError.value = 'Unable to dismiss the avatar suggestion right now.'
+  } finally {
+    isSavingAvatarPrompt.value = false
+  }
+}
+
+const saveAvatarPrompt = async () => {
+  if (isSavingAvatarPrompt.value || !studentId.value) return
+
+  isSavingAvatarPrompt.value = true
+  avatarPromptError.value = ''
+
+  try {
+    await upsertUserProfile(studentId.value, {
+      avatarKey: promptAvatarKey.value,
+      avatarPromptSeen: true,
+    })
+
+    const nextProfile = {
+      ...(studentProfile.value || {}),
+      avatarKey: promptAvatarKey.value,
+      avatarPromptSeen: true,
+    }
+
+    await syncStudentProfileAcrossClasses(studentId.value, {
+      displayName: nextProfile.displayName || auth.currentUser?.displayName || 'Student',
+      photoURL: nextProfile.photoURL || '',
+      avatarKey: promptAvatarKey.value,
+      email: nextProfile.email || auth.currentUser?.email || '',
+      gradeLevel: nextProfile.gradeLevel,
+      studentNumber: nextProfile.studentNumber,
+    })
+
+    studentProfile.value = nextProfile
+    closeAvatarPrompt()
+  } catch (error) {
+    console.error(error)
+    avatarPromptError.value = 'Unable to save your avatar right now.'
+  } finally {
+    isSavingAvatarPrompt.value = false
+  }
 }
 
 const openJoinModal = () => {
@@ -333,6 +513,14 @@ const handleLeaveClass = async (classId) => {
   } catch (error) {
     console.error(error)
   }
+}
+
+const openClassroom = (classId) => {
+  router.push(`/student/class/${classId}`)
+}
+
+const openStudentSettings = () => {
+  router.push('/student/id')
 }
 
 const handleJoinClass = async () => {
@@ -371,9 +559,13 @@ const handleJoinClass = async () => {
       joinCode: matchedClass.joinCode,
     }, {
       displayName: studentProfile.value?.displayName || auth.currentUser?.displayName || 'Student',
-      photoURL: studentProfile.value?.photoURL || auth.currentUser?.photoURL || '',
+      photoURL: studentProfile.value?.photoURL || '',
+      avatarKey:
+        studentProfile.value?.avatarKey ||
+        (studentProfile.value?.photoURL ? undefined : defaultStudentAvatarKey),
       email: auth.currentUser?.email || '',
       gradeLevel: studentProfile.value?.gradeLevel,
+      studentNumber: studentProfile.value?.studentNumber,
     })
 
     if (result.alreadyJoined) {
@@ -413,11 +605,21 @@ const handleLogout = async () => {
 }
 
 onMounted(async () => {
+  startDashboardClock()
+
   const user = auth.currentUser
   if (!user) return
   studentId.value = user.uid
   studentProfile.value = await getUserById(user.uid)
+  promptAvatarKey.value = studentProfile.value?.avatarKey || defaultStudentAvatarKey
+  if (studentProfile.value?.avatarPromptSeen === false) {
+    isAvatarPromptOpen.value = true
+  }
   await loadStudentClasses()
+})
+
+onBeforeUnmount(() => {
+  stopDashboardClock()
 })
 </script>
 

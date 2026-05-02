@@ -1,27 +1,44 @@
 <template>
-  <div class="min-h-screen bg-[#515151] px-4 py-8 sm:px-6 lg:flex lg:items-center lg:justify-center">
+  <div
+    class="relative min-h-screen overflow-hidden px-4 py-8 sm:px-6 lg:flex lg:items-center lg:justify-center"
+    :class="frameBackgroundSrc ? 'bg-[#fbfbfb]' : 'bg-[#515151]'"
+  >
+    <img
+      v-if="frameBackgroundSrc"
+      :src="frameBackgroundSrc"
+      alt=""
+      aria-hidden="true"
+      class="pointer-events-none absolute inset-x-0 bottom-0 h-auto w-full object-cover object-bottom"
+    />
+
     <div
-      class="mx-auto flex w-full max-w-[1087px] overflow-hidden rounded-[40px] bg-[#f6f6f6] shadow-[0_4px_98.4px_-24px_rgba(0,0,0,0.25)] lg:min-h-[746px] lg:rounded-[60px]"
+      v-if="frameBackgroundSrc"
+      class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.96),rgba(255,255,255,0.86)_42%,rgba(255,255,255,0.72)_72%,rgba(255,255,255,0.18)_100%)]"
+    />
+
+    <div
+      class="relative z-10 mx-auto flex w-full max-w-[1087px] overflow-hidden rounded-[40px] bg-[#f6f6f6] shadow-[0_4px_98.4px_-24px_rgba(0,0,0,0.25)] lg:min-h-[746px] lg:rounded-[60px]"
     >
-      <section class="hidden flex-1 items-center justify-center px-12 py-16 lg:flex">
+      <section class="relative z-10 hidden flex-1 items-center justify-center px-12 py-16 lg:flex">
         <img
-          :src="illustrationSrc"
-          alt="Teacher explaining study material"
+          :src="activeIllustrationSrc"
+          :alt="activeIllustrationAlt"
           class="h-auto w-full max-w-[456px] object-contain"
         />
       </section>
 
       <section
-        class="relative flex w-full flex-col justify-center border-2 border-[#2e82ef] bg-white px-6 py-10 sm:px-10 lg:w-[512px] lg:rounded-[61px] lg:px-8 lg:py-12"
+        class="relative z-10 flex w-full flex-col justify-center border-2 border-[#2e82ef] bg-white/95 px-6 py-10 backdrop-blur-[1px] sm:px-10 lg:w-[512px] lg:rounded-[61px] lg:px-8 lg:py-12"
       >
         <div class="mx-auto flex w-full max-w-[439px] flex-col items-center">
-          <div class="mb-5 text-[#1188f8]">
-            <svg width="40" height="33" viewBox="0 0 40 33" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M20 0L23.2763 12.7237L36 16L23.2763 19.2763L20 32L16.7237 19.2763L4 16L16.7237 12.7237L20 0Z"
-                fill="currentColor"
-              />
-            </svg>
+          <div class="flex w-full justify-start">
+            <RouterLink to="/" class="text-[14px] font-semibold text-[#1188f8]">
+              Back to home
+            </RouterLink>
+          </div>
+
+          <div class="mb-6">
+            <img :src="imgLogo" alt="" class="h-[68px] w-[68px] object-contain sm:h-[80px] sm:w-[80px]" />
           </div>
 
           <h1 class="text-center text-[36px] leading-none font-black text-black">
@@ -99,7 +116,11 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+import defaultIllustration from '../../assets/figma/svg-images/Teacher explaining study material.svg'
+import imgLogo from '../../assets/icons/recicall-logo.png'
+
+const props = defineProps({
   title: {
     type: String,
     required: true,
@@ -126,12 +147,36 @@ defineProps({
   },
   illustrationSrc: {
     type: String,
-    default: 'https://www.figma.com/api/mcp/asset/21ad59c0-6226-44fe-ae67-da5fdb2f3e59',
+    default: defaultIllustration,
+  },
+  studentIllustrationSrc: {
+    type: String,
+    default: '',
+  },
+  frameBackgroundSrc: {
+    type: String,
+    default: '',
   },
   googleDisabled: {
     type: Boolean,
     default: false,
   },
+})
+
+const activeIllustrationSrc = computed(() => {
+  if (props.modelValue === 'student' && props.studentIllustrationSrc) {
+    return props.studentIllustrationSrc
+  }
+
+  return props.illustrationSrc
+})
+
+const activeIllustrationAlt = computed(() => {
+  if (props.modelValue === 'student' && props.studentIllustrationSrc) {
+    return 'Student raising hand during online lesson'
+  }
+
+  return 'Teacher explaining study material'
 })
 
 const roleOptions = [

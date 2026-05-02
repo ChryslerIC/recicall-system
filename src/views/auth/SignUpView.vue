@@ -5,8 +5,10 @@
     subtitle="Create your digital learning space."
     prompt-text="Already have an account?"
     prompt-action="Log in"
-    prompt-link="/"
+    prompt-link="/login"
+    :frame-background-src="loginFrameBackground"
     :google-disabled="isSubmitting"
+    :student-illustration-src="studentIllustration"
     @google="handleGoogleAuth"
   >
     <form class="space-y-4" @submit.prevent="handleSignUp">
@@ -94,8 +96,12 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AuthShell from '../../components/auth/AuthShell.vue'
+import loginFrameBackground from '../../assets/figma/images/login-school-supplies-frame.png'
+import studentIllustration from '../../assets/figma/images/student-raising-hand-online-lesson.png'
 import { logoutUser, registerUser, signInWithGoogle } from '../../services/authService'
 import { createUserProfile, getUserById, upsertUserProfile } from '../../services/userService'
+import { defaultStudentAvatarKey } from '../../utils/studentAvatarOptions'
+import { defaultTeacherAvatarKey } from '../../utils/teacherAvatarOptions'
 
 const router = useRouter()
 
@@ -122,6 +128,12 @@ const routeByRole = (role) => {
   errorMessage.value = 'Invalid user role.'
 }
 
+const buildRoleProfileDefaults = (role) => ({
+  avatarPromptSeen: false,
+  photoURL: '',
+  avatarKey: role === 'student' ? defaultStudentAvatarKey : defaultTeacherAvatarKey,
+})
+
 const handleSignUp = async () => {
   errorMessage.value = ''
 
@@ -143,6 +155,7 @@ const handleSignUp = async () => {
       role: selectedRole.value,
       displayName: `${firstName.value} ${lastName.value}`.trim(),
       createdAt: new Date().toISOString(),
+      ...buildRoleProfileDefaults(selectedRole.value),
     })
 
     routeByRole(selectedRole.value)
@@ -184,8 +197,8 @@ const handleGoogleAuth = async () => {
       email: user.email || email.value,
       role: selectedRole.value,
       displayName: user.displayName || `${derivedFirstName} ${derivedLastName}`.trim(),
-      photoURL: user.photoURL || '',
       createdAt: new Date().toISOString(),
+      ...buildRoleProfileDefaults(selectedRole.value),
     })
 
     routeByRole(selectedRole.value)

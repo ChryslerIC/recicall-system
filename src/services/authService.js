@@ -41,13 +41,13 @@ const withTimeout = (promise, timeoutMs, message) => {
   })
 }
 
-export const updateCurrentUserAccount = async ({ displayName, photoFile }) => {
+export const updateCurrentUserAccount = async ({ displayName, photoFile, photoURL } = {}) => {
   const user = auth.currentUser
   if (!user) {
     throw new Error('No authenticated user found.')
   }
 
-  let photoURL = user.photoURL || ''
+  let nextPhotoURL = typeof photoURL === 'string' ? photoURL : undefined
   let photoUploadError = ''
 
   if (photoFile) {
@@ -58,28 +58,34 @@ export const updateCurrentUserAccount = async ({ displayName, photoFile }) => {
         15000,
         'Profile photo upload timed out. Please try again.',
       )
-      photoURL = await withTimeout(
+      const uploadedPhotoURL = await withTimeout(
         getDownloadURL(profilePhotoRef),
         10000,
         'Unable to retrieve the uploaded profile photo. Please try again.',
       )
+      nextPhotoURL = uploadedPhotoURL
     } catch (error) {
       photoUploadError = error?.message || 'Unable to upload profile photo right now.'
     }
   }
 
+  const updatePayload = {
+    displayName: displayName ?? user.displayName ?? '',
+  }
+
+  if (typeof nextPhotoURL === 'string') {
+    updatePayload.photoURL = nextPhotoURL
+  }
+
   await withTimeout(
-    updateProfile(user, {
-      displayName: displayName ?? user.displayName ?? '',
-      photoURL,
-    }),
+    updateProfile(user, updatePayload),
     10000,
     'Profile update timed out. Please try again.',
   )
 
   return {
     displayName: user.displayName || displayName || '',
-    photoURL: user.photoURL || photoURL || '',
+    photoURL: typeof nextPhotoURL === 'string' ? nextPhotoURL : '',
     photoUploadError,
   }
 }

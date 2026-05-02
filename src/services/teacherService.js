@@ -5,14 +5,22 @@ import {
   doc,
   getDoc,
   getDocs,
+  increment,
   serverTimestamp,
+  setDoc,
   updateDoc,
 } from 'firebase/firestore'
 import { db } from '../config/firebase'
 
 const teacherClassesCollection = (teacherId) => collection(db, 'users', teacherId, 'classes')
 const teacherClassStudentsCollection = (teacherId, classId) => collection(db, 'users', teacherId, 'classes', classId, 'students')
+const teacherClassStudentRef = (teacherId, classId, studentId) =>
+  doc(db, 'users', teacherId, 'classes', classId, 'students', studentId)
+const teacherClassParticipationCollection = (teacherId, classId) =>
+  collection(db, 'users', teacherId, 'classes', classId, 'participationEvents')
 const createJoinCode = () => Math.random().toString(36).slice(2, 8).toUpperCase()
+const removeUndefinedValues = (value) =>
+  Object.fromEntries(Object.entries(value).filter(([, entryValue]) => entryValue !== undefined))
 
 const getEnrolledStudentsForTeacherClass = async (teacherId, classId) => {
   const mirroredStudentsSnapshot = await getDocs(teacherClassStudentsCollection(teacherId, classId))
@@ -42,6 +50,7 @@ const getEnrolledStudentsForTeacherClass = async (teacherId, classId) => {
       studentId: userDoc.id,
       displayName: userData.displayName,
       photoURL: userData.photoURL,
+      avatarKey: userData.avatarKey,
       email: userData.email,
       gradeLevel: userData.gradeLevel,
       joinedAt: matchedClass.data().joinedAt,
@@ -49,6 +58,21 @@ const getEnrolledStudentsForTeacherClass = async (teacherId, classId) => {
   }
 
   return enrolledStudents
+}
+
+const getParticipationEventsForTeacherClass = async (teacherId, classId) => {
+  const snapshot = await getDocs(teacherClassParticipationCollection(teacherId, classId))
+
+  return snapshot.docs
+    .map((eventDoc) => ({
+      id: eventDoc.id,
+      ...eventDoc.data(),
+    }))
+    .sort((left, right) => {
+      const leftTime = left.createdAt?.seconds || 0
+      const rightTime = right.createdAt?.seconds || 0
+      return leftTime - rightTime
+    })
 }
 
 const sortClasses = (classes) =>
@@ -88,12 +112,16 @@ export const getTeacherClassById = async (teacherId, classId) => {
     return null
   }
 
-  const enrolledStudents = await getEnrolledStudentsForTeacherClass(teacherId, classId)
+  const [enrolledStudents, participationEvents] = await Promise.all([
+    getEnrolledStudentsForTeacherClass(teacherId, classId),
+    getParticipationEventsForTeacherClass(teacherId, classId),
+  ])
 
   return {
     id: snapshot.id,
     ...snapshot.data(),
     enrolledStudents,
+    participationEvents,
     students: enrolledStudents.length,
   }
 }
@@ -140,4 +168,39 @@ export const restoreTeacherClass = async (teacherId, classId) => {
 export const permanentlyDeleteTeacherClass = async (teacherId, classId) => {
   const classRef = doc(db, 'users', teacherId, 'classes', classId)
   await deleteDoc(classRef)
+}
+
+export const recordStudentParticipation = async (teacherId, classId, studentPayload, points) => {
+  const studentId = studentPayload.studentId || studentPayload.id
+
+  if (!teacherId || !classId || !studentId) {
+    throw new Error('Missing teacher, class, or student information.')
+  }
+
+  const safePoints = Number(points) || 0
+  const payload = removeUndefinedValues({
+    studentId,
+    displayName: studentPayload.displayName,
+    email: studentPayload.email,
+    studentNumber: studentPayload.studentNumber,
+    photoURL: studentPayload.photoURL,
+    avatarKey: studentPayload.avatarKey,
+    latestPoints: safePoints,
+    totalPoints: increment(safePoints),
+    participatedSessions: increment(1),
+    lastParticipationAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  })
+
+  await setDoc(teacherClassStudentRef(teacherId, classId, studentId), payload, { merge: true })
+
+  await addDoc(teacherClassParticipationCollection(teacherId, classId), removeUndefinedValues({
+    studentId,
+    displayName: studentPayload.displayName,
+    studentNumber: studentPayload.studentNumber,
+    photoURL: studentPayload.photoURL,
+    avatarKey: studentPayload.avatarKey,
+    points: safePoints,
+    createdAt: serverTimestamp(),
+  }))
 }

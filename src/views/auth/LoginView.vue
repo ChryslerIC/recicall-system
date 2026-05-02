@@ -6,7 +6,9 @@
     prompt-text="Don't have an account?"
     prompt-action="Sign up"
     prompt-link="/signup"
+    :frame-background-src="loginFrameBackground"
     :google-disabled="isSubmitting"
+    :student-illustration-src="studentIllustration"
     @google="handleGoogleAuth"
   >
     <form class="space-y-4" @submit.prevent="handleLogin">
@@ -83,8 +85,12 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AuthShell from '../../components/auth/AuthShell.vue'
+import loginFrameBackground from '../../assets/figma/images/login-school-supplies-frame.png'
+import studentIllustration from '../../assets/figma/images/student-raising-hand-online-lesson.png'
 import { loginUser, logoutUser, signInWithGoogle } from '../../services/authService'
 import { getUserById, upsertUserProfile } from '../../services/userService'
+import { defaultStudentAvatarKey } from '../../utils/studentAvatarOptions'
+import { defaultTeacherAvatarKey } from '../../utils/teacherAvatarOptions'
 
 const router = useRouter()
 
@@ -109,6 +115,12 @@ const routeByRole = (role) => {
 
   errorMessage.value = 'Invalid user role.'
 }
+
+const buildRoleProfileDefaults = (role) => ({
+  avatarPromptSeen: false,
+  photoURL: '',
+  avatarKey: role === 'student' ? defaultStudentAvatarKey : defaultTeacherAvatarKey,
+})
 
 const handleLogin = async () => {
   errorMessage.value = ''
@@ -167,8 +179,8 @@ const handleGoogleAuth = async () => {
       email: user.email || '',
       role: selectedRole.value,
       displayName: user.displayName || `${firstName} ${lastName}`.trim(),
-      photoURL: user.photoURL || '',
       createdAt: new Date().toISOString(),
+      ...buildRoleProfileDefaults(selectedRole.value),
     })
 
     routeByRole(selectedRole.value)
