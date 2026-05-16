@@ -107,7 +107,7 @@
             class="rounded-[18px] border border-[#d6e6fa] bg-white px-5 py-6 shadow-[0_12px_30px_rgba(17,136,248,0.06)]"
           >
             <div class="flex h-[52px] w-[52px] items-center justify-center rounded-[16px] bg-[#eef6ff]">
-              <img :src="feature.icon" alt="" class="h-[28px] w-[28px] object-contain" />
+              <AppIcon :name="feature.icon" :size="28" class="text-[#1188f8]" />
             </div>
             <h3 class="mt-5 text-[22px] font-bold leading-[1.1]">{{ feature.title }}</h3>
             <p class="mt-3 text-[16px] leading-[1.55] text-[#475467]">
@@ -208,9 +208,7 @@
 </template>
 
 <script setup>
-import imgAnalytics from '../assets/icons/recicall-analytics.svg'
-import imgClasses from '../assets/icons/recicall-classes.svg'
-import imgStudentId from '../assets/icons/recicall-student-id.svg'
+import AppIcon from '../components/common/AppIcon.vue'
 import imgLogo from '../assets/icons/recicall-logo.png'
 import collaborationVisual from '../assets/landing/landing-collaboration-classroom.png'
 import digitalClassroomVisual from '../assets/landing/landing-digital-classroom.png'
@@ -238,17 +236,17 @@ const featureHighlights = [
   {
     title: 'Classroom Control',
     description: 'Manage classes, start sessions, and keep recitation flow organized from one teacher dashboard.',
-    icon: imgClasses,
+    icon: 'classes',
   },
   {
     title: 'Participation Analytics',
     description: 'Surface trends, recent activity, and visibility into which students need more speaking opportunities.',
-    icon: imgAnalytics,
+    icon: 'insights',
   },
   {
     title: 'Student Identity',
     description: 'Give students a clear profile, QR-backed ID, and a simple way to see their classroom standing.',
-    icon: imgStudentId,
+    icon: 'badge',
   },
 ]
 

@@ -15,11 +15,7 @@
       <label class="block">
         <span class="sr-only">Email or Username</span>
         <div class="flex h-14 items-center rounded-[15px] border border-black px-4">
-          <svg class="mr-3 h-5 w-5 text-[#777]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path
-              d="M2.5 4.5A2.5 2.5 0 0 1 5 2h10a2.5 2.5 0 0 1 2.5 2.5v11A2.5 2.5 0 0 1 15 18H5a2.5 2.5 0 0 1-2.5-2.5v-11Zm2.5-.5a.5.5 0 0 0-.5.5v.217l5.5 4.278 5.5-4.278V4.5a.5.5 0 0 0-.5-.5H5Zm10.5 2.985-4.886 3.8a1 1 0 0 1-1.228 0L4.5 6.985V15.5a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V6.985Z"
-            />
-          </svg>
+          <AppIcon name="mail" :size="20" class="mr-3 text-[#777]" />
           <input
             v-model.trim="email"
             type="email"
@@ -32,13 +28,7 @@
       <label class="block">
         <span class="sr-only">Password</span>
         <div class="flex h-14 items-center rounded-[15px] border border-black px-4">
-          <svg class="mr-3 h-5 w-5 text-[#777]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path
-              fill-rule="evenodd"
-              d="M6 8V6a4 4 0 1 1 8 0v2a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2Zm2-2a2 2 0 1 1 4 0v2H8V6Zm2 4a1.25 1.25 0 0 0-.75 2.25V14a.75.75 0 0 0 1.5 0v-1.75A1.25 1.25 0 0 0 10 10Z"
-              clip-rule="evenodd"
-            />
-          </svg>
+          <AppIcon name="lock" :size="20" class="mr-3 text-[#777]" />
           <input
             v-model="password"
             :type="showPassword ? 'text' : 'password'"
@@ -46,11 +36,7 @@
             class="w-full bg-transparent text-[16px] font-medium text-black outline-none placeholder:text-[#777]"
           />
           <button type="button" class="ml-3 text-[#777]" @click="showPassword = !showPassword">
-            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path
-                d="M10 4.5c4.363 0 7.446 3.145 8.675 5.044a.84.84 0 0 1 0 .912C17.446 12.355 14.363 15.5 10 15.5S2.554 12.355 1.325 10.456a.84.84 0 0 1 0-.912C2.554 7.645 5.637 4.5 10 4.5Zm0 2c-3.174 0-5.625 2.19-6.792 3.5C4.375 11.31 6.826 13.5 10 13.5s5.625-2.19 6.792-3.5C15.625 8.69 13.174 6.5 10 6.5Zm0 1.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"
-              />
-            </svg>
+            <AppIcon :name="showPassword ? 'eye-off' : 'eye'" :size="20" />
           </button>
         </div>
       </label>
@@ -61,13 +47,22 @@
           <span>Remember me</span>
         </label>
 
-        <button type="button" class="text-[14px] font-medium text-[#3abef6]">
-          Forgot Password?
+        <button
+          type="button"
+          class="text-[14px] font-medium text-[#3abef6] disabled:cursor-not-allowed disabled:opacity-70"
+          :disabled="isSendingPasswordReset"
+          @click="handleForgotPassword"
+        >
+          {{ isSendingPasswordReset ? 'Sending reset...' : 'Forgot Password?' }}
         </button>
       </div>
 
-      <p v-if="errorMessage" class="text-sm font-medium text-red-600">
-        {{ errorMessage }}
+      <p v-if="passwordResetMessage" class="text-sm font-medium text-[#1188f8]">
+        {{ passwordResetMessage }}
+      </p>
+
+      <p v-if="visibleErrorMessage" class="text-sm font-medium text-red-600">
+        {{ visibleErrorMessage }}
       </p>
 
       <button
@@ -82,17 +77,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import AuthShell from '../../components/auth/AuthShell.vue'
+import AppIcon from '../../components/common/AppIcon.vue'
 import loginFrameBackground from '../../assets/figma/images/login-school-supplies-frame.png'
 import studentIllustration from '../../assets/figma/images/student-raising-hand-online-lesson.png'
-import { loginUser, logoutUser, signInWithGoogle } from '../../services/authService'
+import { loginUser, logoutUser, requestPasswordReset, signInWithGoogle } from '../../services/authService'
 import { getUserById, upsertUserProfile } from '../../services/userService'
 import { defaultStudentAvatarKey } from '../../utils/studentAvatarOptions'
 import { defaultTeacherAvatarKey } from '../../utils/teacherAvatarOptions'
 
 const router = useRouter()
+const route = useRoute()
+
+const PROFILE_ACCESS_ERROR = 'profile-access'
+const PROFILE_ACCESS_ERROR_MESSAGE =
+  'Your account signed in, but we could not load your profile. Please check Firestore access and try again.'
 
 const email = ref('')
 const password = ref('')
@@ -100,7 +101,14 @@ const selectedRole = ref('teacher')
 const rememberMe = ref(false)
 const showPassword = ref(false)
 const isSubmitting = ref(false)
+const isSendingPasswordReset = ref(false)
 const errorMessage = ref('')
+const passwordResetMessage = ref('')
+
+const routeErrorMessage = computed(() =>
+  route.query.error === PROFILE_ACCESS_ERROR ? PROFILE_ACCESS_ERROR_MESSAGE : '',
+)
+const visibleErrorMessage = computed(() => errorMessage.value || routeErrorMessage.value)
 
 const routeByRole = (role) => {
   if (role === 'teacher') {
@@ -122,8 +130,40 @@ const buildRoleProfileDefaults = (role) => ({
   avatarKey: role === 'student' ? defaultStudentAvatarKey : defaultTeacherAvatarKey,
 })
 
+const clearRouteError = async () => {
+  if (!route.query.error) return
+
+  await router.replace({
+    path: route.path,
+    query: {},
+  })
+}
+
+const buildLoginErrorMessage = (error) => {
+  if (error?.code === 'permission-denied') {
+    return PROFILE_ACCESS_ERROR_MESSAGE
+  }
+
+  if (
+    error?.code === 'auth/invalid-credential' ||
+    error?.code === 'auth/wrong-password' ||
+    error?.code === 'auth/user-not-found' ||
+    error?.code === 'auth/invalid-email'
+  ) {
+    return 'Invalid email or password.'
+  }
+
+  if (error?.code === 'auth/too-many-requests') {
+    return 'Too many login attempts. Please wait a moment and try again.'
+  }
+
+  return 'Unable to log in right now. Please try again.'
+}
+
 const handleLogin = async () => {
+  await clearRouteError()
   errorMessage.value = ''
+  passwordResetMessage.value = ''
   isSubmitting.value = true
 
   try {
@@ -143,15 +183,52 @@ const handleLogin = async () => {
 
     routeByRole(userProfile.role)
   } catch (error) {
-    errorMessage.value = 'Invalid email or password.'
+    if (error?.code === 'permission-denied') {
+      await logoutUser().catch(() => {})
+    }
+
+    errorMessage.value = buildLoginErrorMessage(error)
     console.error(error)
   } finally {
     isSubmitting.value = false
   }
 }
 
-const handleGoogleAuth = async () => {
+const handleForgotPassword = async () => {
+  await clearRouteError()
   errorMessage.value = ''
+  passwordResetMessage.value = ''
+
+  if (!email.value) {
+    errorMessage.value = 'Enter your email first so we can send a password reset link.'
+    return
+  }
+
+  isSendingPasswordReset.value = true
+
+  try {
+    await requestPasswordReset(email.value)
+    passwordResetMessage.value =
+      'If that email is registered, a password reset link has been sent.'
+  } catch (error) {
+    if (error?.code === 'auth/invalid-email') {
+      errorMessage.value = 'Enter a valid email address to reset your password.'
+    } else if (error?.code === 'auth/too-many-requests') {
+      errorMessage.value = 'Too many reset attempts. Please wait a moment and try again.'
+    } else {
+      errorMessage.value = 'We could not send a reset email right now. Please try again.'
+    }
+
+    console.error(error)
+  } finally {
+    isSendingPasswordReset.value = false
+  }
+}
+
+const handleGoogleAuth = async () => {
+  await clearRouteError()
+  errorMessage.value = ''
+  passwordResetMessage.value = ''
   isSubmitting.value = true
 
   try {
@@ -185,7 +262,13 @@ const handleGoogleAuth = async () => {
 
     routeByRole(selectedRole.value)
   } catch (error) {
-    errorMessage.value = 'Google sign-in was not completed.'
+    if (error?.code === 'permission-denied') {
+      await logoutUser().catch(() => {})
+      errorMessage.value = PROFILE_ACCESS_ERROR_MESSAGE
+    } else {
+      errorMessage.value = 'Google sign-in was not completed.'
+    }
+
     console.error(error)
   } finally {
     isSubmitting.value = false

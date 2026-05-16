@@ -1,11 +1,15 @@
 import {
   collection,
+  collectionGroup,
   deleteDoc,
   doc,
   getDoc,
   getDocs,
+  limit,
+  query,
   serverTimestamp,
   setDoc,
+  where,
 } from 'firebase/firestore'
 import { db } from '../config/firebase'
 
@@ -25,25 +29,20 @@ export const getStudentClasses = async (studentId) => {
 
 export const findTeacherClassByJoinCode = async (joinCode) => {
   const normalizedCode = joinCode.trim().toUpperCase()
-  const usersSnapshot = await getDocs(collection(db, 'users'))
+  const classesSnapshot = await getDocs(
+    query(collectionGroup(db, 'classes'), where('joinCode', '==', normalizedCode), limit(1)),
+  )
+  const classDoc = classesSnapshot.docs.find((item) => !item.data().archived)
 
-  for (const teacherDoc of usersSnapshot.docs) {
-    const classesSnapshot = await getDocs(collection(db, 'users', teacherDoc.id, 'classes'))
-    const classDoc = classesSnapshot.docs.find((item) => {
-      const data = item.data()
-      return String(data.joinCode || '').trim().toUpperCase() === normalizedCode && !data.archived
-    })
-
-    if (classDoc) {
-      return {
-        id: classDoc.id,
-        teacherId: teacherDoc.id,
-        ...classDoc.data(),
-      }
-    }
+  if (!classDoc) {
+    return null
   }
 
-  return null
+  return {
+    id: classDoc.id,
+    teacherId: classDoc.ref.parent.parent?.id || '',
+    ...classDoc.data(),
+  }
 }
 
 export const enrollStudentInClass = async (studentId, classData, studentProfile = {}) => {
@@ -131,4 +130,20 @@ export const leaveStudentClass = async (studentId, classId) => {
   }
 
   await deleteDoc(classRef)
+}
+
+export const deleteStudentAccountData = async (studentId) => {
+  const enrolledClassesSnapshot = await getDocs(studentClassesCollection(studentId))
+
+  await Promise.all(
+    enrolledClassesSnapshot.docs.map(async (classDoc) => {
+      const classData = classDoc.data()
+
+      if (classData.teacherId) {
+        await deleteDoc(teacherClassStudentRef(classData.teacherId, classDoc.id, studentId))
+      }
+
+      await deleteDoc(classDoc.ref)
+    }),
+  )
 }

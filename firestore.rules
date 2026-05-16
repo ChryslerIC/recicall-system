@@ -1,0 +1,87 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function userProfile(userId) {
+      return get(/databases/$(database)/documents/users/$(userId));
+    }
+
+    function hasRole(userId, role) {
+      return isSelf(userId)
+        && exists(/databases/$(database)/documents/users/$(userId))
+        && userProfile(userId).data.role == role;
+    }
+
+    function isTeacher(userId) {
+      return hasRole(userId, 'teacher');
+    }
+
+    function isStudent(userId) {
+      return hasRole(userId, 'student');
+    }
+
+    function currentUserIsTeacher() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && userProfile(request.auth.uid).data.role == 'teacher';
+    }
+
+    function enrolledClassDoc(studentId, classId) {
+      return get(/databases/$(database)/documents/users/$(studentId)/enrolledClasses/$(classId));
+    }
+
+    function isEnrolledStudentForClass(teacherId, classId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid)/enrolledClasses/$(classId))
+        && enrolledClassDoc(request.auth.uid, classId).data.teacherId == teacherId;
+    }
+
+    match /users/{userId} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create, update, delete: if isSelf(userId);
+
+      match /classes/{classId} {
+        allow get, list: if signedIn();
+        allow create, update, delete: if isTeacher(userId);
+
+        match /students/{studentId} {
+          allow get, list: if isTeacher(userId) || isEnrolledStudentForClass(userId, classId);
+          allow create, update, delete: if isTeacher(userId)
+            || (
+              isStudent(studentId)
+              && exists(/databases/$(database)/documents/users/$(studentId)/enrolledClasses/$(classId))
+              && enrolledClassDoc(studentId, classId).data.teacherId == userId
+            );
+        }
+
+        match /participationEvents/{eventId} {
+          allow get, list: if isTeacher(userId) || isEnrolledStudentForClass(userId, classId);
+          allow create, update, delete: if isTeacher(userId);
+        }
+      }
+
+      match /enrolledClasses/{classId} {
+        allow get, list: if isSelf(userId)
+          || (currentUserIsTeacher() && resource.data.teacherId == request.auth.uid);
+        allow create, update, delete: if isStudent(userId);
+      }
+    }
+
+    match /{document=**}/classes/{classId} {
+      allow get, list: if signedIn();
+    }
+
+    match /{document=**}/enrolledClasses/{classId} {
+      allow get, list: if currentUserIsTeacher() && resource.data.teacherId == request.auth.uid;
+    }
+  }
+}

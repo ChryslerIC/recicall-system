@@ -9,7 +9,7 @@
             aria-label="Toggle sidebar"
             @click="isSidebarExpanded = !isSidebarExpanded"
           >
-            <img :src="imgMenu" alt="" class="block h-full w-full" />
+            <AppIcon name="menu" class="h-full w-full text-[#111]" />
           </button>
           <img :src="imgStar" alt="" class="ml-4 mt-1 h-[40px] w-[44px] object-contain sm:ml-6 sm:mt-2 sm:h-[48px] sm:w-[53px] lg:ml-[31px] lg:mt-[15px] lg:h-[55px] lg:w-[61px]" />
           <p class="ml-3 mt-1 text-[28px] leading-none font-black tracking-[-0.03em] sm:ml-4 sm:mt-2 sm:text-[34px] lg:ml-[22px] lg:mt-[18px] lg:text-[40px]">ReciCall</p>
@@ -37,7 +37,7 @@
               aria-label="Classes"
               @click="router.push('/teacher')"
             >
-              <img :src="imgClasses" alt="" class="h-[36px] w-[45px] shrink-0" :style="inactiveNavIconStyle" />
+              <AppIcon name="classes" :size="26" class="shrink-0 text-[#707070]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Classes</span>
             </button>
             <button
@@ -47,14 +47,14 @@
               aria-label="Predictive analytics"
               @click="openPredictiveAnalytics"
             >
-              <img :src="imgAnalytics" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
+              <AppIcon name="insights" :size="24" class="shrink-0 text-[#707070]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[15px] font-medium text-[#3a3a3a]">Predictive Analytics</span>
             </button>
             <div
               class="flex h-[63px] w-full items-center rounded-[17px] bg-[rgba(46,130,239,0.25)]"
               :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center'"
             >
-              <img :src="imgArchive" alt="" class="h-[40px] w-[38px] shrink-0" :style="activeNavIconStyle" />
+              <AppIcon name="archive" :size="24" class="shrink-0 text-[#174ca0]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-semibold text-[#174ca0]">Archive</span>
             </div>
           </div>
@@ -67,7 +67,7 @@
               aria-label="Settings"
               @click="openProfileModal"
             >
-              <img :src="imgSettings" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
+              <AppIcon name="settings" :size="24" class="shrink-0 text-[#707070]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Settings</span>
             </button>
             <button
@@ -75,9 +75,9 @@
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(255,84,84,0.08)]"
               :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
               aria-label="Logout"
-              @click="handleLogout"
+              @click="openLogoutConfirm"
             >
-              <img :src="imgLogout" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
+              <AppIcon name="logout" :size="24" class="shrink-0 text-[#707070]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Logout</span>
             </button>
           </div>
@@ -93,16 +93,20 @@
 
               <button type="button" class="mt-[2px] flex h-[78px] w-[250px] items-center rounded-[33.5px] bg-[#1188f8] pl-[32px] pr-[21px]" @click="router.push('/teacher')">
                 <span class="grid h-[48px] w-[48px] place-items-center rounded-full bg-white text-[#1188f8]">
-                  <svg class="h-[26px] w-[26px]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M10.25 6.75 5 12l5.25 5.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" />
-                    <path d="M19 12H5.5" stroke="currentColor" stroke-linecap="round" stroke-width="2.4" />
-                  </svg>
+                  <AppIcon name="back" :size="24" />
                 </span>
                 <span class="ml-[10px] text-[24px] font-semibold text-white">Back to Classes</span>
               </button>
             </div>
 
             <div v-if="isLoading" class="mt-10 text-[18px] font-medium text-[#5d5d5d]">Loading archived classes...</div>
+
+            <div
+              v-else-if="loadError"
+              class="mt-10 rounded-[24px] border border-[#ffd0d0] bg-[#fff8f8] px-6 py-8 text-[18px] font-medium text-[#b81717]"
+            >
+              {{ loadError }}
+            </div>
 
             <div v-else-if="classes.length === 0" class="mt-10 rounded-[24px] border border-[#d9e8fb] bg-[#fbfdff] px-6 py-8 text-[18px] font-medium text-[#5d5d5d]">
               No archived classes yet.
@@ -118,33 +122,15 @@
                 <div class="relative mx-[5px] mt-[6px] h-[173px] overflow-hidden rounded-[17px]" :style="{ backgroundImage: classItem.gradient }">
                   <div class="absolute inset-x-0 bottom-0 h-[20px]" :style="{ backgroundImage: classItem.gradient }" />
 
-                  <template v-if="classItem.gradientId === 'blue'">
-                    <div class="absolute right-[28px] top-[67px] h-[91px] w-[34px] bg-[rgba(19,67,145,0.72)] [clip-path:polygon(100%_0,0_82%,100%_100%)]" />
-                    <div class="absolute right-[15px] top-[121px] h-[61px] w-[20px] bg-[rgba(22,92,182,0.8)] [clip-path:polygon(100%_0,0_66%,100%_100%)]" />
-                    <div class="absolute right-[15px] top-[138px] h-[46px] w-[6px] bg-[rgba(13,73,165,0.85)] [clip-path:polygon(100%_0,0_100%,100%_100%)]" />
-                    <div class="absolute right-[5px] top-[72px] h-[81px] w-[15px] bg-[rgba(18,86,173,0.78)] [clip-path:polygon(100%_0,0_100%,100%_84%)]" />
-                  </template>
-                  <template v-else-if="classItem.gradientId === 'green'">
-                    <div class="absolute right-[0px] top-[80px] h-[71px] w-[112px] bg-[rgba(33,170,41,0.48)] [clip-path:polygon(100%_4%,100%_100%,0_100%,26%_64%,39%_67%,51%_47%,62%_49%,79%_17%,89%_22%)]" />
-                    <div class="absolute right-[1px] top-[116px] h-[38px] w-[118px] bg-[rgba(44,192,55,0.58)] [clip-path:polygon(100%_8%,100%_100%,0_100%,18%_42%,30%_40%,52%_68%,76%_24%,89%_35%)]" />
-                    <div class="absolute right-[30px] top-[119px] h-[35px] w-[71px] bg-[rgba(35,155,44,0.65)] [clip-path:polygon(100%_0,100%_100%,0_100%,28%_28%,44%_40%,63%_0)]" />
-                  </template>
-                  <template v-else>
-                    <div class="absolute right-[4px] top-[86px] h-[88px] w-[96px]">
-                      <div class="absolute right-[26px] top-[0] h-[46px] w-[46px] rounded-full bg-[rgba(255,243,97,0.22)]" />
-                      <div class="absolute right-[66px] top-[18px] h-[14px] w-[14px] rounded-full bg-[rgba(255,243,97,0.28)]" />
-                      <div class="absolute right-[58px] top-[39px] h-[8px] w-[8px] rounded-full bg-[rgba(255,243,97,0.28)]" />
-                      <div class="absolute right-[0px] top-[40px] h-[50px] w-[80px] bg-[rgba(242,214,34,0.34)] [clip-path:polygon(100%_0,100%_100%,0_100%,20%_44%)]" />
-                    </div>
-                  </template>
+                  <ClassThemeArt :theme-id="classItem.gradientId" variant="card" />
 
                   <button
                     type="button"
-                    class="absolute right-[8px] top-[11px] z-20"
+                    class="absolute right-[10px] top-[11px] z-20 grid h-[38px] w-[38px] place-items-center rounded-full bg-black/10 text-white transition hover:bg-black/18"
                     :aria-label="`Open options for ${classItem.classLabel}`"
                     @click.stop="toggleOptions(classItem.id)"
                   >
-                    <img :src="imgEllipsisWhite" alt="" class="h-[39px] w-[35px]" />
+                    <AppIcon name="more" :size="22" />
                   </button>
 
                   <div
@@ -171,6 +157,9 @@
                   <p class="relative z-10 mt-[10px] pl-[16px] text-[24px] leading-none font-medium text-white">
                     {{ classItem.gradeLevel }} | {{ classItem.subject }}
                   </p>
+                  <p class="relative z-10 mt-[12px] ml-[15px] inline-flex w-fit rounded-full bg-white/18 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-white backdrop-blur-[1px]">
+                    {{ classItem.themeLabel }}
+                  </p>
                   <p class="relative z-10 mt-[24px] pl-[15px] text-[18px] leading-none font-medium text-white">
                     {{ classItem.scheduleLabel }} &bull; {{ classItem.time }}
                   </p>
@@ -195,22 +184,44 @@
       <div class="px-4 pb-6 sm:px-6 lg:hidden">
         <div class="flex items-center justify-center gap-8 rounded-[20px] border border-[#d9e8fb] bg-white px-4 py-3 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
           <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Classes" @click="router.push('/teacher')">
-            <img :src="imgClasses" alt="" class="h-[24px] w-[30px]" :style="inactiveNavIconStyle" />
+            <AppIcon name="classes" :size="22" class="text-[#707070]" />
           </button>
           <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Predictive analytics" @click="openPredictiveAnalytics">
-            <img :src="imgAnalytics" alt="" class="h-[28px] w-[26px]" :style="inactiveNavIconStyle" />
+            <AppIcon name="insights" :size="22" class="text-[#707070]" />
           </button>
           <button type="button" class="grid h-10 w-10 place-items-center rounded-[12px] bg-[rgba(46,130,239,0.25)]" aria-label="Archive">
-            <img :src="imgArchive" alt="" class="h-[28px] w-[26px]" :style="activeNavIconStyle" />
+            <AppIcon name="archive" :size="22" class="text-[#174ca0]" />
           </button>
           <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Settings" @click="openProfileModal">
-            <img :src="imgSettings" alt="" class="h-[28px] w-[26px]" :style="inactiveNavIconStyle" />
+            <AppIcon name="settings" :size="22" class="text-[#707070]" />
           </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Logout" @click="handleLogout">
-            <img :src="imgLogout" alt="" class="h-[28px] w-[26px]" :style="inactiveNavIconStyle" />
+          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Logout" @click="openLogoutConfirm">
+            <AppIcon name="logout" :size="22" class="text-[#707070]" />
           </button>
         </div>
       </div>
+
+      <ConfirmActionModal
+        :open="isLogoutConfirmOpen"
+        title="Log out?"
+        message="Are you sure you want to log out?"
+        confirm-text="Log out"
+        loading-text="Logging out..."
+        :loading="isLoggingOut"
+        @cancel="closeLogoutConfirm"
+        @confirm="handleLogout"
+      />
+
+      <ConfirmActionModal
+        :open="isDeleteAccountConfirmOpen"
+        title="Delete Account?"
+        message="This will permanently delete your teacher account, classes, join codes, mirrored student enrollments, and profile data. This action cannot be restored."
+        confirm-text="Delete Forever"
+        loading-text="Deleting..."
+        :loading="isDeletingAccount"
+        @cancel="closeDeleteAccountConfirm"
+        @confirm="handleDeleteAccount"
+      />
 
       <AnalyticsClassPickerModal
         :open="isAnalyticsClassPickerOpen"
@@ -233,7 +244,9 @@
                 <h2 class="text-[40px] leading-none font-semibold">Edit Profile</h2>
                 <p class="mt-2 text-[20px] font-medium">Update your display name and choose a preset avatar.</p>
               </div>
-              <button type="button" class="text-[34px] leading-none" aria-label="Close profile modal" @click="closeProfileModal">x</button>
+              <button type="button" class="grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8]" aria-label="Close profile modal" @click="closeProfileModal">
+                <AppIcon name="x" :size="20" />
+              </button>
             </div>
 
             <form class="space-y-4 pt-5" @submit.prevent="saveProfileChanges">
@@ -272,8 +285,28 @@
                 </div>
               </div>
 
+              <div class="rounded-[20px] border border-[#ffd6d6] bg-[#fff7f7] px-4 py-4">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p class="text-[16px] font-bold text-[#b81717]">Delete Account</p>
+                    <p class="mt-1 text-[14px] leading-[1.4] text-[#6b1d1d]">
+                      Permanently remove this teacher account and all of its class data. This cannot be undone.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    class="h-[46px] min-w-[148px] rounded-[18px] bg-[#b81717] px-5 text-[16px] font-semibold text-white transition hover:bg-[#9f1111] disabled:cursor-not-allowed disabled:opacity-70"
+                    :disabled="isSavingProfile || isDeletingAccount"
+                    @click="openDeleteAccountConfirm"
+                  >
+                    Delete Account
+                  </button>
+                </div>
+              </div>
+
               <p v-if="profileError" class="text-sm font-medium text-red-600">{{ profileError }}</p>
               <p v-if="profileSuccess" class="text-sm font-medium text-green-600">{{ profileSuccess }}</p>
+              <p v-if="deleteAccountError" class="text-sm font-medium text-red-600">{{ deleteAccountError }}</p>
 
               <div class="flex justify-end gap-4 pt-2">
                 <button type="button" class="h-[57px] w-[151px] rounded-[33.5px] bg-[#c5c5c5] text-[20px] font-bold" @click="closeProfileModal">
@@ -294,59 +327,52 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import AppIcon from '../../components/common/AppIcon.vue'
+import ClassThemeArt from '../../components/common/ClassThemeArt.vue'
+import ConfirmActionModal from '../../components/common/ConfirmActionModal.vue'
 import AnalyticsClassPickerModal from '../../components/teacher/AnalyticsClassPickerModal.vue'
 import { auth } from '../../config/firebase'
 import { logoutUser, updateCurrentUserAccount } from '../../services/authService'
+import {
+  deleteTeacherAccount,
+  getDeleteAccountErrorMessage,
+} from '../../services/accountService'
 import {
   getTeacherClasses,
   permanentlyDeleteTeacherClass,
   restoreTeacherClass,
 } from '../../services/teacherService'
 import { getUserById, upsertUserProfile } from '../../services/userService'
-import imgAnalytics from '../../assets/icons/recicall-analytics.svg'
-import imgArchive from '../../assets/icons/recicall-archive.svg'
-import imgClasses from '../../assets/icons/recicall-classes.svg'
-import imgEllipsisWhite from '../../assets/icons/recicall-ellipsis-white.svg'
-import imgLogout from '../../assets/icons/recicall-logout.svg'
-import imgMenu from '../../assets/icons/recicall-menu.svg'
 import imgProfile from '../../assets/icons/recicall-profile.svg'
-import imgSettings from '../../assets/icons/recicall-settings.svg'
 import imgStar from '../../assets/icons/recicall-logo.png'
-import { activeNavIconStyle, inactiveNavIconStyle } from '../../utils/navIconStyles'
+import { decorateClassWithTheme, getClassTheme } from '../../utils/classThemes'
 import { defaultTeacherAvatarKey, resolveTeacherAvatar, sanitizeTeacherAvatarKey, teacherAvatarOptions } from '../../utils/teacherAvatarOptions'
 
 const router = useRouter()
-
-const gradientConfig = {
-  blue: {
-    gradient: 'linear-gradient(90deg, rgb(37, 122, 255) 0%, rgb(36, 118, 247) 44.712%, rgb(29, 96, 201) 90.385%, rgb(22, 73, 153) 100%)',
-  },
-  green: {
-    gradient: 'linear-gradient(90deg, rgb(29, 201, 49) 0%, rgb(6, 196, 28) 15.865%, rgb(89, 234, 99) 87.019%, rgb(85, 232, 96) 92.308%)',
-  },
-  yellow: {
-    gradient: 'linear-gradient(90deg, rgb(228, 206, 40) 0%, rgb(253, 228, 66) 36.058%, rgb(255, 238, 47) 76.442%, rgb(237, 211, 42) 100%)',
-  },
-}
 
 const teacherName = ref('Maam. Anderson')
 const teacherRole = ref('High School Teacher')
 const teacherAvatarKey = ref(defaultTeacherAvatarKey)
 const isLoading = ref(true)
 const isLoggingOut = ref(false)
+const isLogoutConfirmOpen = ref(false)
 const isSidebarExpanded = ref(false)
 const isAnalyticsClassPickerOpen = ref(false)
 const isLoadingAnalyticsClasses = ref(false)
 const isProfileModalOpen = ref(false)
 const isSavingProfile = ref(false)
+const isDeleteAccountConfirmOpen = ref(false)
+const isDeletingAccount = ref(false)
 const profileError = ref('')
 const profileSuccess = ref('')
+const deleteAccountError = ref('')
 const profileName = ref('')
 const profileAvatarKey = ref(defaultTeacherAvatarKey)
 const openOptionsId = ref(null)
 const teacherId = ref('')
 const classes = ref([])
 const analyticsClasses = ref([])
+const loadError = ref('')
 const teacherPhoto = computed(() =>
   resolveTeacherAvatar(teacherAvatarKey.value, ''),
 )
@@ -371,24 +397,34 @@ const classCardWidth = (classItem) => {
 }
 
 const mapClassToCard = (classItem) => {
-  const config = gradientConfig[classItem.gradientId] || gradientConfig.blue
+  const themedClass = decorateClassWithTheme(classItem)
+  const theme = getClassTheme(themedClass)
 
   return {
-    ...classItem,
-    students: classItem.students ?? 35,
-    gradient: config.gradient,
-    width: classItem.gradientId === 'blue' ? 396.347 : 400,
-    statsWidth: classItem.gradientId === 'blue' ? 140.482 : 142.391,
-    engagementWidth: classItem.gradientId === 'blue' ? 139.41 : 141.304,
+    ...themedClass,
+    students: themedClass.students ?? 0,
+    engagement: themedClass.engagement || theme.engagementFallback,
+    width: 400,
+    statsWidth: 142.391,
+    engagementWidth: 141.304,
   }
 }
 
 const loadArchivedClasses = async () => {
   if (!teacherId.value) return
   isLoading.value = true
-  const archivedClasses = await getTeacherClasses(teacherId.value, { archived: true })
-  classes.value = archivedClasses.map(mapClassToCard)
-  isLoading.value = false
+  loadError.value = ''
+
+  try {
+    const archivedClasses = await getTeacherClasses(teacherId.value, { archived: true })
+    classes.value = archivedClasses.map(mapClassToCard)
+  } catch (error) {
+    console.error(error)
+    classes.value = []
+    loadError.value = 'We could not load archived classes right now. Please refresh and try again.'
+  } finally {
+    isLoading.value = false
+  }
 }
 
 const loadActiveAnalyticsClasses = async () => {
@@ -419,6 +455,19 @@ const closeProfileModal = () => {
   isProfileModalOpen.value = false
   profileError.value = ''
   profileSuccess.value = ''
+  deleteAccountError.value = ''
+}
+
+const openDeleteAccountConfirm = () => {
+  if (isSavingProfile.value || isDeletingAccount.value) return
+
+  deleteAccountError.value = ''
+  isDeleteAccountConfirmOpen.value = true
+}
+
+const closeDeleteAccountConfirm = () => {
+  if (isDeletingAccount.value) return
+  isDeleteAccountConfirmOpen.value = false
 }
 
 const openPredictiveAnalytics = async () => {
@@ -487,6 +536,25 @@ const saveProfileChanges = async () => {
   }
 }
 
+const handleDeleteAccount = async () => {
+  if (!teacherId.value || isDeletingAccount.value) return
+
+  isDeletingAccount.value = true
+  deleteAccountError.value = ''
+
+  try {
+    await deleteTeacherAccount(teacherId.value)
+    isDeleteAccountConfirmOpen.value = false
+    isProfileModalOpen.value = false
+    await router.replace('/')
+  } catch (error) {
+    console.error(error)
+    deleteAccountError.value = getDeleteAccountErrorMessage(error, 'teacher account')
+  } finally {
+    isDeletingAccount.value = false
+  }
+}
+
 const restoreClass = async (classId) => {
   await restoreTeacherClass(teacherId.value, classId)
   openOptionsId.value = null
@@ -499,6 +567,16 @@ const permanentlyDeleteClass = async (classId) => {
   await loadArchivedClasses()
 }
 
+const openLogoutConfirm = () => {
+  if (isLoggingOut.value) return
+  isLogoutConfirmOpen.value = true
+}
+
+const closeLogoutConfirm = () => {
+  if (isLoggingOut.value) return
+  isLogoutConfirmOpen.value = false
+}
+
 const handleLogout = async () => {
   if (isLoggingOut.value) return
 
@@ -508,6 +586,7 @@ const handleLogout = async () => {
     router.push('/')
   } finally {
     isLoggingOut.value = false
+    isLogoutConfirmOpen.value = false
   }
 }
 

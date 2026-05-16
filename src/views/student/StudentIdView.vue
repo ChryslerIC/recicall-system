@@ -9,7 +9,7 @@
             aria-label="Toggle sidebar"
             @click="isSidebarExpanded = !isSidebarExpanded"
           >
-            <img :src="imgMenu" alt="" class="block h-full w-full" />
+            <AppIcon name="menu" class="h-full w-full text-[#111]" />
           </button>
 
           <img :src="imgStar" alt="" class="ml-4 mt-1 h-[40px] w-[44px] object-contain sm:ml-6 sm:mt-2 sm:h-[48px] sm:w-[53px] lg:ml-[31px] lg:mt-[15px] lg:h-[55px] lg:w-[61px]" />
@@ -20,14 +20,7 @@
           </p>
         </div>
 
-        <div class="ml-4 flex items-start gap-4 sm:gap-5 lg:mr-[34px] lg:gap-[24px]">
-          <button type="button" class="mt-1 sm:mt-2 lg:mt-[18px]" aria-label="Notifications">
-            <img
-              :src="imgBell"
-              alt=""
-              class="block h-[52px] w-[40px] object-contain sm:h-[56px] sm:w-[44px] lg:h-[55px] lg:w-[70px]"
-            />
-          </button>
+        <div class="ml-4 flex items-start sm:gap-5 lg:mr-[34px]">
           <button type="button" class="mt-0 sm:mt-1 lg:mt-[12px]" aria-label="Profile" @click="openEditModal">
             <img
               :src="studentAvatarSrc"
@@ -51,14 +44,14 @@
               aria-label="Dashboard"
               @click="router.push('/student')"
             >
-              <img :src="imgRectangle14" alt="" class="h-[36px] w-[45px] shrink-0" :style="inactiveNavIconStyle" />
+              <AppIcon name="classes" :size="26" class="shrink-0 text-[#707070]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Classes</span>
             </button>
             <div
               class="flex h-[63px] w-full items-center rounded-[17px] bg-[rgba(46,130,239,0.25)]"
               :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center'"
             >
-              <img :src="imgRectangle77Active" alt="" class="h-[54px] w-[42px] shrink-0" />
+              <AppIcon name="badge" :size="24" class="shrink-0 text-[#174ca0]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-semibold text-[#174ca0]">Student ID</span>
             </div>
           </div>
@@ -71,7 +64,7 @@
               aria-label="Settings"
               @click="openEditModal"
             >
-              <img :src="imgRectangle18" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
+              <AppIcon name="settings" :size="24" class="shrink-0 text-[#707070]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Settings</span>
             </button>
             <button
@@ -79,9 +72,9 @@
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(255,84,84,0.08)]"
               :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
               aria-label="Logout"
-              @click="handleLogout"
+              @click="openLogoutConfirm"
             >
-              <img :src="imgRectangle17" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
+              <AppIcon name="logout" :size="24" class="shrink-0 text-[#707070]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Logout</span>
             </button>
           </div>
@@ -98,36 +91,19 @@
 
               <button
                 type="button"
-                style="
-                  margin-top: 6px;
-                  width: min(100%, 116px);
-                  height: 42px;
-                  border-radius: 20px;
-                  background: #1188f8;
-                  display: flex;
-                  align-items: center;
-                  padding-left: 14px;
-                  padding-right: 14px;
-                  box-sizing: border-box;
-                "
+                :disabled="isSavingIdPdf"
+                class="mt-[6px] inline-flex h-[42px] w-full max-w-[132px] items-center justify-center gap-[8px] rounded-[20px] bg-[#1188f8] px-[14px] text-[13px] font-semibold text-white disabled:opacity-60"
+                @click="saveStudentIdAsPdf"
               >
-                <span class="block h-[24px] w-[24px] shrink-0 bg-white" :style="saveMaskStyle" />
-                <span
-                  style="
-                    margin-left: 7px;
-                    font-size: 13px;
-                    font-weight: 600;
-                    color: white;
-                    line-height: 1;
-                  "
-                  >Save Id</span
-                >
+                <AppIcon name="download" :size="18" class="text-white" />
+                <span>{{ isSavingIdPdf ? 'Saving...' : 'Save ID' }}</span>
               </button>
             </div>
 
             <div class="mt-[34px] hidden sm:flex sm:justify-center">
               <div class="mx-auto flex w-full max-w-[860px] flex-col items-center">
                 <div
+                  ref="desktopIdCardRef"
                   class="relative overflow-hidden border-2 border-black"
                   style="
                     width: 640px;
@@ -147,16 +123,7 @@
                       gap: 12px;
                     "
                   >
-                    <svg
-                      viewBox="0 0 52 47"
-                      aria-hidden="true"
-                      style="width: 40px; height: 36px; display: block"
-                    >
-                      <path
-                        d="M26 0L31.5 17.5L52 23.5L31.5 29.5L26 47L20.5 29.5L0 23.5L20.5 17.5L26 0Z"
-                        fill="#1f88f5"
-                      />
-                    </svg>
+                    <img :src="imgStar" alt="" style="width: 40px; height: 36px; display: block; object-fit: contain" />
                     <p style="margin: 0; font-size: 20px; font-weight: 700; line-height: 1">
                       ReciCall
                     </p>
@@ -244,7 +211,7 @@
                     "
                     @click="openEditModal"
                   >
-                    <img :src="imgEdit" alt="" style="width: 30px; height: 30px; display: block" />
+                    <AppIcon name="pencil" :size="24" class="text-white" />
                     <span style="font-size: 19px; font-weight: 700; color: white; line-height: 1"
                       >Edit Id</span
                     >
@@ -254,14 +221,9 @@
             </div>
 
             <div class="mt-10 sm:hidden">
-              <div class="mx-auto w-full max-w-[360px] overflow-hidden rounded-[34px] border-2 border-black bg-[linear-gradient(135deg,#dce8fb_0%,#c7d9f8_46%,#2e82ef_100%)] px-3 py-4">
+              <div ref="mobileIdCardRef" class="mx-auto w-full max-w-[360px] overflow-hidden rounded-[34px] border-2 border-black bg-[linear-gradient(135deg,#dce8fb_0%,#c7d9f8_46%,#2e82ef_100%)] px-3 py-4">
                 <div class="flex items-center gap-2">
-                  <svg viewBox="0 0 52 47" aria-hidden="true" class="h-[26px] w-[28px] shrink-0">
-                    <path
-                      d="M26 0L31.5 17.5L52 23.5L31.5 29.5L26 47L20.5 29.5L0 23.5L20.5 17.5L26 0Z"
-                      fill="#1f88f5"
-                    />
-                  </svg>
+                  <img :src="imgStar" alt="" class="h-[26px] w-[28px] shrink-0 object-contain" />
                   <p class="text-[16px] leading-none font-bold">ReciCall</p>
                 </div>
 
@@ -307,7 +269,7 @@
                 "
                 @click="openEditModal"
               >
-                <img :src="imgEdit" alt="" style="width: 22px; height: 22px; display: block" />
+                <AppIcon name="pencil" :size="18" class="text-white" />
                 <span style="font-size: 16px; font-weight: 700; color: white; line-height: 1"
                   >Edit Id</span
                 >
@@ -327,30 +289,52 @@
             aria-label="Dashboard"
             @click="router.push('/student')"
           >
-            <img :src="imgRectangle14" alt="" class="h-[24px] w-[30px]" :style="inactiveNavIconStyle" />
+            <AppIcon name="classes" :size="22" class="text-[#707070]" />
           </button>
           <button
             type="button"
             class="grid h-10 w-10 place-items-center rounded-[12px] bg-[rgba(46,130,239,0.25)]"
             aria-label="Student ID"
           >
-            <img :src="imgRectangle77Active" alt="" class="h-[26px] w-[20px]" />
+            <AppIcon name="badge" :size="22" class="text-[#174ca0]" />
           </button>
           <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Settings" @click="openEditModal">
-            <img :src="imgRectangle18" alt="" class="h-[24px] w-[24px]" :style="inactiveNavIconStyle" />
+            <AppIcon name="settings" :size="22" class="text-[#707070]" />
           </button>
           <button
             type="button"
             class="grid h-10 w-10 place-items-center"
             aria-label="Logout"
-            @click="handleLogout"
+            @click="openLogoutConfirm"
           >
-            <img :src="imgRectangle17" alt="" class="h-[24px] w-[24px]" :style="inactiveNavIconStyle" />
+            <AppIcon name="logout" :size="22" class="text-[#707070]" />
           </button>
         </div>
       </div>
     </div>
   </div>
+
+  <ConfirmActionModal
+    :open="isLogoutConfirmOpen"
+    title="Log out?"
+    message="Are you sure you want to log out?"
+    confirm-text="Log out"
+    loading-text="Logging out..."
+    :loading="isLoggingOut"
+    @cancel="closeLogoutConfirm"
+    @confirm="handleLogout"
+  />
+
+  <ConfirmActionModal
+    :open="isDeleteAccountConfirmOpen"
+    title="Delete Account?"
+    message="This will permanently delete your student account, joined classes, mirrored class records, and profile data. This action cannot be restored."
+    confirm-text="Delete Forever"
+    loading-text="Deleting..."
+    :loading="isDeletingAccount"
+    @cancel="closeDeleteAccountConfirm"
+    @confirm="handleDeleteAccount"
+  />
 
   <div
     v-if="isEditModalOpen"
@@ -368,11 +352,11 @@
 
         <button
           type="button"
-          class="text-[26px] leading-none"
+          class="grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8]"
           aria-label="Close"
           @click="closeEditModal"
         >
-          x
+          <AppIcon name="x" :size="20" />
         </button>
       </div>
 
@@ -419,6 +403,29 @@
         </p>
       </div>
 
+      <div class="mt-6 rounded-[20px] border border-[#ffd6d6] bg-[#fff7f7] px-4 py-4">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="text-[16px] font-bold text-[#b81717]">Delete Account</p>
+            <p class="mt-1 text-[14px] leading-[1.4] text-[#6b1d1d]">
+              Permanently remove this student account, joined classes, and profile data. This cannot be undone.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="h-[46px] min-w-[148px] rounded-[18px] bg-[#b81717] px-5 text-[16px] font-semibold text-white transition hover:bg-[#9f1111] disabled:cursor-not-allowed disabled:opacity-70"
+            :disabled="isSavingName || isDeletingAccount"
+            @click="openDeleteAccountConfirm"
+          >
+            Delete Account
+          </button>
+        </div>
+      </div>
+
+      <p v-if="deleteAccountError" class="mt-4 text-[15px] font-medium text-red-600">
+        {{ deleteAccountError }}
+      </p>
+
       <div class="mt-8 flex justify-end gap-4">
         <button
           type="button"
@@ -442,43 +449,30 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import AppIcon from '../../components/common/AppIcon.vue'
+import ConfirmActionModal from '../../components/common/ConfirmActionModal.vue'
 import { auth } from '../../config/firebase'
 import { logoutUser, updateCurrentUserAccount } from '../../services/authService'
+import {
+  deleteStudentAccount,
+  getDeleteAccountErrorMessage,
+} from '../../services/accountService'
 import { syncStudentProfileAcrossClasses } from '../../services/studentService'
 import { getUserById, upsertUserProfile } from '../../services/userService'
-import imgRectangle17 from '../../assets/icons/recicall-logout.svg'
-import imgRectangle18 from '../../assets/icons/recicall-settings.svg'
-import imgRectangle14 from '../../assets/icons/recicall-classes.svg'
-import imgRectangle77Active from '../../assets/icons/recicall-student-id-active.svg'
-import imgMenu from '../../assets/icons/recicall-menu.svg'
+import { downloadElementAsPdf } from '../../utils/participationReports'
 import imgStar from '../../assets/icons/recicall-logo.png'
-import imgBell from '../../assets/icons/notification-bell-svgrepo-com.svg'
-import { inactiveNavIconStyle } from '../../utils/navIconStyles'
 import {
   defaultStudentAvatarKey,
   resolveStudentAvatar,
   studentAvatarOptions,
 } from '../../utils/studentAvatarOptions'
-
-const svgDataUri = (svg) => `data:image/svg+xml;utf8,${encodeURIComponent(svg.trim())}`
-const imgRectangle78 = svgDataUri(`
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-    <path d="M12 4v11" stroke="black" stroke-width="2.3" stroke-linecap="round"/>
-    <path d="m7.5 11.5 4.5 4.5 4.5-4.5" stroke="black" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M5 20h14" stroke="black" stroke-width="2.3" stroke-linecap="round"/>
-  </svg>
-`)
-const imgEdit = svgDataUri(`
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-    <path d="M7 25h5l12-12-5-5L7 20v5Z" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="m17 8 5 5" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M6 27h20" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-  </svg>
-`)
 const router = useRouter()
 const isLoggingOut = ref(false)
+const isLogoutConfirmOpen = ref(false)
+const isDeleteAccountConfirmOpen = ref(false)
+const isDeletingAccount = ref(false)
 const displayName = ref('Alonso Von Leopard')
 const studentNumber = ref('20232023')
 const studentUid = ref('')
@@ -488,21 +482,15 @@ const isEditModalOpen = ref(false)
 const editNameValue = ref('')
 const editAvatarKey = ref(defaultStudentAvatarKey)
 const editError = ref('')
+const deleteAccountError = ref('')
 const isSavingName = ref(false)
+const isSavingIdPdf = ref(false)
 const nameChangeCount = ref(0)
 const avatarKey = ref(defaultStudentAvatarKey)
 const maxNameChanges = 2
-
-const saveMaskStyle = {
-  maskImage: `url('${imgRectangle78}')`,
-  WebkitMaskImage: `url('${imgRectangle78}')`,
-  maskRepeat: 'no-repeat',
-  WebkitMaskRepeat: 'no-repeat',
-  maskPosition: 'center',
-  WebkitMaskPosition: 'center',
-  maskSize: 'contain',
-  WebkitMaskSize: 'contain',
-}
+const qrImageUrl = ref('')
+const desktopIdCardRef = ref(null)
+const mobileIdCardRef = ref(null)
 
 const nameParts = computed(() => displayName.value.trim().split(/\s+/).filter(Boolean))
 const firstNameValue = computed(() => {
@@ -537,10 +525,53 @@ const qrPayload = computed(() =>
   }),
 )
 
-const qrImageUrl = computed(
-  () =>
-    `https://api.qrserver.com/v1/create-qr-code/?size=244x244&data=${encodeURIComponent(qrPayload.value)}`,
-)
+const refreshQrImage = async () => {
+  const { default: QRCode } = await import('qrcode')
+  qrImageUrl.value = await QRCode.toDataURL(qrPayload.value, {
+    width: 244,
+    margin: 1,
+    color: {
+      dark: '#000000',
+      light: '#ffffff',
+    },
+  })
+}
+
+watch(qrPayload, () => {
+  refreshQrImage().catch((error) => {
+    console.error('Unable to generate QR code:', error)
+  })
+}, { immediate: true })
+
+const getVisibleIdCardElement = () => {
+  const candidates = [desktopIdCardRef.value, mobileIdCardRef.value]
+  return candidates.find((element) => {
+    if (!element) return false
+    const styles = window.getComputedStyle(element)
+    return styles.display !== 'none' && styles.visibility !== 'hidden'
+  }) || desktopIdCardRef.value || mobileIdCardRef.value
+}
+
+const saveStudentIdAsPdf = async () => {
+  const target = getVisibleIdCardElement()
+  if (!target || isSavingIdPdf.value) return
+
+  isSavingIdPdf.value = true
+  try {
+    await downloadElementAsPdf({
+      element: target,
+      fileName: `${displayName.value.trim().replace(/\s+/g, '-').toLowerCase() || 'student-id'}-recicall-id.pdf`,
+      orientation: 'landscape',
+      format: 'a4',
+      margin: 12,
+      backgroundColor: '#ffffff',
+    })
+  } catch (error) {
+    console.error('Unable to save student ID PDF:', error)
+  } finally {
+    isSavingIdPdf.value = false
+  }
+}
 
 const generateStudentNumber = (uid) => {
   const digits = uid.replace(/\D/g, '')
@@ -554,6 +585,16 @@ const generateStudentNumber = (uid) => {
   return String(hash).padStart(8, '0')
 }
 
+const openLogoutConfirm = () => {
+  if (isLoggingOut.value) return
+  isLogoutConfirmOpen.value = true
+}
+
+const closeLogoutConfirm = () => {
+  if (isLoggingOut.value) return
+  isLogoutConfirmOpen.value = false
+}
+
 const handleLogout = async () => {
   if (isLoggingOut.value) return
   isLoggingOut.value = true
@@ -564,6 +605,7 @@ const handleLogout = async () => {
     console.error(error)
   } finally {
     isLoggingOut.value = false
+    isLogoutConfirmOpen.value = false
   }
 }
 
@@ -573,6 +615,7 @@ const openEditModal = () => {
   editError.value = canEditName.value
     ? ''
     : `You have already used all ${maxNameChanges} lifetime name changes, but you can still change your avatar.`
+  deleteAccountError.value = ''
   isEditModalOpen.value = true
 }
 
@@ -580,6 +623,19 @@ const closeEditModal = (force = false) => {
   if (isSavingName.value && !force) return
   isEditModalOpen.value = false
   editError.value = ''
+  deleteAccountError.value = ''
+}
+
+const openDeleteAccountConfirm = () => {
+  if (isSavingName.value || isDeletingAccount.value) return
+
+  deleteAccountError.value = ''
+  isDeleteAccountConfirmOpen.value = true
+}
+
+const closeDeleteAccountConfirm = () => {
+  if (isDeletingAccount.value) return
+  isDeleteAccountConfirmOpen.value = false
 }
 
 const saveProfileChanges = async () => {
@@ -654,6 +710,25 @@ const saveProfileChanges = async () => {
     editError.value = error?.message || 'Unable to update your profile right now.'
   } finally {
     isSavingName.value = false
+  }
+}
+
+const handleDeleteAccount = async () => {
+  if (!studentUid.value || isDeletingAccount.value) return
+
+  isDeletingAccount.value = true
+  deleteAccountError.value = ''
+
+  try {
+    await deleteStudentAccount(studentUid.value)
+    isDeleteAccountConfirmOpen.value = false
+    isEditModalOpen.value = false
+    await router.replace('/')
+  } catch (error) {
+    console.error(error)
+    deleteAccountError.value = getDeleteAccountErrorMessage(error, 'student account')
+  } finally {
+    isDeletingAccount.value = false
   }
 }
 

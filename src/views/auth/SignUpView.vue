@@ -37,11 +37,7 @@
       <label class="block">
         <span class="sr-only">Email or Username</span>
         <div class="flex h-14 items-center rounded-[15px] border border-black px-4">
-          <svg class="mr-3 h-5 w-5 text-[#777]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path
-              d="M2.5 4.5A2.5 2.5 0 0 1 5 2h10a2.5 2.5 0 0 1 2.5 2.5v11A2.5 2.5 0 0 1 15 18H5a2.5 2.5 0 0 1-2.5-2.5v-11Zm2.5-.5a.5.5 0 0 0-.5.5v.217l5.5 4.278 5.5-4.278V4.5a.5.5 0 0 0-.5-.5H5Zm10.5 2.985-4.886 3.8a1 1 0 0 1-1.228 0L4.5 6.985V15.5a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V6.985Z"
-            />
-          </svg>
+          <AppIcon name="mail" :size="20" class="mr-3 text-[#777]" />
           <input
             v-model.trim="email"
             type="email"
@@ -54,13 +50,7 @@
       <label class="block">
         <span class="sr-only">Password</span>
         <div class="flex h-14 items-center rounded-[15px] border border-black px-4">
-          <svg class="mr-3 h-5 w-5 text-[#777]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path
-              fill-rule="evenodd"
-              d="M6 8V6a4 4 0 1 1 8 0v2a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2Zm2-2a2 2 0 1 1 4 0v2H8V6Zm2 4a1.25 1.25 0 0 0-.75 2.25V14a.75.75 0 0 0 1.5 0v-1.75A1.25 1.25 0 0 0 10 10Z"
-              clip-rule="evenodd"
-            />
-          </svg>
+          <AppIcon name="lock" :size="20" class="mr-3 text-[#777]" />
           <input
             v-model="password"
             :type="showPassword ? 'text' : 'password'"
@@ -68,13 +58,27 @@
             class="w-full bg-transparent text-[16px] font-medium text-black outline-none placeholder:text-[#777]"
           />
           <button type="button" class="ml-3 text-[#777]" @click="showPassword = !showPassword">
-            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path
-                d="M10 4.5c4.363 0 7.446 3.145 8.675 5.044a.84.84 0 0 1 0 .912C17.446 12.355 14.363 15.5 10 15.5S2.554 12.355 1.325 10.456a.84.84 0 0 1 0-.912C2.554 7.645 5.637 4.5 10 4.5Zm0 2c-3.174 0-5.625 2.19-6.792 3.5C4.375 11.31 6.826 13.5 10 13.5s5.625-2.19 6.792-3.5C15.625 8.69 13.174 6.5 10 6.5Zm0 1.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"
-              />
-            </svg>
+            <AppIcon :name="showPassword ? 'eye-off' : 'eye'" :size="20" />
           </button>
         </div>
+      </label>
+
+      <label class="flex items-start gap-3 rounded-[18px] bg-[#f6f9ff] px-4 py-4 text-[14px] leading-[1.45] text-[#334155]">
+        <input
+          v-model="acceptedPolicies"
+          type="checkbox"
+          class="mt-1 h-4 w-4 rounded border-black text-[#1188f8]"
+        />
+        <span>
+          I agree to the
+          <RouterLink to="/terms" class="font-semibold text-[#1188f8] hover:underline">
+            Terms of Service
+          </RouterLink>
+          and
+          <RouterLink to="/privacy" class="font-semibold text-[#1188f8] hover:underline">
+            Privacy Policy
+          </RouterLink>.
+        </span>
       </label>
 
       <p v-if="errorMessage" class="text-sm font-medium text-red-600">
@@ -96,6 +100,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AuthShell from '../../components/auth/AuthShell.vue'
+import AppIcon from '../../components/common/AppIcon.vue'
 import loginFrameBackground from '../../assets/figma/images/login-school-supplies-frame.png'
 import studentIllustration from '../../assets/figma/images/student-raising-hand-online-lesson.png'
 import { logoutUser, registerUser, signInWithGoogle } from '../../services/authService'
@@ -113,6 +118,7 @@ const selectedRole = ref('teacher')
 const showPassword = ref(false)
 const isSubmitting = ref(false)
 const errorMessage = ref('')
+const acceptedPolicies = ref(false)
 
 const routeByRole = (role) => {
   if (role === 'teacher') {
@@ -134,11 +140,26 @@ const buildRoleProfileDefaults = (role) => ({
   avatarKey: role === 'student' ? defaultStudentAvatarKey : defaultTeacherAvatarKey,
 })
 
+const buildLegalAcceptanceFields = () => {
+  const acceptedAt = new Date().toISOString()
+
+  return {
+    acceptedTermsAt: acceptedAt,
+    acceptedPrivacyAt: acceptedAt,
+    acceptedLegalVersion: '2026-05-12',
+  }
+}
+
 const handleSignUp = async () => {
   errorMessage.value = ''
 
   if (!firstName.value || !lastName.value || !email.value || !password.value) {
     errorMessage.value = 'Complete all fields before creating an account.'
+    return
+  }
+
+  if (!acceptedPolicies.value) {
+    errorMessage.value = 'You need to agree to the Terms of Service and Privacy Policy to continue.'
     return
   }
 
@@ -156,6 +177,7 @@ const handleSignUp = async () => {
       displayName: `${firstName.value} ${lastName.value}`.trim(),
       createdAt: new Date().toISOString(),
       ...buildRoleProfileDefaults(selectedRole.value),
+      ...buildLegalAcceptanceFields(),
     })
 
     routeByRole(selectedRole.value)
@@ -169,6 +191,12 @@ const handleSignUp = async () => {
 
 const handleGoogleAuth = async () => {
   errorMessage.value = ''
+
+  if (!acceptedPolicies.value) {
+    errorMessage.value = 'Please agree to the Terms of Service and Privacy Policy before signing up with Google.'
+    return
+  }
+
   isSubmitting.value = true
 
   try {
@@ -199,6 +227,7 @@ const handleGoogleAuth = async () => {
       displayName: user.displayName || `${derivedFirstName} ${derivedLastName}`.trim(),
       createdAt: new Date().toISOString(),
       ...buildRoleProfileDefaults(selectedRole.value),
+      ...buildLegalAcceptanceFields(),
     })
 
     routeByRole(selectedRole.value)

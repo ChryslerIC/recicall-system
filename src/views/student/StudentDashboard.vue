@@ -9,21 +9,14 @@
             aria-label="Toggle sidebar"
             @click="isSidebarExpanded = !isSidebarExpanded"
           >
-            <img :src="imgMenu" alt="" class="block h-full w-full" />
+            <AppIcon name="menu" class="h-full w-full text-[#111]" />
           </button>
 
           <img :src="imgStar" alt="" class="ml-4 mt-1 h-[40px] w-[44px] object-contain sm:ml-6 sm:mt-2 sm:h-[48px] sm:w-[53px] lg:ml-[31px] lg:mt-[15px] lg:h-[55px] lg:w-[61px]" />
           <p class="ml-3 mt-1 text-[28px] leading-none font-black tracking-[-0.03em] sm:ml-4 sm:mt-2 sm:text-[34px] lg:ml-[22px] lg:mt-[18px] lg:text-[40px]">ReciCall</p>
         </div>
 
-        <div class="ml-4 flex items-start gap-4 sm:gap-5 lg:mr-[34px] lg:gap-[24px]">
-          <button type="button" class="mt-1 sm:mt-2 lg:mt-[18px]" aria-label="Notifications">
-            <img
-              :src="imgBell"
-              alt=""
-              class="block h-[52px] w-[40px] object-contain sm:h-[56px] sm:w-[44px] lg:h-[55px] lg:w-[70px]"
-            />
-          </button>
+        <div class="ml-4 flex items-start sm:gap-5 lg:mr-[34px]">
           <button type="button" class="mt-0 sm:mt-1 lg:mt-[12px]" aria-label="Profile" @click="openStudentSettings">
             <img :src="studentAvatarSrc" alt="" class="h-[48px] w-[49px] rounded-full object-cover sm:h-[56px] sm:w-[57px] lg:h-[63px] lg:w-[64px]" />
           </button>
@@ -40,7 +33,7 @@
               class="flex h-[63px] w-full items-center rounded-[17px] bg-[rgba(46,130,239,0.25)]"
               :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center'"
             >
-              <img :src="imgRectangle14" alt="" class="h-[36px] w-[45px] shrink-0" :style="activeNavIconStyle" />
+              <AppIcon name="classes" :size="26" class="shrink-0 text-[#174ca0]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-semibold text-[#174ca0]">Classes</span>
             </div>
             <button
@@ -50,7 +43,7 @@
               aria-label="Student ID"
               @click="router.push('/student/id')"
             >
-              <img :src="imgRectangle77" alt="" class="h-[54px] w-[42px] shrink-0" />
+              <AppIcon name="badge" :size="24" class="shrink-0 text-[#707070]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Student ID</span>
             </button>
           </div>
@@ -63,7 +56,7 @@
               aria-label="Settings"
               @click="openStudentSettings"
             >
-              <img :src="imgRectangle18" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
+              <AppIcon name="settings" :size="24" class="shrink-0 text-[#707070]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Settings</span>
             </button>
             <button
@@ -71,9 +64,9 @@
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(255,84,84,0.08)]"
               :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
               aria-label="Logout"
-              @click="handleLogout"
+              @click="openLogoutConfirm"
             >
-              <img :src="imgRectangle17" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
+              <AppIcon name="logout" :size="24" class="shrink-0 text-[#707070]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Logout</span>
             </button>
           </div>
@@ -89,16 +82,20 @@
 
               <button type="button" class="mt-[2px] flex h-[72px] w-full max-w-[249px] items-center rounded-[33.5px] bg-[#1188f8] pl-[24px] pr-[18px] sm:h-[78px] sm:pl-[32px] sm:pr-[21px]" @click="openJoinModal">
                 <span class="grid h-[42px] w-[46px] place-items-center rounded-full bg-white sm:h-[48px] sm:w-[53px]">
-                  <svg viewBox="0 0 53 48" class="h-[24px] w-[24px] sm:h-[28px] sm:w-[28px]" fill="none" aria-hidden="true">
-                    <path d="M26.5 10V38" stroke="#1188F8" stroke-width="5" stroke-linecap="round" />
-                    <path d="M12.5 24H40.5" stroke="#1188F8" stroke-width="5" stroke-linecap="round" />
-                  </svg>
+                  <AppIcon name="plus" :size="28" class="text-[#1188f8]" />
                 </span>
                 <span class="ml-[7px] text-[20px] font-semibold text-white sm:text-[24px]">Join Class</span>
               </button>
             </div>
 
             <div v-if="isLoading" class="mt-10 text-[18px] font-medium text-[#5d5d5d]">Loading classes...</div>
+
+            <div
+              v-else-if="loadError"
+              class="mt-10 rounded-[24px] border border-[#f1b5b5] bg-[#fff5f5] px-6 py-8 text-[18px] font-medium text-[#b81717]"
+            >
+              {{ loadError }}
+            </div>
 
             <div
               v-else-if="classes.length === 0"
@@ -117,31 +114,15 @@
               >
                 <div class="relative mx-[5px] mt-[6px] h-[173px] overflow-hidden rounded-[17px]" :style="{ backgroundImage: classItem.gradient }">
                   <div class="absolute inset-x-0 bottom-0 h-[20px]" :style="{ backgroundImage: classItem.gradient }" />
-
-                  <template v-if="classItem.gradientId === 'blue'">
-                    <img :src="imgPolygon4" alt="" class="absolute right-[28px] top-[67px] h-[91px] w-[34px]" />
-                    <img :src="imgPolygon5" alt="" class="absolute right-[15px] top-[121px] h-[61px] w-[20px]" />
-                    <img :src="imgPolygon6" alt="" class="absolute right-[15px] top-[138px] h-[46px] w-[6px]" />
-                    <img :src="imgPolygon7" alt="" class="absolute right-[5px] top-[72px] h-[81px] w-[15px]" />
-                  </template>
-
-                  <template v-else-if="classItem.gradientId === 'green'">
-                    <img :src="imgVector1" alt="" class="absolute right-[-1px] top-[82px] h-[71px] w-[112px]" />
-                    <img :src="imgVector2" alt="" class="absolute right-[1px] top-[116px] h-[38px] w-[118px]" />
-                    <img :src="imgVector3" alt="" class="absolute right-[30px] top-[119px] h-[35px] w-[71px]" />
-                  </template>
-
-                  <template v-else>
-                    <img :src="imgGroup9" alt="" class="absolute right-[-29px] top-[67px] h-[133px] w-[160px]" />
-                  </template>
+                  <ClassThemeArt :theme-id="classItem.gradientId" variant="card" />
 
                   <button
                     type="button"
-                    class="absolute right-[8px] top-[11px] z-20"
+                    class="absolute right-[10px] top-[11px] z-20 grid h-[38px] w-[38px] place-items-center rounded-full bg-black/10 text-white transition hover:bg-black/18"
                     :aria-label="`Open options for ${classItem.subject}`"
                     @click.stop="toggleOptions(classItem.id)"
                   >
-                    <img :src="imgVerticalDots" alt="" class="h-[39px] w-[35px]" />
+                    <AppIcon name="more" :size="22" />
                   </button>
 
                   <div
@@ -160,6 +141,9 @@
                   <p class="relative z-10 pl-[16px] pt-[16px] text-[36px] leading-none font-semibold text-white">{{ classItem.subject }}</p>
                   <p class="relative z-10 mt-[10px] pl-[16px] text-[24px] leading-none font-medium text-white">
                     {{ classItem.gradeLevel }} | {{ classItem.classLabel }}
+                  </p>
+                  <p class="relative z-10 mt-[12px] ml-[15px] inline-flex w-fit rounded-full bg-white/18 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-white backdrop-blur-[1px]">
+                    {{ classItem.themeLabel }}
                   </p>
                   <p class="relative z-10 mt-[24px] pl-[15px] text-[18px] leading-none font-medium text-white">{{ classItem.scheduleLabel }} &bull; {{ classItem.time }}</p>
                 </div>
@@ -182,19 +166,30 @@
       <div class="px-4 pb-6 sm:px-6 lg:hidden">
         <div class="flex items-center justify-center gap-8 rounded-[20px] border border-[#d9e8fb] bg-white px-4 py-3 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
           <button type="button" class="grid h-10 w-10 place-items-center rounded-[12px] bg-[rgba(46,130,239,0.25)]" aria-label="Dashboard">
-            <img :src="imgRectangle14" alt="" class="h-[24px] w-[30px]" :style="activeNavIconStyle" />
+            <AppIcon name="classes" :size="22" class="text-[#174ca0]" />
           </button>
           <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Student ID" @click="router.push('/student/id')">
-            <img :src="imgRectangle77" alt="" class="h-[26px] w-[20px]" />
+            <AppIcon name="badge" :size="22" class="text-[#707070]" />
           </button>
           <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Settings" @click="openStudentSettings">
-            <img :src="imgRectangle18" alt="" class="h-[24px] w-[24px]" :style="inactiveNavIconStyle" />
+            <AppIcon name="settings" :size="22" class="text-[#707070]" />
           </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Logout" @click="handleLogout">
-            <img :src="imgRectangle17" alt="" class="h-[24px] w-[24px]" :style="inactiveNavIconStyle" />
+          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Logout" @click="openLogoutConfirm">
+            <AppIcon name="logout" :size="22" class="text-[#707070]" />
           </button>
         </div>
       </div>
+
+      <ConfirmActionModal
+        :open="isLogoutConfirmOpen"
+        title="Log out?"
+        message="Are you sure you want to log out?"
+        confirm-text="Log out"
+        loading-text="Logging out..."
+        :loading="isLoggingOut"
+        @cancel="closeLogoutConfirm"
+        @confirm="handleLogout"
+      />
 
       <AvatarSuggestionModal
         :open="isAvatarPromptOpen"
@@ -225,7 +220,9 @@
                 <h2 class="text-[40px] leading-none font-semibold">Join Class</h2>
                 <p class="mt-2 text-[20px] font-medium">Enter the class join code below.</p>
               </div>
-              <button type="button" class="text-[34px] leading-none" aria-label="Close modal" @click="closeJoinModal">x</button>
+              <button type="button" class="grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8]" aria-label="Close modal" @click="closeJoinModal">
+                <AppIcon name="x" :size="20" />
+              </button>
             </div>
 
             <form class="space-y-4 pt-5" @submit.prevent="handleJoinClass">
@@ -265,54 +262,29 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import AppIcon from '../../components/common/AppIcon.vue'
+import ClassThemeArt from '../../components/common/ClassThemeArt.vue'
+import ConfirmActionModal from '../../components/common/ConfirmActionModal.vue'
 import AvatarSuggestionModal from '../../components/profile/AvatarSuggestionModal.vue'
 import { auth } from '../../config/firebase'
 import { logoutUser } from '../../services/authService'
 import { enrollStudentInClass, findTeacherClassByJoinCode, getStudentClasses, leaveStudentClass, syncStudentProfileAcrossClasses } from '../../services/studentService'
 import { getUserById, upsertUserProfile } from '../../services/userService'
-import imgRectangle17 from '../../assets/icons/recicall-logout.svg'
-import imgRectangle18 from '../../assets/icons/recicall-settings.svg'
-import imgRectangle14 from '../../assets/icons/recicall-classes.svg'
-import imgRectangle77 from '../../assets/icons/recicall-student-id.svg'
-import imgMenu from '../../assets/icons/recicall-menu.svg'
 import imgStar from '../../assets/icons/recicall-logo.png'
-import imgBell from '../../assets/icons/notification-bell-svgrepo-com.svg'
-import { activeNavIconStyle, inactiveNavIconStyle } from '../../utils/navIconStyles'
+import { decorateClassWithTheme } from '../../utils/classThemes'
 import { defaultStudentAvatarKey, resolveStudentAvatar, studentAvatarOptions } from '../../utils/studentAvatarOptions'
 import { resolveTeacherAvatar } from '../../utils/teacherAvatarOptions'
 
-const svgDataUri = (svg) => `data:image/svg+xml;utf8,${encodeURIComponent(svg.trim())}`
-const imgPolygon4 = svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 91"><path d="M34 0 0 74 34 91V0Z" fill="rgba(19,67,145,0.72)"/></svg>`)
-const imgPolygon5 = svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 61"><path d="M20 0 0 40 20 61V0Z" fill="rgba(22,92,182,0.8)"/></svg>`)
-const imgPolygon6 = svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 46"><path d="M6 0 0 46H6V0Z" fill="rgba(13,73,165,0.85)"/></svg>`)
-const imgPolygon7 = svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 81"><path d="M15 0 0 81 15 68V0Z" fill="rgba(18,86,173,0.78)"/></svg>`)
-const imgVector1 = svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 71"><path d="M112 3v68H0V54l29-8 14 2 15-14 11 2 18-24 12 5 13-14Z" fill="rgba(33,170,41,0.48)"/></svg>`)
-const imgVector2 = svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 118 38"><path d="M118 3v35H0V24l21-8 14-2 26 11 27-19 13 6 17-9Z" fill="rgba(44,192,55,0.58)"/></svg>`)
-const imgVector3 = svgDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 35"><path d="M71 0v35H0l20-16 11 7 14-26 10 7 16-7Z" fill="rgba(35,155,44,0.65)"/></svg>`)
-const imgGroup9 = svgDataUri(`
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 133" fill="none">
-    <circle cx="93" cy="34" r="34" fill="rgba(255,243,97,0.28)"/>
-    <circle cx="46" cy="56" r="9" fill="rgba(255,243,97,0.34)"/>
-    <circle cx="56" cy="82" r="5" fill="rgba(255,243,97,0.34)"/>
-    <path d="M160 40v50H80l16-22h64Z" fill="rgba(242,214,34,0.34)"/>
-  </svg>
-`)
-const imgVerticalDots = svgDataUri(`
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 39" fill="none">
-    <circle cx="17.5" cy="7" r="5" fill="#fff"/>
-    <circle cx="17.5" cy="19.5" r="5" fill="#fff"/>
-    <circle cx="17.5" cy="32" r="5" fill="#fff"/>
-  </svg>
-`)
-
 const router = useRouter()
 const isLoggingOut = ref(false)
+const isLogoutConfirmOpen = ref(false)
 const isLoading = ref(true)
 const isJoinModalOpen = ref(false)
 const isJoining = ref(false)
 const joinCode = ref('')
 const joinError = ref('')
 const joinSuccess = ref('')
+const loadError = ref('')
 const openOptionsId = ref(null)
 const isSidebarExpanded = ref(false)
 const studentId = ref('')
@@ -356,23 +328,15 @@ const promptAvatarPreview = computed(() =>
   resolveStudentAvatar(promptAvatarKey.value, studentProfile.value?.photoURL || ''),
 )
 
-const gradientMap = {
-  blue: 'linear-gradient(90deg, rgb(37, 122, 255) 0%, rgb(36, 118, 247) 44.712%, rgb(29, 96, 201) 90.385%, rgb(22, 73, 153) 100%)',
-  green: 'linear-gradient(90deg, rgb(29, 201, 49) 0%, rgb(6, 196, 28) 15.865%, rgb(89, 234, 99) 87.019%, rgb(85, 232, 96) 92.308%)',
-  yellow: 'linear-gradient(90deg, rgb(228, 206, 40) 0%, rgb(253, 228, 66) 36.058%, rgb(255, 238, 47) 76.442%, rgb(237, 211, 42) 100%)',
-}
-
 const mapClassToCard = (classItem) => {
-  const gradientId = classItem.gradientId || 'blue'
+  const themedClass = decorateClassWithTheme(classItem)
 
   return {
-    ...classItem,
-    gradientId,
-    gradient: classItem.gradient || gradientMap[gradientId] || gradientMap.blue,
-    teacherName: classItem.teacherName || 'Maam. Anderson',
-    teacherRole: classItem.teacherRole || 'High School Teacher',
-    teacherAvatarSrc: resolveTeacherAvatar(classItem.teacherAvatarKey, ''),
-    width: gradientId === 'blue' ? 396.347 : 400,
+    ...themedClass,
+    teacherName: themedClass.teacherName || 'Maam. Anderson',
+    teacherRole: themedClass.teacherRole || 'High School Teacher',
+    teacherAvatarSrc: resolveTeacherAvatar(themedClass.teacherAvatarKey, ''),
+    width: 400,
   }
 }
 
@@ -398,29 +362,42 @@ const stopDashboardClock = () => {
 
 const loadStudentClasses = async () => {
   if (!studentId.value) return
+
   isLoading.value = true
-  const enrolledClasses = await getStudentClasses(studentId.value)
-  classes.value = await Promise.all(
-    enrolledClasses.map(async (classItem) => {
-      if (!classItem.teacherId) {
-        return mapClassToCard(classItem)
-      }
+  loadError.value = ''
 
-      const latestTeacherProfile = await getUserById(classItem.teacherId)
+  try {
+    const enrolledClasses = await getStudentClasses(studentId.value)
+    classes.value = await Promise.all(
+      enrolledClasses.map(async (classItem) => {
+        if (!classItem.teacherId) {
+          return mapClassToCard(classItem)
+        }
 
-      return mapClassToCard({
-        ...classItem,
-        teacherName: latestTeacherProfile?.displayName || classItem.teacherName,
-        teacherRole:
-          latestTeacherProfile?.roleLabel ||
-          (latestTeacherProfile?.role === 'teacher' ? 'High School Teacher' : latestTeacherProfile?.role) ||
-          classItem.teacherRole,
-        teacherAvatarKey: latestTeacherProfile?.avatarKey || classItem.teacherAvatarKey,
-        teacherPhotoURL: latestTeacherProfile?.photoURL || classItem.teacherPhotoURL,
-      })
-    }),
-  )
-  isLoading.value = false
+        const latestTeacherProfile = await getUserById(classItem.teacherId)
+
+        return mapClassToCard({
+          ...classItem,
+          teacherName: latestTeacherProfile?.displayName || classItem.teacherName,
+          teacherRole:
+            latestTeacherProfile?.roleLabel ||
+            (latestTeacherProfile?.role === 'teacher' ? 'High School Teacher' : latestTeacherProfile?.role) ||
+            classItem.teacherRole,
+          teacherAvatarKey: latestTeacherProfile?.avatarKey || classItem.teacherAvatarKey,
+          teacherPhotoURL: latestTeacherProfile?.photoURL || classItem.teacherPhotoURL,
+        })
+      }),
+    )
+
+    return true
+  } catch (error) {
+    console.error(error)
+    classes.value = []
+    loadError.value = 'We could not load your classes right now. Please refresh and try again.'
+    return false
+  } finally {
+    isLoading.value = false
+  }
 }
 
 const closeAvatarPrompt = () => {
@@ -573,8 +550,10 @@ const handleJoinClass = async () => {
       return
     }
 
-    joinSuccess.value = 'Class joined successfully.'
-    await loadStudentClasses()
+    const didRefreshClasses = await loadStudentClasses()
+    joinSuccess.value = didRefreshClasses
+      ? 'Class joined successfully.'
+      : 'Class joined successfully. Refresh the page if it does not appear right away.'
     setTimeout(() => {
       closeJoinModal()
     }, 700)
@@ -589,6 +568,16 @@ const handleJoinClass = async () => {
   }
 }
 
+const openLogoutConfirm = () => {
+  if (isLoggingOut.value) return
+  isLogoutConfirmOpen.value = true
+}
+
+const closeLogoutConfirm = () => {
+  if (isLoggingOut.value) return
+  isLogoutConfirmOpen.value = false
+}
+
 const handleLogout = async () => {
   if (isLoggingOut.value) return
 
@@ -601,6 +590,7 @@ const handleLogout = async () => {
     console.error(error)
   } finally {
     isLoggingOut.value = false
+    isLogoutConfirmOpen.value = false
   }
 }
 

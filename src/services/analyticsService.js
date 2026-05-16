@@ -57,6 +57,14 @@ const getTimestamp = (value) => {
   return date ? date.getTime() : null
 }
 
+const isAbsenceEvent = (event = {}) => event?.eventType === 'absence'
+
+const getParticipationOnlyEvents = (events = []) =>
+  (Array.isArray(events) ? events : []).filter((event) => !isAbsenceEvent(event))
+
+const getAbsenceOnlyEvents = (events = []) =>
+  (Array.isArray(events) ? events : []).filter((event) => isAbsenceEvent(event))
+
 const getGroupedParticipationEvents = (events = []) => {
   const buckets = []
   const bucketMap = new Map()
@@ -394,7 +402,10 @@ export const buildClassAnalytics = (classroom = {}) => {
     .sort((left, right) => right.score - left.score)
     .slice(0, 5)
 
-  const participationEvents = classroom.participationEvents || []
+  const participationEvents = getParticipationOnlyEvents(classroom.participationEvents || [])
+  const trackedSessionCount = Array.isArray(classroom.sessionHistory) && classroom.sessionHistory.length
+    ? classroom.sessionHistory.length
+    : 0
   const groupedEvents = getGroupedParticipationEvents(participationEvents)
   const lastParticipationMap = getLastParticipationMap(participationEvents)
   const sessionTrend = ensureSeriesLength(
@@ -464,7 +475,7 @@ export const buildClassAnalytics = (classroom = {}) => {
     predictedNextParticipants,
     averagePoints,
     totalPoints,
-    totalSessions: groupedEvents.length,
+    totalSessions: trackedSessionCount || groupedEvents.length,
     priorityStudents: sortedByRisk.slice(0, 4),
     strongestStudents,
     students: studentPredictions,
@@ -493,7 +504,7 @@ export const buildClassAnalytics = (classroom = {}) => {
       value: student.points,
       score: student.score,
     })),
-    recentHighlights: (classroom.participationEvents || [])
+    recentHighlights: participationEvents
       .slice(-5)
       .reverse()
       .map((event, index) => {
@@ -518,15 +529,24 @@ export const buildClassAnalytics = (classroom = {}) => {
 
 export const buildPriorityQueueRecommendation = (classroom = {}, excludedStudentIds = []) => {
   const analytics = buildClassAnalytics(classroom)
-  const groupedEvents = getGroupedParticipationEvents(classroom.participationEvents || [])
-  const lastParticipationMap = getLastParticipationMap(classroom.participationEvents || [])
+  const participationEvents = getParticipationOnlyEvents(classroom.participationEvents || [])
+  const absenceEvents = getAbsenceOnlyEvents(classroom.participationEvents || [])
+  const groupedEvents = getGroupedParticipationEvents(participationEvents)
+  const lastParticipationMap = getLastParticipationMap(participationEvents)
   const seatEnvironmentMap = buildSeatEnvironmentMap(classroom)
   const excludedSet = new Set(excludedStudentIds.filter(Boolean))
-  const totalSessions = Math.max(groupedEvents.length, 1)
+  const totalSessions = Math.max(analytics.totalSessions, groupedEvents.length, 1)
+  const absenceCountMap = new Map()
+
+  absenceEvents.forEach((event) => {
+    if (!event.studentId) return
+    absenceCountMap.set(event.studentId, (absenceCountMap.get(event.studentId) || 0) + 1)
+  })
 
   const candidates = analytics.students.map((student) => {
     const lastParticipation = lastParticipationMap.get(student.id)
     const seatEnvironment = seatEnvironmentMap.get(student.id) || null
+    const absenceCount = absenceCountMap.get(student.id) || 0
     const sessionsSinceLastParticipation = lastParticipation
       ? Math.max(groupedEvents.length - (lastParticipation.index + 1), 0)
       : totalSessions
@@ -535,11 +555,13 @@ export const buildPriorityQueueRecommendation = (classroom = {}, excludedStudent
     const inactivityBoost = clamp(sessionsSinceLastParticipation * 18, 0, 45)
     const zeroParticipationBoost = student.sessions === 0 ? 28 : 0
     const seatEnvironmentBoost = seatEnvironment?.priorityBoost || 0
-    const exclusionPenalty = excludedSet.has(student.id) ? 35 : 0
+    const absenceBoost = clamp(absenceCount * 10, 0, 24)
+    const exclusionPenalty = excludedSet.has(student.id) ? 85 : 0
     const priorityScore = clamp(
       normalizedNeed * 0.52 +
         inactivityBoost +
         zeroParticipationBoost +
+        absenceBoost +
         seatEnvironmentBoost -
         exclusionPenalty,
       0,
@@ -550,6 +572,9 @@ export const buildPriorityQueueRecommendation = (classroom = {}, excludedStudent
     if (student.sessions === 0) reasons.push('No participation yet')
     if (sessionsSinceLastParticipation >= 2) reasons.push(`${sessionsSinceLastParticipation} sessions since last turn`)
     if (student.score < analytics.averageScore) reasons.push('Below class engagement average')
+    if (absenceCount > 0) {
+      reasons.push(absenceCount === 1 ? 'Missed one called turn due to absence' : `Missed ${absenceCount} called turns due to absence`)
+    }
     if (seatEnvironment && seatEnvironmentBoost >= 8) {
       reasons.push(`Seat environment: ${seatEnvironment.zoneLabel}`)
     }
@@ -560,6 +585,8 @@ export const buildPriorityQueueRecommendation = (classroom = {}, excludedStudent
       ...student,
       priorityScore,
       seatEnvironmentBoost,
+      absenceBoost,
+      absenceCount,
       seatEnvironmentScore: seatEnvironment?.environmentScore || 0,
       seatZoneLabel: seatEnvironment?.zoneLabel || 'Seat not assigned',
       sessionsSinceLastParticipation,
