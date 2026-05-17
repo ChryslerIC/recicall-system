@@ -14,12 +14,13 @@
           </p>
         </div>
 
-        <RouterLink
-          to="/signup"
+        <button
+          type="button"
           class="inline-flex h-[46px] items-center justify-center rounded-full border border-[#1188f8] px-5 text-[15px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff]"
+          @click="goBack"
         >
-          Back to Sign Up
-        </RouterLink>
+          Back
+        </button>
       </div>
 
       <div class="space-y-8 pt-8 text-[16px] leading-[1.7] text-[#344054]">
@@ -70,3 +71,19 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import { useRoute, useRouter } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
+
+const goBack = () => {
+  if (typeof route.query.returnTo === 'string' && route.query.returnTo) {
+    router.push(route.query.returnTo)
+    return
+  }
+
+  router.back()
+}
+</script>

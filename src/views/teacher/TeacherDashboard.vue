@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-[#f6f6f6] font-sans text-black">
     <div class="w-full">
-      <header class="flex items-start justify-between px-4 pt-4 sm:px-6 lg:px-[30px] lg:pt-[13px]">
+      <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
           <button
             type="button"
@@ -25,9 +25,52 @@
         </button>
       </header>
 
+      <transition name="fade">
+        <div
+          v-if="isSidebarExpanded"
+          class="fixed inset-0 z-30 bg-[rgba(12,18,28,0.45)] backdrop-blur-[2px] lg:hidden"
+          @click.self="isSidebarExpanded = false"
+        >
+          <aside class="flex h-full w-[272px] max-w-[86vw] flex-col justify-between bg-white px-4 pb-6 pt-5 shadow-[0_18px_44px_rgba(0,0,0,0.18)]">
+            <div>
+              <div class="flex items-center justify-between">
+                <p class="text-[26px] font-black leading-none tracking-[-0.03em]">ReciCall</p>
+                <button type="button" class="grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8]" aria-label="Close sidebar" @click="isSidebarExpanded = false">
+                  <AppIcon name="x" :size="20" />
+                </button>
+              </div>
+              <div class="mt-8 space-y-3">
+                <div class="flex h-[56px] items-center rounded-[18px] bg-[rgba(46,130,239,0.25)] px-4">
+                  <AppIcon name="classes" :size="24" class="text-[#174ca0]" />
+                  <span class="ml-4 text-[16px] font-semibold text-[#174ca0]">Classes</span>
+                </div>
+                <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(46,130,239,0.12)]" aria-label="Predictive analytics" @click="isSidebarExpanded = false; openPredictiveAnalytics()">
+                  <AppIcon name="insights" :size="22" class="text-[#707070]" />
+                  <span class="ml-4 text-[15px] font-medium text-[#3a3a3a]">Predictive Analytics</span>
+                </button>
+                <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(46,130,239,0.12)]" aria-label="Archive" @click="isSidebarExpanded = false; router.push('/teacher/archive')">
+                  <AppIcon name="archive" :size="22" class="text-[#707070]" />
+                  <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Archive</span>
+                </button>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(46,130,239,0.12)]" aria-label="Settings" @click="isSidebarExpanded = false; openProfileModal()">
+                <AppIcon name="settings" :size="22" class="text-[#707070]" />
+                <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Settings</span>
+              </button>
+              <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(255,84,84,0.08)]" aria-label="Logout" @click="isSidebarExpanded = false; openLogoutConfirm()">
+                <AppIcon name="logout" :size="22" class="text-[#707070]" />
+                <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Logout</span>
+              </button>
+            </div>
+          </aside>
+        </div>
+      </transition>
+
       <div class="flex gap-4 px-4 pb-4 pt-2 sm:px-6 lg:gap-0 lg:px-0">
         <aside
-          class="hidden shrink-0 flex-col justify-between pb-[40px] pt-[77px] transition-[width,padding] duration-200 lg:ml-[7px] lg:flex lg:h-[650px]"
+          class="hidden shrink-0 self-start flex-col justify-between pb-[40px] pt-[77px] transition-[width,padding] duration-200 lg:sticky lg:top-[118px] lg:ml-[7px] lg:flex lg:h-[650px]"
           :class="isSidebarExpanded ? 'w-[220px] px-[12px]' : 'w-[72px]'"
         >
           <div class="flex flex-col gap-[18px]">
@@ -200,26 +243,6 @@
         </main>
       </div>
 
-      <div class="px-4 pb-6 sm:px-6 lg:hidden">
-        <div class="flex items-center justify-center gap-8 rounded-[20px] border border-[#d9e8fb] bg-white px-4 py-3 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
-          <button type="button" class="grid h-10 w-10 place-items-center rounded-[12px] bg-[rgba(46,130,239,0.25)]" aria-label="Dashboard">
-            <AppIcon name="classes" :size="22" class="text-[#174ca0]" />
-          </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Predictive analytics" @click="openPredictiveAnalytics">
-            <AppIcon name="insights" :size="22" class="text-[#707070]" />
-          </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Archive" @click="router.push('/teacher/archive')">
-            <AppIcon name="archive" :size="22" class="text-[#707070]" />
-          </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Settings" @click="openProfileModal">
-            <AppIcon name="settings" :size="22" class="text-[#707070]" />
-          </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Logout" @click="openLogoutConfirm">
-            <AppIcon name="logout" :size="22" class="text-[#707070]" />
-          </button>
-        </div>
-      </div>
-
       <ConfirmActionModal
         :open="isLogoutConfirmOpen"
         title="Log out?"
@@ -271,14 +294,14 @@
       <transition name="fade">
         <div
           v-if="isProfileModalOpen"
-          class="fixed inset-0 z-20 flex items-center justify-center bg-[rgba(224,224,224,0.44)] px-4 py-8 backdrop-blur-[1px]"
+          class="fixed inset-0 z-20 flex items-start justify-center overflow-y-auto bg-[rgba(224,224,224,0.44)] px-3 py-3 backdrop-blur-[1px] sm:px-4 sm:py-8 sm:items-center"
           @click.self="closeProfileModal"
         >
-          <div class="w-full max-w-[540px] rounded-[22px] bg-white px-6 py-5 shadow-[0_4px_39.3px_2px_rgba(0,0,0,0.2)]">
-            <div class="flex items-start justify-between border-b border-[#d7d7d7] pb-4">
+          <div class="w-full max-w-[560px] max-h-[calc(100vh-1.5rem)] overflow-y-auto rounded-[22px] bg-white px-4 py-4 shadow-[0_4px_39.3px_2px_rgba(0,0,0,0.2)] sm:max-h-[calc(100vh-4rem)] sm:px-6 sm:py-5">
+            <div class="sticky top-0 z-10 flex items-start justify-between border-b border-[#d7d7d7] bg-white pb-4">
               <div>
-                <h2 class="text-[40px] leading-none font-semibold">Edit Profile</h2>
-                <p class="mt-2 text-[20px] font-medium">Update your display name and choose a preset avatar.</p>
+                <h2 class="text-[30px] leading-none font-semibold sm:text-[40px]">Settings</h2>
+                <p class="mt-2 text-[15px] font-medium sm:text-[20px]">Manage your teacher profile, password access, and privacy options.</p>
               </div>
               <button type="button" class="grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8]" aria-label="Close profile modal" @click="closeProfileModal">
                 <AppIcon name="x" :size="20" />
@@ -286,42 +309,89 @@
             </div>
 
             <form class="space-y-4 pt-5" @submit.prevent="saveProfileChanges">
-              <div class="flex items-center gap-4">
-                <img :src="profilePreviewSrc" alt="" class="h-[88px] w-[88px] rounded-full border border-[#d7d7d7] object-cover" />
+              <div class="flex flex-wrap gap-2 rounded-[22px] bg-[#f6f6f6] p-2">
+                <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'profile' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'profile'">Profile</button>
+                <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'security' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'security'">Security</button>
+                <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'legal' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'legal'">Legal</button>
+                <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'danger' ? 'bg-white text-[#b81717] shadow-[0_8px_18px_rgba(184,23,23,0.12)]' : 'text-[#7a4a4a]'" @click="activeSettingsSection = 'danger'">Danger Zone</button>
               </div>
 
-              <label class="block">
-                <span class="mb-1 block text-[16px] font-semibold">Display Name</span>
-                <input
-                  v-model.trim="profileName"
-                  type="text"
-                  placeholder="Enter your name"
-                  class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
-                />
-              </label>
-
-              <div>
-                <div class="flex items-center justify-between gap-4">
-                  <p class="text-[16px] font-semibold">Preset Avatars</p>
-                  <p class="text-[13px] text-[#666]">Choose one avatar to use across the app.</p>
+              <div v-if="activeSettingsSection === 'profile'" class="space-y-4">
+                <div class="flex items-center gap-4">
+                  <img :src="profilePreviewSrc" alt="" class="h-[72px] w-[72px] rounded-full border border-[#d7d7d7] object-cover sm:h-[88px] sm:w-[88px]" />
                 </div>
-                <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+
+                <label class="block">
+                  <span class="mb-1 block text-[16px] font-semibold">Display Name</span>
+                  <input
+                    v-model.trim="profileName"
+                    type="text"
+                    placeholder="Enter your name"
+                    class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
+                  />
+                </label>
+
+                <div>
+                  <div class="flex items-center justify-between gap-4">
+                    <p class="text-[16px] font-semibold">Preset Avatars</p>
+                    <p class="text-[13px] text-[#666]">Choose one avatar to use across the app.</p>
+                  </div>
+                  <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <button
+                      v-for="avatar in teacherAvatarOptions"
+                      :key="avatar.key"
+                      type="button"
+                      class="rounded-[18px] border px-3 py-3 text-center transition"
+                      :class="profileAvatarKey === avatar.key ? 'border-[#1188f8] bg-[#eef6ff] shadow-[0_0_0_2px_rgba(17,136,248,0.12)]' : 'border-[#d7d7d7] bg-[#fafafa] hover:border-[#1188f8]'"
+                      :disabled="isSavingProfile"
+                      @click="selectTeacherAvatarPreset(avatar.key)"
+                    >
+                      <img :src="avatar.src" :alt="avatar.label" class="mx-auto h-[64px] w-[64px] rounded-full object-cover" />
+                      <p class="mt-3 text-[13px] font-semibold text-black">{{ avatar.label }}</p>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div v-else-if="activeSettingsSection === 'security'" class="rounded-[20px] border border-[#d9e8fb] bg-[#f8fbff] px-4 py-4">
+                <p class="text-[18px] font-bold text-black">Password & Sign-In</p>
+                <p class="mt-2 text-[14px] leading-[1.5] text-[#5b5b5b]">Use your account email to receive a secure password reset link.</p>
+                <div class="mt-4 rounded-[16px] border border-[#d9e8fb] bg-white px-4 py-3">
+                  <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#6b7280]">Signed in email</p>
+                  <p class="mt-1 break-all text-[15px] font-semibold text-black">{{ signedInEmail }}</p>
+                </div>
+                <button
+                  type="button"
+                  class="mt-4 flex min-h-[46px] w-full items-center justify-center rounded-[18px] border border-[#1188f8] bg-white px-5 text-[15px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff] disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+                  :disabled="isSavingProfile || isSendingPasswordReset"
+                  @click="sendPasswordResetLink"
+                >
+                  {{ isSendingPasswordReset ? 'Sending reset link...' : 'Change Password' }}
+                </button>
+              </div>
+
+              <div v-else-if="activeSettingsSection === 'legal'" class="rounded-[20px] border border-[#d9e8fb] bg-[#f8fbff] px-4 py-4">
+                <p class="text-[18px] font-bold text-black">Terms & Privacy</p>
+                <p class="mt-2 text-[14px] leading-[1.5] text-[#5b5b5b]">Open the app policies in their own page. They now use a normal back button instead of returning to sign up.</p>
+                <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <button
-                    v-for="avatar in teacherAvatarOptions"
-                    :key="avatar.key"
                     type="button"
-                    class="rounded-[18px] border px-3 py-3 text-center transition"
-                    :class="profileAvatarKey === avatar.key ? 'border-[#1188f8] bg-[#eef6ff] shadow-[0_0_0_2px_rgba(17,136,248,0.12)]' : 'border-[#d7d7d7] bg-[#fafafa] hover:border-[#1188f8]'"
-                    :disabled="isSavingProfile"
-                    @click="selectTeacherAvatarPreset(avatar.key)"
+                    class="flex min-h-[46px] items-center justify-center rounded-[18px] border border-[#d7d7d7] bg-white px-5 text-[15px] font-semibold text-black transition hover:bg-[#f7f7f7]"
+                    @click="goToTerms"
                   >
-                    <img :src="avatar.src" :alt="avatar.label" class="mx-auto h-[64px] w-[64px] rounded-full object-cover" />
-                    <p class="mt-3 text-[13px] font-semibold text-black">{{ avatar.label }}</p>
+                    Terms of Service
+                  </button>
+                  <button
+                    type="button"
+                    class="flex min-h-[46px] items-center justify-center rounded-[18px] border border-[#d7d7d7] bg-white px-5 text-[15px] font-semibold text-black transition hover:bg-[#f7f7f7]"
+                    @click="goToPrivacy"
+                  >
+                    Privacy Policy
                   </button>
                 </div>
               </div>
 
-              <div class="rounded-[20px] border border-[#ffd6d6] bg-[#fff7f7] px-4 py-4">
+              <div v-else class="rounded-[20px] border border-[#ffd6d6] bg-[#fff7f7] px-4 py-4">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p class="text-[16px] font-bold text-[#b81717]">Delete Account</p>
@@ -344,11 +414,11 @@
               <p v-if="profileSuccess" class="text-sm font-medium text-green-600">{{ profileSuccess }}</p>
               <p v-if="deleteAccountError" class="text-sm font-medium text-red-600">{{ deleteAccountError }}</p>
 
-              <div class="flex justify-end gap-4 pt-2">
-                <button type="button" class="h-[57px] w-[151px] rounded-[33.5px] bg-[#c5c5c5] text-[20px] font-bold" @click="closeProfileModal">
+              <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+                <button type="button" class="h-[52px] w-full rounded-[24px] bg-[#c5c5c5] text-[18px] font-bold sm:h-[57px] sm:w-[151px] sm:rounded-[33.5px] sm:text-[20px]" @click="closeProfileModal">
                   Cancel
                 </button>
-                <button type="submit" class="h-[57px] w-[151px] rounded-[33.5px] bg-[#1188f8] text-[20px] font-bold text-white disabled:opacity-70" :disabled="isSavingProfile">
+                <button v-if="activeSettingsSection === 'profile'" type="submit" class="h-[52px] w-full rounded-[24px] bg-[#1188f8] text-[18px] font-bold text-white disabled:opacity-70 sm:h-[57px] sm:w-[151px] sm:rounded-[33.5px] sm:text-[20px]" :disabled="isSavingProfile">
                   {{ isSavingProfile ? 'Saving...' : 'Save' }}
                 </button>
               </div>
@@ -368,10 +438,16 @@
               <div class="min-w-0">
                 <h2 class="text-[28px] leading-none font-semibold sm:text-[40px]">Class Details</h2>
                 <p class="mt-2 text-[16px] font-medium sm:text-[20px]">
-                  {{ editingClassId ? 'Update the class info below' : 'To start new class, Enter info below' }}
+                  {{ classModalSubtitle }}
                 </p>
               </div>
-              <button type="button" class="grid h-10 w-10 shrink-0 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8]" aria-label="Close modal" @click="closeModal">
+              <button
+                type="button"
+                class="grid h-10 w-10 shrink-0 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8] disabled:cursor-not-allowed disabled:opacity-50"
+                aria-label="Close modal"
+                :disabled="isSavingClass"
+                @click="closeModal"
+              >
                 <AppIcon name="x" :size="20" />
               </button>
             </div>
@@ -484,8 +560,8 @@
 
               <div>
                 <div class="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                  <span class="block text-[16px] font-semibold">Subject Theme</span>
-                  <span class="text-[13px] font-medium text-[#666]">Choose the visual style that best matches the subject.</span>
+                  <span class="block text-[16px] font-semibold">Class Theme</span>
+                  <span class="text-[13px] font-medium text-[#666]">Choose the mood and visual style that best matches the learning experience.</span>
                 </div>
                 <div class="grid gap-3 sm:grid-cols-3">
                   <button
@@ -501,7 +577,11 @@
                     <div class="relative z-10">
                       <p class="text-[16px] font-bold text-white">{{ option.label }}</p>
                       <p class="mt-1 text-[12px] font-medium text-white/88">
-                        {{ option.id === 'math' ? 'Numbers, formulas, and problem solving' : option.id === 'science' ? 'Experiments, STEM, and discovery' : 'Language, humanities, and creative work' }}
+                        {{ option.id === 'focus-flow'
+                          ? 'Clear thinking, calm focus, and smart problem solving'
+                          : option.id === 'wonder-mode'
+                            ? 'Explore, discover, and learn with curiosity'
+                            : 'Express, imagine, and bring ideas to life' }}
                       </p>
                     </div>
                   </button>
@@ -511,15 +591,20 @@
               <p v-if="formError" class="text-sm font-medium text-red-600">{{ formError }}</p>
 
               <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end sm:gap-4">
-                <button type="button" class="h-[57px] w-full rounded-[33.5px] bg-[#c5c5c5] text-[20px] font-bold sm:w-[151px]" @click="closeModal">
+                <button
+                  type="button"
+                  class="h-[57px] w-full rounded-[33.5px] bg-[#c5c5c5] text-[20px] font-bold disabled:cursor-not-allowed disabled:opacity-60 sm:w-[151px]"
+                  :disabled="isSavingClass"
+                  @click="closeModal"
+                >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   class="h-[57px] w-full rounded-[33.5px] bg-[#1188f8] text-[20px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-[151px]"
-                  :disabled="isClassFormIncomplete"
+                  :disabled="isClassFormIncomplete || isSavingClass"
                 >
-                  {{ editingClassId ? 'Save' : 'Create' }}
+                  {{ isSavingClass ? (editingClassId ? 'Saving...' : 'Creating...') : (editingClassId ? 'Save' : 'Create') }}
                 </button>
               </div>
             </form>
@@ -531,15 +616,15 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import AppIcon from '../../components/common/AppIcon.vue'
 import ClassThemeArt from '../../components/common/ClassThemeArt.vue'
 import ConfirmActionModal from '../../components/common/ConfirmActionModal.vue'
 import AvatarSuggestionModal from '../../components/profile/AvatarSuggestionModal.vue'
 import AnalyticsClassPickerModal from '../../components/teacher/AnalyticsClassPickerModal.vue'
 import { auth } from '../../config/firebase'
-import { logoutUser, updateCurrentUserAccount } from '../../services/authService'
+import { logoutUser, requestCurrentUserPasswordReset, updateCurrentUserAccount } from '../../services/authService'
 import {
   deleteTeacherAccount,
   getDeleteAccountErrorMessage,
@@ -562,6 +647,7 @@ import {
 import { defaultTeacherAvatarKey, resolveTeacherAvatar, sanitizeTeacherAvatarKey, teacherAvatarOptions } from '../../utils/teacherAvatarOptions'
 
 const router = useRouter()
+const route = useRoute()
 
 const dayOptions = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
@@ -584,39 +670,6 @@ const buildTimeOptions = () => {
 
 const timeOptions = buildTimeOptions()
 
-const defaultClasses = [
-  {
-    classLabel: 'Class 1',
-    gradeLevel: 'Grade 6',
-    subject: 'Araling Panlipunan',
-    scheduleLabel: 'Monday / Tuesday',
-    time: '10 AM - 12 PM',
-    engagement: 'High',
-    gradientId: 'literature-arts',
-    sortOrder: 1,
-  },
-  {
-    classLabel: 'Class 2',
-    gradeLevel: 'Grade 6',
-    subject: 'Science',
-    scheduleLabel: 'Monday / Tuesday',
-    time: '10 AM - 12 PM',
-    engagement: 'Moderate',
-    gradientId: 'science',
-    sortOrder: 2,
-  },
-  {
-    classLabel: 'Class 3',
-    gradeLevel: 'Grade 6',
-    subject: 'Math',
-    scheduleLabel: 'Monday / Tuesday',
-    time: '10 AM - 12 PM',
-    engagement: 'High',
-    gradientId: 'math',
-    sortOrder: 3,
-  },
-]
-
 const teacherName = ref('Maam. Anderson')
 const teacherRole = ref('High School Teacher')
 const teacherAvatarKey = ref(defaultTeacherAvatarKey)
@@ -627,12 +680,17 @@ const isLogoutConfirmOpen = ref(false)
 const isSidebarExpanded = ref(false)
 const isModalOpen = ref(false)
 const isAnalyticsClassPickerOpen = ref(false)
+const hasAnyClasses = ref(false)
+const hasPromptedFirstClass = ref(false)
 const isAvatarPromptOpen = ref(false)
 const isProfileModalOpen = ref(false)
 const isSavingAvatarPrompt = ref(false)
 const isSavingProfile = ref(false)
+const isSavingClass = ref(false)
 const isDeleteAccountConfirmOpen = ref(false)
 const isDeletingAccount = ref(false)
+const isSendingPasswordReset = ref(false)
+const activeSettingsSection = ref('profile')
 const formError = ref('')
 const avatarPromptError = ref('')
 const profileError = ref('')
@@ -675,6 +733,7 @@ const dashboardSubtitle = computed(() => `${dashboardGreeting.value} | ${liveDat
 const teacherPhoto = computed(() =>
   resolveTeacherAvatar(teacherAvatarKey.value, ''),
 )
+const signedInEmail = computed(() => auth.currentUser?.email || 'No email available')
 const promptAvatarPreview = computed(() =>
   resolveTeacherAvatar(promptAvatarKey.value, ''),
 )
@@ -690,6 +749,71 @@ const isClassFormIncomplete = computed(
     !newClass.endTime ||
     !newClass.scheduleDays.length,
 )
+const isFirstClassFlow = computed(() => !editingClassId.value && !hasAnyClasses.value)
+const classModalSubtitle = computed(() =>
+  editingClassId.value
+    ? 'Update the class info below.'
+    : isFirstClassFlow.value
+      ? 'Create your first class to start the teacher experience.'
+      : 'Enter the class info below.',
+)
+
+const normalizeSettingsSection = (value) =>
+  ['profile', 'security', 'legal', 'danger'].includes(value) ? value : 'profile'
+
+const syncProfileModalQuery = async (open, section = activeSettingsSection.value) => {
+  const normalizedSection = normalizeSettingsSection(section)
+  const nextQuery = { ...route.query }
+
+  if (open) {
+    nextQuery.settings = 'open'
+    nextQuery.settingsSection = normalizedSection
+  } else {
+    delete nextQuery.settings
+    delete nextQuery.settingsSection
+  }
+
+  const isOpenInRoute = route.query.settings === 'open'
+  const currentSection = normalizeSettingsSection(route.query.settingsSection)
+  if ((open && isOpenInRoute && currentSection === normalizedSection) || (!open && !isOpenInRoute)) {
+    return
+  }
+
+  await router.replace({
+    path: route.path,
+    query: nextQuery,
+  })
+}
+
+const buildSettingsReturnTo = (section = activeSettingsSection.value) =>
+  router.resolve({
+    path: route.path,
+    query: {
+      ...route.query,
+      settings: 'open',
+      settingsSection: normalizeSettingsSection(section),
+    },
+  }).fullPath
+
+const prefillProfileSettings = () => {
+  profileName.value = teacherName.value
+  profileAvatarKey.value = teacherAvatarKey.value || defaultTeacherAvatarKey
+}
+
+const recoverTeacherAccessFailure = async (error) => {
+  console.error('Unable to load the teacher profile or classes.', error)
+
+  try {
+    await logoutUser()
+  } catch (signOutError) {
+    console.error('Unable to sign out after a teacher access failure.', signOutError)
+  }
+
+  await router.replace({
+    path: '/login',
+    query: { error: 'profile-access' },
+  })
+}
 
 const ensureProfileFallback = (event) => {
   event.target.src = imgProfile
@@ -817,21 +941,6 @@ const stopDashboardClock = () => {
   dashboardClockTimer = null
 }
 
-const seedDefaultClasses = async () => {
-  const activeClasses = await getTeacherClasses(teacherId.value, { archived: false })
-  const archivedClasses = await getTeacherClasses(teacherId.value, { archived: true })
-
-  if (activeClasses.length > 0 || archivedClasses.length > 0) {
-    return activeClasses
-  }
-
-  for (const classItem of defaultClasses) {
-    await createTeacherClass(teacherId.value, classItem)
-  }
-
-  return getTeacherClasses(teacherId.value, { archived: false })
-}
-
 const loadClasses = async () => {
   if (!teacherId.value) return
 
@@ -839,11 +948,26 @@ const loadClasses = async () => {
   loadError.value = ''
 
   try {
-    const activeClasses = await seedDefaultClasses()
+    const [activeClasses, archivedClasses] = await Promise.all([
+      getTeacherClasses(teacherId.value, { archived: false }),
+      getTeacherClasses(teacherId.value, { archived: true }),
+    ])
+
+    hasAnyClasses.value = activeClasses.length > 0 || archivedClasses.length > 0
     classes.value = activeClasses.map(mapClassToCard)
+
+    if (!hasAnyClasses.value && !hasPromptedFirstClass.value) {
+      hasPromptedFirstClass.value = true
+      openModal()
+    }
   } catch (error) {
     console.error(error)
+    if (error?.code === 'permission-denied' || error?.code === 'firestore/permission-denied') {
+      await recoverTeacherAccessFailure(error)
+      return
+    }
     classes.value = []
+    hasAnyClasses.value = false
     loadError.value = 'We could not load your classes right now. Please refresh and try again.'
   } finally {
     isLoading.value = false
@@ -851,23 +975,66 @@ const loadClasses = async () => {
 }
 
 const openModal = () => {
+  if (isSavingClass.value) return
+
   openOptionsId.value = null
+  resetForm()
   isModalOpen.value = true
 }
 
-const openProfileModal = () => {
+const openProfileModal = async (section = 'profile') => {
   profileError.value = ''
   profileSuccess.value = ''
-  profileName.value = teacherName.value
-  profileAvatarKey.value = teacherAvatarKey.value || defaultTeacherAvatarKey
+  prefillProfileSettings()
+  activeSettingsSection.value = normalizeSettingsSection(section)
   isProfileModalOpen.value = true
+  await syncProfileModalQuery(true, activeSettingsSection.value)
 }
 
-const closeProfileModal = () => {
+const closeProfileModal = async ({ skipRouteSync = false } = {}) => {
   isProfileModalOpen.value = false
   profileError.value = ''
   profileSuccess.value = ''
   deleteAccountError.value = ''
+  if (!skipRouteSync) {
+    await syncProfileModalQuery(false)
+  }
+}
+
+const sendPasswordResetLink = async () => {
+  if (isSendingPasswordReset.value) return
+
+  isSendingPasswordReset.value = true
+  profileError.value = ''
+  profileSuccess.value = ''
+
+  try {
+    await requestCurrentUserPasswordReset()
+    profileSuccess.value = 'Password reset instructions were sent to your email.'
+  } catch (error) {
+    console.error(error)
+    profileError.value = error?.message || 'We could not send a password reset link right now.'
+  } finally {
+    isSendingPasswordReset.value = false
+  }
+}
+
+const goToTerms = () => {
+  router.push({
+    path: '/terms',
+    query: {
+      returnTo: buildSettingsReturnTo('legal'),
+    },
+  })
+}
+
+const goToPrivacy = () => {
+  router.push({
+    path: '/privacy',
+    query: {
+      returnTo: buildSettingsReturnTo('legal'),
+    },
+  })
 }
 
 const openDeleteAccountConfirm = () => {
@@ -883,6 +1050,8 @@ const closeDeleteAccountConfirm = () => {
 }
 
 const closeModal = () => {
+  if (isSavingClass.value) return
+
   isModalOpen.value = false
   resetForm()
 }
@@ -1072,6 +1241,7 @@ const handleDeleteAccount = async () => {
 
 const startEditingClass = (classItem) => {
   openOptionsId.value = null
+  formError.value = ''
   editingClassId.value = classItem.id
   const parsedTimeRange = parseTimeRangeLabel(classItem.time)
   newClass.classLabel = classItem.classLabel
@@ -1091,6 +1261,8 @@ const archiveClass = async (classId) => {
 }
 
 const handleSaveClass = async () => {
+  if (isSavingClass.value) return
+
   formError.value = ''
 
   if (isClassFormIncomplete.value) {
@@ -1103,8 +1275,26 @@ const handleSaveClass = async () => {
   const option = classThemeOptions.find((item) => item.id === resolvedNewClassThemeId.value) || classThemeOptions[0]
   const theme = getClassTheme({ subject: newClass.subject, gradientId: option.id })
 
-  if (editingClassId.value) {
-    await updateTeacherClass(teacherId.value, editingClassId.value, {
+  isSavingClass.value = true
+
+  try {
+    if (editingClassId.value) {
+      await updateTeacherClass(teacherId.value, editingClassId.value, {
+        classLabel: newClass.classLabel,
+        gradeLevel: newClass.gradeLevel,
+        subject: newClass.subject,
+        scheduleLabel,
+        time: timeLabel,
+        engagement: theme.engagementFallback,
+        gradientId: theme.id,
+      })
+      await loadClasses()
+      isSavingClass.value = false
+      closeModal()
+      return
+    }
+
+    await createTeacherClass(teacherId.value, {
       classLabel: newClass.classLabel,
       gradeLevel: newClass.gradeLevel,
       subject: newClass.subject,
@@ -1112,24 +1302,17 @@ const handleSaveClass = async () => {
       time: timeLabel,
       engagement: theme.engagementFallback,
       gradientId: theme.id,
+      sortOrder: classes.value.length + 1,
     })
     await loadClasses()
+    isSavingClass.value = false
     closeModal()
-    return
+  } catch (error) {
+    console.error(error)
+    formError.value = error?.message || 'We could not save the class right now. Please try again.'
+  } finally {
+    isSavingClass.value = false
   }
-
-  await createTeacherClass(teacherId.value, {
-    classLabel: newClass.classLabel,
-    gradeLevel: newClass.gradeLevel,
-    subject: newClass.subject,
-    scheduleLabel,
-    time: timeLabel,
-    engagement: theme.engagementFallback,
-    gradientId: theme.id,
-    sortOrder: classes.value.length + 1,
-  })
-  await loadClasses()
-  closeModal()
 }
 
 const openLogoutConfirm = () => {
@@ -1163,19 +1346,47 @@ onMounted(async () => {
   const user = auth.currentUser
   if (!user) return
 
-  teacherId.value = user.uid
-  const profile = await getUserById(user.uid)
-  if (profile?.displayName) teacherName.value = profile.displayName
-  else if (user.displayName) teacherName.value = user.displayName
-  teacherAvatarKey.value = sanitizeTeacherAvatarKey(profile?.avatarKey)
-  promptAvatarKey.value = teacherAvatarKey.value || defaultTeacherAvatarKey
-  profileName.value = teacherName.value
-  if (profile?.avatarPromptSeen === false) {
-    isAvatarPromptOpen.value = true
-  }
+  try {
+    teacherId.value = user.uid
+    const profile = await getUserById(user.uid)
+    if (!profile?.role) {
+      throw new Error('Authenticated teacher profile is missing a role.')
+    }
+    if (profile?.displayName) teacherName.value = profile.displayName
+    else if (user.displayName) teacherName.value = user.displayName
+    teacherAvatarKey.value = sanitizeTeacherAvatarKey(profile?.avatarKey)
+    promptAvatarKey.value = teacherAvatarKey.value || defaultTeacherAvatarKey
+    profileName.value = teacherName.value
+    if (profile?.avatarPromptSeen === false) {
+      isAvatarPromptOpen.value = true
+    }
 
-  await loadClasses()
+    if (route.query.settings === 'open') {
+      prefillProfileSettings()
+    }
+
+    await loadClasses()
+  } catch (error) {
+    await recoverTeacherAccessFailure(error)
+  }
 })
+
+watch(
+  () => [route.query.settings, route.query.settingsSection],
+  ([settings, section]) => {
+    if (settings === 'open') {
+      activeSettingsSection.value = normalizeSettingsSection(section)
+      prefillProfileSettings()
+      isProfileModalOpen.value = true
+      return
+    }
+
+    if (isProfileModalOpen.value) {
+      closeProfileModal({ skipRouteSync: true })
+    }
+  },
+  { immediate: true },
+)
 
 onBeforeUnmount(() => {
   stopDashboardClock()

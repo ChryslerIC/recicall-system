@@ -25,6 +25,15 @@ export const requestPasswordReset = (email) => {
   return sendPasswordResetEmail(auth, email)
 }
 
+export const requestCurrentUserPasswordReset = () => {
+  const email = auth.currentUser?.email
+  if (!email) {
+    throw new Error('No email address is available for this account.')
+  }
+
+  return sendPasswordResetEmail(auth, email)
+}
+
 export const signInWithGoogle = () => {
   return signInWithPopup(auth, googleProvider)
 }

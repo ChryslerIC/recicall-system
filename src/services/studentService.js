@@ -14,10 +14,22 @@ import {
 import { db } from '../config/firebase'
 
 const studentClassesCollection = (studentId) => collection(db, 'users', studentId, 'enrolledClasses')
+const teacherClassRef = (teacherId, classId) => doc(db, 'users', teacherId, 'classes', classId)
+const teacherClassStudentsCollection = (teacherId, classId) =>
+  collection(db, 'users', teacherId, 'classes', classId, 'students')
+const teacherClassParticipationCollection = (teacherId, classId) =>
+  collection(db, 'users', teacherId, 'classes', classId, 'participationEvents')
 const teacherClassStudentRef = (teacherId, classId, studentId) =>
   doc(db, 'users', teacherId, 'classes', classId, 'students', studentId)
 const removeUndefinedValues = (value) =>
   Object.fromEntries(Object.entries(value).filter(([, entryValue]) => entryValue !== undefined))
+
+const sortParticipationEvents = (events = []) =>
+  [...events].sort((left, right) => {
+    const leftTime = left.createdAt?.seconds || 0
+    const rightTime = right.createdAt?.seconds || 0
+    return leftTime - rightTime
+  })
 
 export const getStudentClasses = async (studentId) => {
   const snapshot = await getDocs(studentClassesCollection(studentId))
@@ -25,6 +37,39 @@ export const getStudentClasses = async (studentId) => {
     id: classDoc.id,
     ...classDoc.data(),
   }))
+}
+
+export const getStudentClassroomView = async (teacherId, classId) => {
+  const classSnapshot = await getDoc(teacherClassRef(teacherId, classId))
+
+  if (!classSnapshot.exists()) {
+    return null
+  }
+
+  const [studentsSnapshot, participationSnapshot] = await Promise.all([
+    getDocs(teacherClassStudentsCollection(teacherId, classId)),
+    getDocs(teacherClassParticipationCollection(teacherId, classId)),
+  ])
+
+  const enrolledStudents = studentsSnapshot.docs.map((studentDoc) => ({
+    id: studentDoc.id,
+    ...studentDoc.data(),
+  }))
+
+  const participationEvents = sortParticipationEvents(
+    participationSnapshot.docs.map((eventDoc) => ({
+      id: eventDoc.id,
+      ...eventDoc.data(),
+    })),
+  )
+
+  return {
+    id: classSnapshot.id,
+    ...classSnapshot.data(),
+    enrolledStudents,
+    participationEvents,
+    students: enrolledStudents.length,
+  }
 }
 
 export const findTeacherClassByJoinCode = async (joinCode) => {

@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-[#f6f6f6] font-sans text-black">
     <div class="w-full">
-      <header class="flex items-start justify-between px-4 pt-4 sm:px-6 lg:px-[30px] lg:pt-[13px]">
+      <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
           <button
             type="button"
@@ -25,9 +25,48 @@
         </div>
       </header>
 
+      <transition name="fade">
+        <div
+          v-if="isSidebarExpanded"
+          class="fixed inset-0 z-30 bg-[rgba(12,18,28,0.45)] backdrop-blur-[2px] lg:hidden"
+          @click.self="isSidebarExpanded = false"
+        >
+          <aside class="flex h-full w-[272px] max-w-[86vw] flex-col justify-between bg-white px-4 pb-6 pt-5 shadow-[0_18px_44px_rgba(0,0,0,0.18)]">
+            <div>
+              <div class="flex items-center justify-between">
+                <p class="text-[26px] font-black leading-none tracking-[-0.03em]">ReciCall</p>
+                <button type="button" class="grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8]" aria-label="Close sidebar" @click="isSidebarExpanded = false">
+                  <AppIcon name="x" :size="20" />
+                </button>
+              </div>
+              <div class="mt-8 space-y-3">
+                <div class="flex h-[56px] items-center rounded-[18px] bg-[rgba(46,130,239,0.25)] px-4">
+                  <AppIcon name="classes" :size="24" class="text-[#174ca0]" />
+                  <span class="ml-4 text-[16px] font-semibold text-[#174ca0]">Classes</span>
+                </div>
+                <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(46,130,239,0.12)]" aria-label="Student ID" @click="isSidebarExpanded = false; router.push('/student/id')">
+                  <AppIcon name="badge" :size="22" class="text-[#707070]" />
+                  <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Student ID</span>
+                </button>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(46,130,239,0.12)]" aria-label="Settings" @click="isSidebarExpanded = false; openStudentSettings()">
+                <AppIcon name="settings" :size="22" class="text-[#707070]" />
+                <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Settings</span>
+              </button>
+              <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(255,84,84,0.08)]" aria-label="Logout" @click="isSidebarExpanded = false; openLogoutConfirm()">
+                <AppIcon name="logout" :size="22" class="text-[#707070]" />
+                <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Logout</span>
+              </button>
+            </div>
+          </aside>
+        </div>
+      </transition>
+
       <div class="flex gap-4 px-4 pb-4 pt-2 sm:px-6 lg:gap-0 lg:px-0">
         <aside
-          class="hidden shrink-0 flex-col justify-between pb-[40px] pt-[77px] transition-[width,padding] duration-200 lg:ml-[7px] lg:flex lg:h-[650px]"
+          class="hidden shrink-0 self-start flex-col justify-between pb-[40px] pt-[77px] transition-[width,padding] duration-200 lg:sticky lg:top-[118px] lg:ml-[7px] lg:flex lg:h-[650px]"
           :class="isSidebarExpanded ? 'w-[220px] px-[12px]' : 'w-[72px]'"
         >
           <div class="flex flex-col gap-[18px]">
@@ -80,6 +119,12 @@
           <section class="min-h-[653px] rounded-[28px] border-2 border-[#2e82ef] bg-white px-4 pb-8 pt-6 sm:px-7 sm:pt-8 lg:rounded-[52px] lg:px-[34px] lg:pb-[36px] lg:pt-[30px]">
             <div v-if="isLoading" class="text-[18px] font-medium text-[#5d5d5d]">Loading class...</div>
             <div
+              v-else-if="loadError"
+              class="rounded-[24px] border border-[#ffd0d0] bg-[#fff8f8] px-6 py-8 text-[18px] font-medium text-[#b81717]"
+            >
+              {{ loadError }}
+            </div>
+            <div
               v-else-if="!classroom"
               class="rounded-[24px] border border-[#ffd0d0] bg-[#fff8f8] px-6 py-8 text-[18px] font-medium text-[#b81717]"
             >
@@ -87,32 +132,34 @@
             </div>
 
             <template v-else>
-              <div class="rounded-[30.5px] bg-[#f6f6f6] px-[10px] py-[8px] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)] sm:w-fit">
-                <div class="flex flex-wrap gap-2 sm:flex-nowrap">
-                  <button
-                    type="button"
-                    class="h-[47px] min-w-[141px] rounded-[30.5px] text-[16px] font-semibold"
-                    :class="activeTab === 'class' ? 'bg-white text-[#1188f8]' : 'text-[#373737]'"
-                    @click="setTab('class')"
-                  >
-                    Class
-                  </button>
-                  <button
-                    type="button"
-                    class="h-[47px] min-w-[141px] rounded-[30.5px] text-[16px] font-semibold"
-                    :class="activeTab === 'class-list' ? 'bg-white text-[#1188f8]' : 'text-[#373737]'"
-                    @click="setTab('class-list')"
-                  >
-                    Class List
-                  </button>
-                  <button
-                    type="button"
-                    class="h-[47px] min-w-[141px] rounded-[30.5px] text-[16px] font-semibold"
-                    :class="activeTab === 'analytics' ? 'bg-white text-[#1188f8]' : 'text-[#373737]'"
-                    @click="setTab('analytics')"
-                  >
-                    Insights
-                  </button>
+              <div class="sticky top-[96px] z-10 -mx-4 bg-white/92 px-4 pb-3 pt-1 backdrop-blur-[10px] sm:-mx-7 sm:px-7 lg:-mx-[39px] lg:px-[39px] lg:top-[112px]">
+                <div class="rounded-[30.5px] bg-[#f6f6f6] px-[10px] py-[8px] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)] sm:w-fit">
+                  <div class="flex flex-wrap gap-2 sm:flex-nowrap">
+                    <button
+                      type="button"
+                      class="h-[47px] min-w-[141px] rounded-[30.5px] text-[16px] font-semibold"
+                      :class="activeTab === 'class' ? 'bg-white text-[#1188f8]' : 'text-[#373737]'"
+                      @click="setTab('class')"
+                    >
+                      Class
+                    </button>
+                    <button
+                      type="button"
+                      class="h-[47px] min-w-[141px] rounded-[30.5px] text-[16px] font-semibold"
+                      :class="activeTab === 'class-list' ? 'bg-white text-[#1188f8]' : 'text-[#373737]'"
+                      @click="setTab('class-list')"
+                    >
+                      Class List
+                    </button>
+                    <button
+                      type="button"
+                      class="h-[47px] min-w-[141px] rounded-[30.5px] text-[16px] font-semibold"
+                      :class="activeTab === 'analytics' ? 'bg-white text-[#1188f8]' : 'text-[#373737]'"
+                      @click="setTab('analytics')"
+                    >
+                      Insights
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -146,116 +193,7 @@
                   </div>
                 </div>
 
-                <div class="mt-[15px] grid gap-[18px] xl:grid-cols-[307px_minmax(0,1fr)]">
-                  <div class="flex min-h-[360px] flex-col rounded-[31px] border border-black bg-white px-[8px] py-[12px] xl:min-h-[430px]">
-                    <div class="flex flex-col gap-4 px-[8px]">
-                      <div class="flex flex-col gap-3">
-                        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                          <div>
-                            <p class="text-[22px] leading-none font-semibold text-black lg:text-[24px]">Participation History</p>
-                            <p class="mt-2 text-[14px] font-medium text-[#5d5d5d]">
-                              Filter your participation dates, then download a formatted history for your records.
-                            </p>
-                          </div>
-
-                          <button
-                            type="button"
-                            class="interactive-primary-button inline-flex h-[44px] items-center justify-center rounded-[22px] bg-[#1188f8] px-5 text-[15px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
-                            :disabled="!filteredParticipationHistory.length"
-                            @click="downloadParticipationHistoryReport"
-                          >
-                            Download Report
-                          </button>
-                        </div>
-
-                        <div class="grid gap-3">
-                          <label class="block">
-                            <span class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">From</span>
-                            <input
-                              v-model="historyFilterStartDate"
-                              type="date"
-                              class="mt-2 h-[46px] w-full rounded-[18px] border border-[#cccdce] bg-[#f9fbff] px-4 text-[15px] font-medium text-black outline-none transition focus:border-[#1188f8]"
-                            />
-                          </label>
-
-                          <label class="block">
-                            <span class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">To</span>
-                            <input
-                              v-model="historyFilterEndDate"
-                              type="date"
-                              class="mt-2 h-[46px] w-full rounded-[18px] border border-[#cccdce] bg-[#f9fbff] px-4 text-[15px] font-medium text-black outline-none transition focus:border-[#1188f8]"
-                            />
-                          </label>
-
-                          <button
-                            type="button"
-                            class="interactive-secondary-button h-[44px] rounded-[18px] border border-[#1188f8] bg-white px-5 text-[15px] font-semibold text-[#1188f8]"
-                            @click="clearParticipationHistoryFilters"
-                          >
-                            Clear
-                          </button>
-                        </div>
-
-                        <p class="text-[14px] font-medium text-[#5d5d5d]">
-                          {{ filteredParticipationHistoryDateRangeLabel }}
-                        </p>
-
-                        <div class="grid grid-cols-2 gap-3">
-                          <div class="rounded-[18px] bg-[#f6f6f6] px-4 py-3">
-                            <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Entries</p>
-                            <p class="mt-2 text-[24px] font-bold leading-none text-[#1188f8]">{{ filteredParticipationHistorySummary.sessions }}</p>
-                          </div>
-                          <div class="rounded-[18px] bg-[#f6f6f6] px-4 py-3">
-                            <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Points</p>
-                            <p class="mt-2 text-[24px] font-bold leading-none text-black">+{{ filteredParticipationHistorySummary.points }}</p>
-                          </div>
-                          <div class="col-span-2 rounded-[18px] bg-[#f6f6f6] px-4 py-3">
-                            <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Completed Class Sessions</p>
-                            <p class="mt-2 text-[24px] font-bold leading-none text-black">{{ completedClassSessions }}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div v-if="recentParticipationEntries.length" class="mt-[24px] max-h-[320px] space-y-[14px] overflow-y-auto px-[8px]">
-                      <div
-                        v-for="event in recentParticipationEntries"
-                        :key="event.id"
-                        class="rounded-[32px] border border-[#cccdce] bg-[#f6f6f6] px-[16px] py-[12px]"
-                      >
-                        <div class="flex items-center justify-between gap-3">
-                          <div class="flex items-center gap-[13px]">
-                            <div class="grid h-[57px] w-[72px] place-items-center rounded-[14px] bg-[#50d24a]">
-                              <AppIcon name="sparkles" :size="28" class="text-[#072b10]" />
-                            </div>
-                            <div>
-                              <p class="text-[16px] leading-none font-bold text-black lg:text-[20px]">Participation recorded</p>
-                              <p class="mt-[9px] text-[13px] leading-none font-semibold text-[#4a4a4a] lg:text-[16px]">{{ event.label }}</p>
-                            </div>
-                          </div>
-
-                          <div class="rounded-[10.5px] bg-[#d2e6ff] px-[13px] py-[8px]">
-                            <p class="text-[16px] leading-none font-semibold text-[#1188f8] lg:text-[20px]">+{{ event.points }}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      v-else
-                      class="mt-[24px] mx-[8px] rounded-[32px] border border-dashed border-[#cccdce] bg-[#f8fbff] px-[18px] py-[22px] text-[16px] font-medium leading-[1.4] text-[#5d5d5d]"
-                    >
-                      No participation events yet. Your next QR check-in will show up here.
-                    </div>
-
-                    <button
-                      type="button"
-                      class="mt-auto pt-10 text-center text-[18px] font-semibold text-[#1188f8] hover:underline lg:text-[20px]"
-                      @click="setTab('analytics')"
-                    >
-                      View Insights
-                    </button>
-                  </div>
-
+                <div class="mt-[15px] space-y-[18px]">
                   <div>
                     <div class="flex flex-wrap items-center justify-end gap-4">
                       <button
@@ -304,6 +242,113 @@
                         "{{ teacherFeedback }}"
                       </p>
                     </div>
+                  </div>
+
+                  <div class="flex min-h-[360px] flex-col rounded-[31px] border border-black bg-white px-[12px] py-[14px]">
+                    <div class="flex flex-col gap-4 px-[6px] sm:px-[8px]">
+                      <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                        <div>
+                          <p class="text-[22px] leading-none font-semibold text-black lg:text-[24px]">Participation History</p>
+                          <p class="mt-2 max-w-[620px] text-[14px] font-medium text-[#5d5d5d]">
+                            Filter your participation dates, then download a formatted history for your records.
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          class="interactive-primary-button inline-flex h-[44px] items-center justify-center self-start rounded-[22px] bg-[#1188f8] px-5 text-[15px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                          :disabled="!filteredParticipationHistory.length"
+                          @click="downloadParticipationHistoryReport"
+                        >
+                          Download Report
+                        </button>
+                      </div>
+
+                      <div class="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+                        <label class="block">
+                          <span class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">From</span>
+                          <input
+                            v-model="historyFilterStartDate"
+                            type="date"
+                            class="mt-2 h-[46px] w-full rounded-[18px] border border-[#cccdce] bg-[#f9fbff] px-4 text-[15px] font-medium text-black outline-none transition focus:border-[#1188f8]"
+                          />
+                        </label>
+
+                        <label class="block">
+                          <span class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">To</span>
+                          <input
+                            v-model="historyFilterEndDate"
+                            type="date"
+                            class="mt-2 h-[46px] w-full rounded-[18px] border border-[#cccdce] bg-[#f9fbff] px-4 text-[15px] font-medium text-black outline-none transition focus:border-[#1188f8]"
+                          />
+                        </label>
+
+                        <button
+                          type="button"
+                          class="interactive-secondary-button h-[44px] rounded-[18px] border border-[#1188f8] bg-white px-5 text-[15px] font-semibold text-[#1188f8]"
+                          @click="clearParticipationHistoryFilters"
+                        >
+                          Clear
+                        </button>
+                      </div>
+
+                      <p class="text-[14px] font-medium text-[#5d5d5d]">
+                        {{ filteredParticipationHistoryDateRangeLabel }}
+                      </p>
+
+                      <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                        <div class="rounded-[18px] bg-[#f6f6f6] px-4 py-3">
+                          <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Entries</p>
+                          <p class="mt-2 text-[24px] font-bold leading-none text-[#1188f8]">{{ filteredParticipationHistorySummary.sessions }}</p>
+                        </div>
+                        <div class="rounded-[18px] bg-[#f6f6f6] px-4 py-3">
+                          <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Points</p>
+                          <p class="mt-2 text-[24px] font-bold leading-none text-black">+{{ filteredParticipationHistorySummary.points }}</p>
+                        </div>
+                        <div class="rounded-[18px] bg-[#f6f6f6] px-4 py-3 sm:col-span-2 xl:col-span-1">
+                          <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Completed Class Sessions</p>
+                          <p class="mt-2 text-[24px] font-bold leading-none text-black">{{ completedClassSessions }}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div v-if="recentParticipationEntries.length" class="mt-[24px] max-h-[320px] space-y-[14px] overflow-y-auto px-[6px] sm:px-[8px]">
+                      <div
+                        v-for="event in recentParticipationEntries"
+                        :key="event.id"
+                        class="rounded-[32px] border border-[#cccdce] bg-[#f6f6f6] px-[16px] py-[12px]"
+                      >
+                        <div class="flex items-center justify-between gap-3">
+                          <div class="flex items-center gap-[13px]">
+                            <div class="grid h-[57px] w-[72px] place-items-center rounded-[14px] bg-[#50d24a]">
+                              <AppIcon name="sparkles" :size="28" class="text-[#072b10]" />
+                            </div>
+                            <div>
+                              <p class="text-[16px] leading-none font-bold text-black lg:text-[20px]">Participation recorded</p>
+                              <p class="mt-[9px] text-[13px] leading-none font-semibold text-[#4a4a4a] lg:text-[16px]">{{ event.label }}</p>
+                            </div>
+                          </div>
+
+                          <div class="rounded-[10.5px] bg-[#d2e6ff] px-[13px] py-[8px]">
+                            <p class="text-[16px] leading-none font-semibold text-[#1188f8] lg:text-[20px]">+{{ event.points }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      v-else
+                      class="mt-[24px] mx-[6px] rounded-[32px] border border-dashed border-[#cccdce] bg-[#f8fbff] px-[18px] py-[22px] text-[16px] font-medium leading-[1.4] text-[#5d5d5d] sm:mx-[8px]"
+                    >
+                      No participation events yet. Your next QR check-in will show up here.
+                    </div>
+
+                    <button
+                      type="button"
+                      class="mt-auto pt-10 text-center text-[18px] font-semibold text-[#1188f8] hover:underline lg:text-[20px]"
+                      @click="setTab('analytics')"
+                    >
+                      View Insights
+                    </button>
                   </div>
                 </div>
               </div>
@@ -757,23 +802,6 @@
         </main>
       </div>
 
-      <div class="px-4 pb-6 sm:px-6 lg:hidden">
-        <div class="flex items-center justify-center gap-8 rounded-[20px] border border-[#d9e8fb] bg-white px-4 py-3 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
-          <button type="button" class="grid h-10 w-10 place-items-center rounded-[12px] bg-[rgba(46,130,239,0.25)]" aria-label="Classes" @click="router.push('/student')">
-            <AppIcon name="classes" :size="22" class="text-[#174ca0]" />
-          </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Student ID" @click="router.push('/student/id')">
-            <AppIcon name="badge" :size="22" class="text-[#707070]" />
-          </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Settings" @click="openStudentSettings">
-            <AppIcon name="settings" :size="22" class="text-[#707070]" />
-          </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Logout" @click="openLogoutConfirm">
-            <AppIcon name="logout" :size="22" class="text-[#707070]" />
-          </button>
-        </div>
-      </div>
-
       <ConfirmActionModal
         :open="isLogoutConfirmOpen"
         title="Log out?"
@@ -844,8 +872,7 @@ import ConfirmActionModal from '../../components/common/ConfirmActionModal.vue'
 import ParticipationChart from '../../components/charts/ParticipationChart.vue'
 import { logoutUser } from '../../services/authService'
 import { buildStudentAnalytics } from '../../services/analyticsService'
-import { getStudentClasses } from '../../services/studentService'
-import { getTeacherClassById } from '../../services/teacherService'
+import { getStudentClasses, getStudentClassroomView } from '../../services/studentService'
 import { getUserById, upsertUserProfile } from '../../services/userService'
 import imgStar from '../../assets/icons/recicall-logo.png'
 import { decorateClassWithTheme } from '../../utils/classThemes'
@@ -871,6 +898,7 @@ const isLoading = ref(true)
 const isSidebarExpanded = ref(false)
 const isQrModalOpen = ref(false)
 const classroom = ref(null)
+const loadError = ref('')
 const teacherName = ref('Maam. Anderson')
 const teacherAvatarKey = ref(defaultTeacherAvatarKey)
 const displayName = ref('Alonso Von Leopard')
@@ -1456,52 +1484,60 @@ watch(
 
 onMounted(async () => {
   const user = auth.currentUser
-  if (!user) return
-
-  studentUid.value = user.uid
-
-  const [profile, studentClasses] = await Promise.all([
-    getUserById(user.uid),
-    getStudentClasses(user.uid),
-  ])
-
-  if (profile?.displayName) displayName.value = profile.displayName
-  else if (user.displayName) displayName.value = user.displayName
-  studentPhotoURL.value = profile?.photoURL || ''
-  avatarKey.value = profile?.avatarKey || (profile?.photoURL ? '' : defaultStudentAvatarKey)
-
-  const resolvedStudentNumber = profile?.studentNumber || profile?.idNumber || generateStudentNumber(user.uid)
-  studentNumber.value = resolvedStudentNumber
-
-  if (!profile?.studentNumber) {
-    await upsertUserProfile(user.uid, { studentNumber: resolvedStudentNumber })
-  }
-
-  const joinedClass = studentClasses.find((classItem) => classItem.id === route.params.classId)
-
-  if (!joinedClass) {
+  if (!user) {
     isLoading.value = false
     return
   }
 
-  if (joinedClass.teacherId) {
-    const [teacherProfile, teacherClass] = await Promise.all([
-      getUserById(joinedClass.teacherId),
-      getTeacherClassById(joinedClass.teacherId, joinedClass.id),
+  try {
+    studentUid.value = user.uid
+    loadError.value = ''
+
+    const [profile, studentClasses] = await Promise.all([
+      getUserById(user.uid),
+      getStudentClasses(user.uid),
     ])
 
-    if (teacherProfile?.displayName) teacherName.value = teacherProfile.displayName
-    teacherAvatarKey.value = sanitizeTeacherAvatarKey(teacherProfile?.avatarKey || joinedClass.teacherAvatarKey)
+    if (profile?.displayName) displayName.value = profile.displayName
+    else if (user.displayName) displayName.value = user.displayName
+    studentPhotoURL.value = profile?.photoURL || ''
+    avatarKey.value = profile?.avatarKey || (profile?.photoURL ? '' : defaultStudentAvatarKey)
 
-    classroom.value = mapClassroom({
-      ...joinedClass,
-      ...teacherClass,
-    })
-  } else {
-    classroom.value = mapClassroom(joinedClass)
+    const resolvedStudentNumber = profile?.studentNumber || profile?.idNumber || generateStudentNumber(user.uid)
+    studentNumber.value = resolvedStudentNumber
+
+    if (!profile?.studentNumber) {
+      await upsertUserProfile(user.uid, { studentNumber: resolvedStudentNumber })
+    }
+
+    const joinedClass = studentClasses.find((classItem) => classItem.id === route.params.classId)
+
+    if (!joinedClass) {
+      return
+    }
+
+    if (joinedClass.teacherId) {
+      const [teacherProfile, teacherClass] = await Promise.all([
+        getUserById(joinedClass.teacherId),
+        getStudentClassroomView(joinedClass.teacherId, joinedClass.id),
+      ])
+
+      if (teacherProfile?.displayName) teacherName.value = teacherProfile.displayName
+      teacherAvatarKey.value = sanitizeTeacherAvatarKey(teacherProfile?.avatarKey || joinedClass.teacherAvatarKey)
+
+      classroom.value = mapClassroom({
+        ...joinedClass,
+        ...(teacherClass || {}),
+      })
+    } else {
+      classroom.value = mapClassroom(joinedClass)
+    }
+  } catch (error) {
+    console.error('Unable to load the student classroom.', error)
+    loadError.value = error?.message || 'We could not load this class right now.'
+  } finally {
+    isLoading.value = false
   }
-
-  isLoading.value = false
 })
 </script>
 

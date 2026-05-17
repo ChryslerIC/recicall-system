@@ -63,23 +63,35 @@
         </div>
       </label>
 
-      <label class="flex items-start gap-3 rounded-[18px] bg-[#f6f9ff] px-4 py-4 text-[14px] leading-[1.45] text-[#334155]">
-        <input
-          v-model="acceptedPolicies"
-          type="checkbox"
-          class="mt-1 h-4 w-4 rounded border-black text-[#1188f8]"
-        />
-        <span>
-          I agree to the
-          <RouterLink to="/terms" class="font-semibold text-[#1188f8] hover:underline">
-            Terms of Service
-          </RouterLink>
-          and
-          <RouterLink to="/privacy" class="font-semibold text-[#1188f8] hover:underline">
-            Privacy Policy
-          </RouterLink>.
-        </span>
-      </label>
+      <div class="space-y-3 rounded-[18px] bg-[#f6f9ff] px-4 py-4 text-[14px] leading-[1.45] text-[#334155]">
+        <label class="flex items-start gap-3">
+          <input
+            v-model="acceptedTerms"
+            type="checkbox"
+            class="mt-1 h-4 w-4 rounded border-black text-[#1188f8]"
+          />
+          <span>
+            I agree to the
+            <RouterLink to="/terms" class="font-semibold text-[#1188f8] hover:underline">
+              Terms of Service
+            </RouterLink>.
+          </span>
+        </label>
+
+        <label class="flex items-start gap-3">
+          <input
+            v-model="acceptedPrivacy"
+            type="checkbox"
+            class="mt-1 h-4 w-4 rounded border-black text-[#1188f8]"
+          />
+          <span>
+            I agree to the
+            <RouterLink to="/privacy" class="font-semibold text-[#1188f8] hover:underline">
+              Privacy Policy
+            </RouterLink>.
+          </span>
+        </label>
+      </div>
 
       <p v-if="errorMessage" class="text-sm font-medium text-red-600">
         {{ errorMessage }}
@@ -118,7 +130,8 @@ const selectedRole = ref('teacher')
 const showPassword = ref(false)
 const isSubmitting = ref(false)
 const errorMessage = ref('')
-const acceptedPolicies = ref(false)
+const acceptedTerms = ref(false)
+const acceptedPrivacy = ref(false)
 
 const routeByRole = (role) => {
   if (role === 'teacher') {
@@ -158,8 +171,8 @@ const handleSignUp = async () => {
     return
   }
 
-  if (!acceptedPolicies.value) {
-    errorMessage.value = 'You need to agree to the Terms of Service and Privacy Policy to continue.'
+  if (!acceptedTerms.value || !acceptedPrivacy.value) {
+    errorMessage.value = 'You need to agree to both the Terms of Service and Privacy Policy to continue.'
     return
   }
 
@@ -192,8 +205,8 @@ const handleSignUp = async () => {
 const handleGoogleAuth = async () => {
   errorMessage.value = ''
 
-  if (!acceptedPolicies.value) {
-    errorMessage.value = 'Please agree to the Terms of Service and Privacy Policy before signing up with Google.'
+  if (!acceptedTerms.value || !acceptedPrivacy.value) {
+    errorMessage.value = 'Please agree to both the Terms of Service and Privacy Policy before signing up with Google.'
     return
   }
 

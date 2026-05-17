@@ -29,5 +29,9 @@ export const getDeleteAccountErrorMessage = (error, accountLabel = 'account') =>
     return `We could not delete your ${accountLabel} because the network request failed. Please try again.`
   }
 
+  if (error?.code === 'permission-denied' || error?.code === 'firestore/permission-denied') {
+    return `We could not delete your ${accountLabel} because the app does not have permission to remove all related class records yet.`
+  }
+
   return `We could not delete your ${accountLabel} right now. Please try again.`
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-[#f6f6f6] font-sans text-black">
     <div class="w-full">
-      <header class="flex items-start justify-between px-4 pt-4 sm:px-6 lg:px-[30px] lg:pt-[13px]">
+      <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
           <button
             type="button"
@@ -24,9 +24,52 @@
         </button>
       </header>
 
+      <transition name="fade">
+        <div
+          v-if="isSidebarExpanded"
+          class="fixed inset-0 z-30 bg-[rgba(12,18,28,0.45)] backdrop-blur-[2px] lg:hidden"
+          @click.self="isSidebarExpanded = false"
+        >
+          <aside class="flex h-full w-[272px] max-w-[86vw] flex-col justify-between bg-white px-4 pb-6 pt-5 shadow-[0_18px_44px_rgba(0,0,0,0.18)]">
+            <div>
+              <div class="flex items-center justify-between">
+                <p class="text-[26px] font-black leading-none tracking-[-0.03em]">ReciCall</p>
+                <button type="button" class="grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8]" aria-label="Close sidebar" @click="isSidebarExpanded = false">
+                  <AppIcon name="x" :size="20" />
+                </button>
+              </div>
+              <div class="mt-8 space-y-3">
+                <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(46,130,239,0.12)]" :class="currentTab !== 'analytics' ? 'bg-[rgba(46,130,239,0.25)]' : ''" aria-label="Classes" @click="isSidebarExpanded = false; router.push('/teacher')">
+                  <AppIcon name="classes" :size="22" :class="currentTab !== 'analytics' ? 'text-[#174ca0]' : 'text-[#707070]'" />
+                  <span class="ml-4 text-[16px]" :class="currentTab !== 'analytics' ? 'font-semibold text-[#174ca0]' : 'font-medium text-[#3a3a3a]'">Classes</span>
+                </button>
+                <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(46,130,239,0.12)]" :class="currentTab === 'analytics' ? 'bg-[rgba(46,130,239,0.25)]' : ''" aria-label="Class insights" @click="isSidebarExpanded = false; setTab('analytics')">
+                  <AppIcon name="insights" :size="22" :class="currentTab === 'analytics' ? 'text-[#174ca0]' : 'text-[#707070]'" />
+                  <span class="ml-4 text-[15px]" :class="currentTab === 'analytics' ? 'font-semibold text-[#174ca0]' : 'font-medium text-[#3a3a3a]'">Class Insights</span>
+                </button>
+                <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(46,130,239,0.12)]" aria-label="Archive" @click="isSidebarExpanded = false; router.push('/teacher/archive')">
+                  <AppIcon name="archive" :size="22" class="text-[#707070]" />
+                  <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Archive</span>
+                </button>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(46,130,239,0.12)]" aria-label="Settings" @click="isSidebarExpanded = false; openProfileModal()">
+                <AppIcon name="settings" :size="22" class="text-[#707070]" />
+                <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Settings</span>
+              </button>
+              <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(255,84,84,0.08)]" aria-label="Logout" @click="isSidebarExpanded = false; openLogoutConfirm()">
+                <AppIcon name="logout" :size="22" class="text-[#707070]" />
+                <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Logout</span>
+              </button>
+            </div>
+          </aside>
+        </div>
+      </transition>
+
       <div class="flex gap-4 px-4 pb-4 pt-2 sm:px-6 lg:gap-0 lg:px-0">
         <aside
-          class="hidden shrink-0 flex-col justify-between pb-[40px] pt-[77px] transition-[width,padding] duration-200 lg:ml-[7px] lg:flex lg:h-[650px]"
+          class="hidden shrink-0 self-start flex-col justify-between pb-[40px] pt-[77px] transition-[width,padding] duration-200 lg:sticky lg:top-[118px] lg:ml-[7px] lg:flex lg:h-[650px]"
           :class="isSidebarExpanded ? 'w-[220px] px-[12px]' : 'w-[72px]'"
         >
           <div class="flex flex-col gap-[18px]">
@@ -98,31 +141,33 @@
             <div v-else-if="!classroom" class="px-4 py-8 text-[18px] font-medium text-[#b81717]">We couldn't find that class.</div>
 
             <template v-else>
-              <div class="mt-[18px] flex h-auto w-full max-w-[458px] items-center gap-2 overflow-x-auto rounded-[30.5px] bg-[#f6f6f6] p-[11px] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)]">
-                <button
-                  type="button"
-                  class="interactive-tab-button h-[47px] min-w-[120px] rounded-[30.5px] px-4 text-[16px] font-semibold sm:min-w-[141px]"
-                  :class="currentTab === 'class' ? 'bg-white text-[#1188f8] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)]' : 'text-[#373737]'"
-                  @click="setTab('class')"
-                >
-                  Class
-                </button>
-                <button
-                  type="button"
-                  class="interactive-tab-button h-[47px] min-w-[120px] rounded-[30.5px] px-4 text-[16px] font-semibold sm:min-w-[146px]"
-                  :class="currentTab === 'class-list' ? 'bg-white text-[#1188f8] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)]' : 'text-[#373737]'"
-                  @click="setTab('class-list')"
-                >
-                  Class List
-                </button>
-                <button
-                  type="button"
-                  class="interactive-tab-button h-[47px] min-w-[120px] rounded-[30.5px] px-4 text-[16px] font-semibold"
-                  :class="currentTab === 'analytics' ? 'bg-white text-[#1188f8] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)]' : 'text-[#373737]'"
-                  @click="setTab('analytics')"
-                >
-                  Insights
-                </button>
+              <div class="sticky top-[96px] z-10 -mx-4 bg-white/92 px-4 pb-3 pt-[18px] backdrop-blur-[10px] sm:-mx-6 sm:px-6 lg:-mx-[28px] lg:px-[28px] lg:top-[112px]">
+                <div class="flex h-auto w-full max-w-[458px] items-center gap-2 overflow-x-auto rounded-[30.5px] bg-[#f6f6f6] p-[11px] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)]">
+                  <button
+                    type="button"
+                    class="interactive-tab-button h-[47px] min-w-[120px] rounded-[30.5px] px-4 text-[16px] font-semibold sm:min-w-[141px]"
+                    :class="currentTab === 'class' ? 'bg-white text-[#1188f8] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)]' : 'text-[#373737]'"
+                    @click="setTab('class')"
+                  >
+                    Class
+                  </button>
+                  <button
+                    type="button"
+                    class="interactive-tab-button h-[47px] min-w-[120px] rounded-[30.5px] px-4 text-[16px] font-semibold sm:min-w-[146px]"
+                    :class="currentTab === 'class-list' ? 'bg-white text-[#1188f8] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)]' : 'text-[#373737]'"
+                    @click="setTab('class-list')"
+                  >
+                    Class List
+                  </button>
+                  <button
+                    type="button"
+                    class="interactive-tab-button h-[47px] min-w-[120px] rounded-[30.5px] px-4 text-[16px] font-semibold"
+                    :class="currentTab === 'analytics' ? 'bg-white text-[#1188f8] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)]' : 'text-[#373737]'"
+                    @click="setTab('analytics')"
+                  >
+                    Insights
+                  </button>
+                </div>
               </div>
 
               <template v-if="currentTab === 'class'">
@@ -138,9 +183,41 @@
                     <p class="mt-[14px] text-[18px] font-medium leading-none sm:text-[22px] lg:text-[24px]">{{ classroom.gradeLevel }} | {{ classroom.subject }}</p>
                   </template>
                 </div>
-                  <button type="button" class="interactive-icon-button grid h-[40px] w-[40px] place-items-center rounded-[18px] bg-black/10 text-white" aria-label="Class options">
-                    <AppIcon name="more" :size="22" />
-                  </button>
+                  <div class="relative">
+                    <button
+                      type="button"
+                      class="interactive-icon-button grid h-[40px] w-[40px] place-items-center rounded-[18px] bg-black/10 text-white"
+                      aria-label="Class options"
+                      @click.stop="toggleClassOptions"
+                    >
+                      <AppIcon name="more" :size="22" />
+                    </button>
+
+                    <div
+                      v-if="isClassOptionsOpen"
+                      class="absolute right-0 top-[46px] z-20 w-[190px] rounded-[14px] border border-white/25 bg-white py-2 text-black shadow-[0_10px_24px_rgba(0,0,0,0.18)]"
+                    >
+                      <div class="px-4 pb-1">
+                        <p class="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#777]">Join code</p>
+                        <p class="mt-1 text-[16px] font-bold leading-none text-[#1188f8]">{{ classroom.joinCode || 'Unavailable' }}</p>
+                      </div>
+                      <button
+                        type="button"
+                        class="block w-full px-4 py-[7px] text-left text-[14px] font-medium text-black hover:bg-[#f6f6f6]"
+                        :disabled="!classroom.joinCode"
+                        @click.stop="copyClassJoinCode"
+                      >
+                        {{ copiedJoinCode === classroom.joinCode ? 'Copied' : 'Copy Join Code' }}
+                      </button>
+                      <button
+                        type="button"
+                        class="block w-full px-4 py-[7px] text-left text-[14px] font-medium text-[#b81717] hover:bg-[#fff3f3]"
+                        @click.stop="openArchiveClassConfirm"
+                      >
+                        Delete Class
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <div class="mt-[12px] flex flex-1 items-end justify-end">
@@ -296,121 +373,162 @@
                   </div>
 
                   <section class="mt-[16px] rounded-[28px] border border-[#cccdce] bg-[#f8fbff] px-5 py-5">
-                    <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                    <button
+                      type="button"
+                      class="flex w-full flex-col gap-4 text-left sm:flex-row sm:items-center sm:justify-between"
+                      @click="isClassRecordsOpen = !isClassRecordsOpen"
+                    >
                       <div>
-                        <h2 class="text-[22px] font-bold leading-none text-black">Session Report</h2>
+                        <div class="flex items-center gap-3">
+                          <h2 class="text-[22px] font-bold leading-none text-black">Class Records</h2>
+                          <AppIcon
+                            name="chevron-down"
+                            :size="18"
+                            class="text-[#1188f8] transition-transform duration-200"
+                            :class="isClassRecordsOpen ? 'rotate-180' : ''"
+                          />
+                        </div>
                         <p class="mt-2 text-[15px] font-medium text-[#5d5d5d]">
-                          Filter participation by date, then download a formatted session history for class records.
+                          Track completed sessions, open recitation summaries, and download class participation records.
                         </p>
                       </div>
 
-                      <button
-                        type="button"
-                        class="interactive-primary-button inline-flex h-[48px] items-center justify-center rounded-[24px] bg-[#1188f8] px-6 text-[16px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
-                        :disabled="!filteredSessionReportSessions.length"
-                        @click="downloadSessionReport"
-                      >
-                        Download Report
-                      </button>
-                    </div>
-
-                    <div class="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
-                      <label class="block">
-                        <span class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">From</span>
-                        <input
-                          v-model="sessionReportStartDate"
-                          type="date"
-                          class="mt-2 h-[48px] w-full rounded-[18px] border border-[#cccdce] bg-white px-4 text-[15px] font-medium text-black outline-none transition focus:border-[#1188f8]"
-                        />
-                      </label>
-
-                      <label class="block">
-                        <span class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">To</span>
-                        <input
-                          v-model="sessionReportEndDate"
-                          type="date"
-                          class="mt-2 h-[48px] w-full rounded-[18px] border border-[#cccdce] bg-white px-4 text-[15px] font-medium text-black outline-none transition focus:border-[#1188f8]"
-                        />
-                      </label>
-
-                      <button
-                        type="button"
-                        class="interactive-secondary-button h-[48px] rounded-[18px] border border-[#1188f8] bg-white px-5 text-[15px] font-semibold text-[#1188f8]"
-                        @click="clearSessionReportFilters"
-                      >
-                        Clear
-                      </button>
-                    </div>
-
-                    <p class="mt-3 text-[14px] font-medium text-[#5d5d5d]">
-                      {{ filteredSessionReportDateRangeLabel }}
-                    </p>
-
-                    <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                      <div class="rounded-[18px] bg-white px-4 py-4">
-                        <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Completed Sessions</p>
-                        <p class="mt-2 text-[28px] font-bold leading-none text-[#1188f8]">{{ filteredSessionReportSummary.sessions }}</p>
-                      </div>
-                      <div class="rounded-[18px] bg-white px-4 py-4">
-                        <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Events</p>
-                        <p class="mt-2 text-[28px] font-bold leading-none text-black">{{ filteredSessionReportSummary.events }}</p>
-                      </div>
-                      <div class="rounded-[18px] bg-white px-4 py-4">
-                        <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Students</p>
-                        <p class="mt-2 text-[28px] font-bold leading-none text-black">{{ filteredSessionReportSummary.students }}</p>
-                      </div>
-                      <div class="rounded-[18px] bg-white px-4 py-4">
-                        <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Points</p>
-                        <p class="mt-2 text-[28px] font-bold leading-none text-black">{{ filteredSessionReportSummary.points }}</p>
-                      </div>
-                    </div>
-
-                    <div v-if="filteredSessionReportSessions.length" class="mt-4 max-h-[320px] overflow-y-auto rounded-[22px] border border-[#d8e4f3] bg-white">
-                      <div
-                        v-for="row in filteredSessionReportSessions"
-                        :key="row.id"
-                        class="flex flex-col gap-3 border-b border-[#eef1f4] px-4 py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between"
-                      >
-                        <div class="min-w-0">
-                          <p class="truncate text-[17px] font-bold text-black">{{ row.title }}</p>
-                          <p v-if="row.topic" class="mt-1 text-[13px] font-semibold text-[#1188f8]">{{ row.topic }}</p>
-                          <p class="mt-1 text-[13px] font-medium text-[#5d5d5d]">{{ row.date }}</p>
-                          <p class="mt-1 text-[13px] font-medium text-[#5d5d5d]">Start: {{ row.started }}</p>
-                          <p class="mt-1 text-[13px] font-medium text-[#5d5d5d]">End: {{ row.ended }}</p>
+                      <div class="flex flex-wrap items-center gap-3">
+                        <div class="rounded-[16px] bg-white px-4 py-3 text-left">
+                          <p class="text-[11px] font-bold uppercase tracking-[0.08em] text-[#777]">Sessions</p>
+                          <p class="mt-1 text-[20px] font-bold leading-none text-[#1188f8]">{{ filteredSessionReportSummary.sessions }}</p>
                         </div>
-                        <div class="flex items-center gap-3 sm:shrink-0">
-                          <div class="rounded-[14px] bg-[#f6f6f6] px-3 py-2 text-[13px] font-semibold text-[#4a4a4a]">
-                            {{ row.duration }}
+                        <div class="rounded-[16px] bg-white px-4 py-3 text-left">
+                          <p class="text-[11px] font-bold uppercase tracking-[0.08em] text-[#777]">Events</p>
+                          <p class="mt-1 text-[20px] font-bold leading-none text-black">{{ filteredSessionReportSummary.events }}</p>
+                        </div>
+                        <div class="rounded-[16px] bg-white px-4 py-3 text-left">
+                          <p class="text-[11px] font-bold uppercase tracking-[0.08em] text-[#777]">Recorded</p>
+                          <p class="mt-1 text-[20px] font-bold leading-none text-black">{{ completedSessionRecords.length }}</p>
+                        </div>
+                      </div>
+                    </button>
+
+                    <div v-if="isClassRecordsOpen" class="mt-4 space-y-6">
+                      <div>
+                        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                          <div>
+                            <h3 class="text-[19px] font-bold leading-none text-black">Download Records</h3>
+                            <p class="mt-2 text-[14px] font-medium text-[#5d5d5d]">
+                              Filter by date, then export a formatted participation report for your class files.
+                            </p>
                           </div>
+
+                          <button
+                            type="button"
+                            class="interactive-primary-button inline-flex h-[48px] items-center justify-center self-start rounded-[24px] bg-[#1188f8] px-6 text-[16px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                            :disabled="!filteredSessionReportSessions.length"
+                            @click.stop="downloadSessionReport"
+                          >
+                            Download Report
+                          </button>
+                        </div>
+
+                        <div class="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+                          <label class="block">
+                            <span class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">From</span>
+                            <input
+                              v-model="sessionReportStartDate"
+                              type="date"
+                              class="mt-2 h-[48px] w-full rounded-[18px] border border-[#cccdce] bg-white px-4 text-[15px] font-medium text-black outline-none transition focus:border-[#1188f8]"
+                            />
+                          </label>
+
+                          <label class="block">
+                            <span class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">To</span>
+                            <input
+                              v-model="sessionReportEndDate"
+                              type="date"
+                              class="mt-2 h-[48px] w-full rounded-[18px] border border-[#cccdce] bg-white px-4 text-[15px] font-medium text-black outline-none transition focus:border-[#1188f8]"
+                            />
+                          </label>
+
+                          <button
+                            type="button"
+                            class="interactive-secondary-button h-[48px] rounded-[18px] border border-[#1188f8] bg-white px-5 text-[15px] font-semibold text-[#1188f8]"
+                            @click="clearSessionReportFilters"
+                          >
+                            Clear
+                          </button>
+                        </div>
+
+                        <p class="mt-3 text-[14px] font-medium text-[#5d5d5d]">
+                          {{ filteredSessionReportDateRangeLabel }}
+                        </p>
+
+                        <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                          <div class="rounded-[18px] bg-white px-4 py-4">
+                            <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Completed Sessions</p>
+                            <p class="mt-2 text-[28px] font-bold leading-none text-[#1188f8]">{{ filteredSessionReportSummary.sessions }}</p>
+                          </div>
+                          <div class="rounded-[18px] bg-white px-4 py-4">
+                            <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Events</p>
+                            <p class="mt-2 text-[28px] font-bold leading-none text-black">{{ filteredSessionReportSummary.events }}</p>
+                          </div>
+                          <div class="rounded-[18px] bg-white px-4 py-4">
+                            <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Students</p>
+                            <p class="mt-2 text-[28px] font-bold leading-none text-black">{{ filteredSessionReportSummary.students }}</p>
+                          </div>
+                          <div class="rounded-[18px] bg-white px-4 py-4">
+                            <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Points</p>
+                            <p class="mt-2 text-[28px] font-bold leading-none text-black">{{ filteredSessionReportSummary.points }}</p>
+                          </div>
+                        </div>
+
+                        <div v-if="filteredSessionReportSessions.length" class="mt-4 max-h-[320px] overflow-y-auto rounded-[22px] border border-[#d8e4f3] bg-white">
+                          <div
+                            v-for="row in filteredSessionReportSessions"
+                            :key="row.id"
+                            class="flex flex-col gap-3 border-b border-[#eef1f4] px-4 py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between"
+                          >
+                            <div class="min-w-0">
+                              <p class="truncate text-[17px] font-bold text-black">{{ row.title }}</p>
+                              <p v-if="row.topic" class="mt-1 text-[13px] font-semibold text-[#1188f8]">{{ row.topic }}</p>
+                              <p class="mt-1 text-[13px] font-medium text-[#5d5d5d]">{{ row.date }}</p>
+                              <p class="mt-1 text-[13px] font-medium text-[#5d5d5d]">Start: {{ row.started }}</p>
+                              <p class="mt-1 text-[13px] font-medium text-[#5d5d5d]">End: {{ row.ended }}</p>
+                            </div>
+                            <div class="flex items-center gap-3 sm:shrink-0">
+                              <div class="rounded-[14px] bg-[#f6f6f6] px-3 py-2 text-[13px] font-semibold text-[#4a4a4a]">
+                                {{ row.duration }}
+                              </div>
                           <div class="rounded-[14px] bg-[#eef6ff] px-3 py-2 text-[13px] font-semibold text-[#174ca0]">
                             {{ row.participantCount }} students
+                          </div>
+                          <div class="rounded-[14px] bg-[#fff5e9] px-3 py-2 text-[13px] font-semibold text-[#b66a00]">
+                            {{ row.recitationSummary.absentCount }} absent
                           </div>
                           <div class="rounded-[14px] bg-[#d8ebff] px-3 py-2 text-[16px] font-bold text-[#1188f8]">
                             {{ row.points }} pts
                           </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <p v-else class="mt-4 rounded-[22px] border border-dashed border-[#cccdce] bg-white px-4 py-5 text-[15px] font-medium text-[#5d5d5d]">
-                      No participation records matched the selected date range.
-                    </p>
-                  </section>
-
-                  <section class="rounded-[28px] border border-[#cccdce] bg-white px-5 py-5">
-                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <h2 class="text-[22px] font-bold leading-none text-black">Recitation Records</h2>
-                        <p class="mt-2 text-[15px] font-medium text-[#5d5d5d]">
-                          Open any completed session to see who recited, who did not recite, and the scores given.
+                        <p v-else class="mt-4 rounded-[22px] border border-dashed border-[#cccdce] bg-white px-4 py-5 text-[15px] font-medium text-[#5d5d5d]">
+                          No class records matched the selected date range.
                         </p>
                       </div>
-                      <div class="rounded-[18px] bg-[#f6f6f6] px-4 py-3 text-right">
-                        <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Sessions Recorded</p>
-                        <p class="mt-1 text-[24px] font-bold leading-none text-[#1188f8]">{{ completedSessionRecords.length }}</p>
-                      </div>
-                    </div>
 
-                    <div v-if="completedSessionRecords.length" class="mt-5 space-y-[14px]">
+                      <div class="border-t border-[#d8e4f3] pt-6">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <h3 class="text-[19px] font-bold leading-none text-black">View Recitation Sessions</h3>
+                            <p class="mt-2 text-[14px] font-medium text-[#5d5d5d]">
+                              Open any completed session to see who recited, who did not recite, and the scores given.
+                            </p>
+                          </div>
+                          <div class="rounded-[18px] bg-white px-4 py-3 text-right">
+                            <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Sessions Recorded</p>
+                            <p class="mt-1 text-[24px] font-bold leading-none text-[#1188f8]">{{ completedSessionRecords.length }}</p>
+                          </div>
+                        </div>
+
+                        <div v-if="completedSessionRecords.length" class="mt-5 space-y-[14px]">
                       <button
                         v-for="session in completedSessionRecords.slice().reverse()"
                         :key="session.id"
@@ -425,10 +543,14 @@
                             <p class="mt-2 text-[14px] font-medium text-[#5d5d5d]">{{ formatFullDate(session.startedAt) }}</p>
                           </div>
 
-                          <div class="grid gap-3 sm:grid-cols-3 lg:min-w-[420px]">
+                          <div class="grid gap-3 sm:grid-cols-4 lg:min-w-[520px]">
                             <div class="rounded-[18px] bg-white px-4 py-3">
                               <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Recited</p>
                               <p class="mt-2 text-[22px] font-bold leading-none text-[#1188f8]">{{ session.recitationSummary.recitedCount }}</p>
+                            </div>
+                            <div class="rounded-[18px] bg-[#fff8ef] px-4 py-3">
+                              <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#9c6200]">Picked But Absent</p>
+                              <p class="mt-2 text-[22px] font-bold leading-none text-[#c67a00]">{{ session.recitationSummary.absentCount }}</p>
                             </div>
                             <div class="rounded-[18px] bg-white px-4 py-3">
                               <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Did Not Recite</p>
@@ -441,14 +563,20 @@
                           </div>
                         </div>
                       </button>
-                    </div>
+                        </div>
 
-                    <p v-else class="mt-5 rounded-[22px] border border-dashed border-[#cccdce] bg-[#f8fbff] px-4 py-5 text-[15px] font-medium text-[#5d5d5d]">
-                      No completed recitation sessions yet. Start a session to create the first record.
-                    </p>
+                        <p v-else class="mt-5 rounded-[22px] border border-dashed border-[#cccdce] bg-white px-4 py-5 text-[15px] font-medium text-[#5d5d5d]">
+                          No completed recitation sessions yet. Start a session to create the first record.
+                        </p>
+                      </div>
+                    </div>
                   </section>
                 </div>
               </div>
+
+              <p v-if="classActionError" class="mt-3 text-[14px] font-semibold text-[#ffd5d5]">
+                {{ classActionError }}
+              </p>
               </template>
 
               <template v-else-if="currentTab === 'class-list'">
@@ -770,7 +898,7 @@
                         <section class="rounded-[28px] border border-[#cccdce] bg-white px-5 py-5">
                           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
-                              <h2 class="text-[24px] font-bold leading-none text-black">Most Active Students</h2>
+                              <h2 class="text-[24px] font-bold leading-none text-black">Student Leaderboard</h2>
                               <p class="mt-2 text-[15px] font-medium text-[#5b5b5b]">Students earning the most participation points so far.</p>
                             </div>
                             <div class="rounded-[16px] bg-[#f6f6f6] px-4 py-3 text-right">
@@ -778,9 +906,36 @@
                               <p class="mt-1 text-[24px] font-bold leading-none text-[#1188f8]">{{ classAnalytics.totalPoints }}</p>
                             </div>
                           </div>
-                          <div class="mt-5 h-[280px]">
-                            <ParticipationChart type="bar" :data="teacherTopStudentsChartData" :options="teacherTopStudentsChartOptions" />
+                          <div v-if="teacherLeaderboardRows.length" class="mt-5 space-y-3">
+                            <article
+                              v-for="student in teacherLeaderboardRows"
+                              :key="student.id"
+                              class="rounded-[22px] border border-[#e2e8f0] bg-[#fbfdff] px-4 py-4"
+                            >
+                              <div class="flex items-start justify-between gap-4">
+                                <div class="flex min-w-0 items-center gap-3">
+                                  <div class="grid h-[28px] w-[28px] shrink-0 place-items-center rounded-full text-[12px] font-bold"
+                                    :class="student.rank === 1 ? 'bg-[#ffe769] text-[#8a6a00]' : student.rank === 2 ? 'bg-[#e5e7eb] text-[#666]' : student.rank === 3 ? 'bg-[#ffd9b5] text-[#9a5b18]' : 'bg-[#f3f4f6] text-[#666]'">
+                                    {{ student.rank }}
+                                  </div>
+                                  <img :src="student.avatarSrc" alt="" class="h-[38px] w-[38px] rounded-full border border-[#d8e4f3] object-cover" />
+                                  <div class="min-w-0">
+                                    <p class="truncate text-[16px] font-bold text-black">{{ student.name }}</p>
+                                    <p class="mt-1 text-[12px] font-medium text-[#7b7b7b]">
+                                      {{ student.sessions }} recitations or answers
+                                    </p>
+                                  </div>
+                                </div>
+                                <p class="shrink-0 text-[20px] font-bold leading-none text-[#1188f8]">{{ student.points }} pts</p>
+                              </div>
+                              <div class="mt-3 h-[8px] overflow-hidden rounded-full bg-[#e9eef5]">
+                                <div class="h-full rounded-full bg-[#3b82f6]" :style="{ width: `${student.barWidth}%` }" />
+                              </div>
+                            </article>
                           </div>
+                          <p v-else class="mt-5 rounded-[22px] border border-dashed border-[#cccdce] bg-[#f8fbff] px-4 py-5 text-[15px] font-medium text-[#5d5d5d]">
+                            No participation data yet.
+                          </p>
                         </section>
                       </template>
 
@@ -1220,26 +1375,6 @@
         </main>
       </div>
 
-      <div class="px-4 pb-6 sm:px-6 lg:hidden">
-        <div class="flex items-center justify-center gap-8 rounded-[20px] border border-[#d9e8fb] bg-white px-4 py-3 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
-          <button type="button" class="interactive-mobile-nav-button grid h-10 w-10 place-items-center rounded-[12px]" :class="currentTab !== 'analytics' ? 'bg-[rgba(46,130,239,0.25)]' : ''" aria-label="Classes" @click="router.push('/teacher')">
-            <AppIcon name="classes" :size="22" :class="currentTab !== 'analytics' ? 'text-[#174ca0]' : 'text-[#707070]'" />
-          </button>
-          <button type="button" class="interactive-mobile-nav-button grid h-10 w-10 place-items-center rounded-[12px]" :class="currentTab === 'analytics' ? 'bg-[rgba(46,130,239,0.25)]' : ''" aria-label="Class insights" @click="setTab('analytics')">
-            <AppIcon name="insights" :size="22" :class="currentTab === 'analytics' ? 'text-[#174ca0]' : 'text-[#707070]'" />
-          </button>
-          <button type="button" class="interactive-mobile-nav-button grid h-10 w-10 place-items-center rounded-[12px]" aria-label="Archive" @click="router.push('/teacher/archive')">
-            <AppIcon name="archive" :size="22" class="text-[#707070]" />
-          </button>
-          <button type="button" class="interactive-mobile-nav-button grid h-10 w-10 place-items-center rounded-[12px]" aria-label="Settings" @click="openProfileModal">
-            <AppIcon name="settings" :size="22" class="text-[#707070]" />
-          </button>
-          <button type="button" class="interactive-mobile-nav-button grid h-10 w-10 place-items-center rounded-[12px]" aria-label="Logout" @click="openLogoutConfirm">
-            <AppIcon name="logout" :size="22" class="text-[#707070]" />
-          </button>
-        </div>
-      </div>
-
       <ConfirmActionModal
         :open="isLogoutConfirmOpen"
         title="Log out?"
@@ -1260,6 +1395,17 @@
         :loading="isDeletingAccount"
         @cancel="closeDeleteAccountConfirm"
         @confirm="handleDeleteAccount"
+      />
+
+      <ConfirmActionModal
+        :open="isArchiveClassConfirmOpen"
+        title="Delete Class?"
+        message="This will move the class out of your active list and remove it from the current classroom view. Students will no longer use this join code."
+        confirm-text="Delete Class"
+        loading-text="Deleting..."
+        :loading="isArchivingClass"
+        @cancel="closeArchiveClassConfirm"
+        @confirm="handleArchiveCurrentClass"
       />
 
       <transition name="fade">
@@ -1311,72 +1457,33 @@
                 </div>
               </div>
 
-              <div class="mt-6">
-                <p class="text-[15px] font-semibold text-black">Choose the score before scanning</p>
-                <p class="mt-2 text-[13px] font-medium text-[#6b7280]">
-                  ReciCall will still confirm this pick through the student's QR code before saving the score.
-                </p>
-                <div class="mt-3 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
-                  <button
-                    v-for="points in quickScoreOptions"
-                    :key="`predicted-${points}`"
-                    type="button"
-                    class="flex h-[48px] w-full items-center justify-center rounded-[20px] px-4 text-[21px] font-bold transition-transform sm:h-[52px] sm:min-w-[98px] sm:px-5 sm:text-[24px]"
-                    :class="selectedScanScore === points ? 'bg-[#1188f8] text-white shadow-[0_12px_22px_rgba(17,136,248,0.24)]' : 'bg-[#efefef] text-[#0084ff]'"
-                    :disabled="isSavingQueueAbsence"
-                    @click="selectQuickScore(points)"
-                  >
-                    +{{ points }}
-                  </button>
-                </div>
-                <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <input
-                    v-model="queueCustomScore"
-                    type="number"
-                    min="0.1"
-                    step="0.1"
-                    placeholder="Custom score"
-                    class="h-[46px] w-full rounded-[18px] border border-[#cccdce] bg-white px-4 text-[15px] font-medium text-black outline-none transition focus:border-[#1188f8] sm:max-w-[160px]"
-                  />
-                  <button
-                    type="button"
-                    class="flex h-[46px] min-w-[156px] items-center justify-center rounded-[20px] border border-[#1188f8] bg-white px-4 text-[15px] font-semibold text-[#1188f8] disabled:opacity-50"
-                    :disabled="isSavingQueueAbsence"
-                    @click="armQueueCustomScore"
-                  >
-                    Use Custom Score
-                  </button>
-                </div>
-              </div>
-
-              <div class="mt-6 grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
+              <div class="mt-6 grid gap-3 sm:gap-4">
                 <button
                   type="button"
-                  class="w-full rounded-[20px] bg-[#1188f8] px-4 py-[11px] text-[15px] font-semibold text-white disabled:opacity-50 sm:w-auto"
+                  class="flex min-h-[68px] w-full items-center justify-center rounded-[22px] bg-[#1188f8] px-5 py-[16px] text-center text-[17px] font-semibold text-white shadow-[0_14px_26px_rgba(17,136,248,0.18)] disabled:opacity-50 sm:min-h-[74px] sm:text-[18px]"
                   :disabled="isSavingQueueAbsence || selectedScanScore === null || selectedScanScore === undefined"
                   @click="openQueueScanModal"
                 >
                   Scan Selected Student QR
                 </button>
-                <button
-                  type="button"
-                  class="w-full rounded-[20px] border border-[#d11111] px-4 py-[11px] text-[15px] font-semibold text-[#d11111] disabled:opacity-50 sm:w-auto"
-                  :disabled="isSavingQueueAbsence"
-                  @click="markQueuedStudentAbsent"
-                >
-                  {{ isSavingQueueAbsence ? 'Recording absence...' : 'Mark Absent' }}
-                </button>
-                <button
-                  type="button"
-                  class="w-full rounded-[20px] border border-[#1188f8] px-4 py-[11px] text-[15px] font-semibold text-[#1188f8] disabled:opacity-50 sm:w-auto"
-                  :disabled="queueRecommendation.candidateCount <= 1 || isSavingQueueAbsence"
-                  @click="rerollQueuedStudent"
-                >
-                  Advance Queue
-                </button>
-                <p class="text-center text-[14px] font-medium text-[#6b7280] sm:text-left">
-                  {{ queueRecommendation.candidateCount }} students in queue
-                </p>
+                <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                  <button
+                    type="button"
+                    class="flex min-h-[60px] w-full items-center justify-center rounded-[22px] border border-[#d11111] px-4 py-[14px] text-center text-[15px] font-semibold text-[#d11111] disabled:opacity-50 sm:min-h-[64px] sm:px-5 sm:text-[16px]"
+                    :disabled="isSavingQueueAbsence"
+                    @click="markQueuedStudentAbsent"
+                  >
+                    {{ isSavingQueueAbsence ? 'Recording absence...' : 'Mark Absent' }}
+                  </button>
+                  <button
+                    type="button"
+                    class="flex min-h-[60px] w-full items-center justify-center rounded-[22px] border border-[#1188f8] px-4 py-[14px] text-center text-[15px] font-semibold text-[#1188f8] disabled:opacity-50 sm:min-h-[64px] sm:px-5 sm:text-[16px]"
+                    :disabled="queueRecommendation.candidateCount <= 1 || isSavingQueueAbsence"
+                    @click="rerollQueuedStudent"
+                  >
+                    Advance Queue
+                  </button>
+                </div>
               </div>
 
               <div v-if="queueRecommendation.alternatives.length" class="mt-6 rounded-[20px] border border-[#e4e4e4] bg-white px-4 py-4">
@@ -1414,13 +1521,13 @@
       <transition name="fade">
         <div
           v-if="isScanModalOpen"
-          class="fixed inset-0 z-30 flex items-center justify-center bg-[rgba(8,13,22,0.68)] px-4 py-6 backdrop-blur-[2px]"
+          class="fixed inset-0 z-30 flex items-center justify-center bg-[rgba(224,224,224,0.44)] px-4 py-6 backdrop-blur-[1px]"
           @click.self="closeScanModal"
         >
-          <div class="relative w-full max-w-[640px] rounded-[28px] bg-[#101722] px-5 pb-6 pt-5 text-white shadow-[0_24px_64px_rgba(0,0,0,0.42)]">
+          <div class="relative w-full max-w-[640px] rounded-[28px] border border-[#d9e8fb] bg-white px-5 pb-6 pt-5 text-black shadow-[0_24px_64px_rgba(17,136,248,0.16)]">
             <button
               type="button"
-              class="absolute right-[16px] top-[14px] grid h-10 w-10 place-items-center rounded-full text-white/80 transition hover:bg-white/10 hover:text-white"
+              class="absolute right-[16px] top-[14px] grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8]"
               aria-label="Close scan modal"
               @click="closeScanModal"
             >
@@ -1434,7 +1541,7 @@
               <h2 class="mt-2 text-[30px] leading-none font-bold">
                 {{ isQueueScanMode ? 'Scan the selected student' : 'Ready to scan' }}
               </h2>
-              <p class="mt-3 max-w-[440px] text-[15px] font-medium leading-[1.45] text-white/75">
+              <p class="mt-3 max-w-[440px] text-[15px] font-medium leading-[1.45] text-[#5f5f5f]">
                 {{ isQueueScanMode
                   ? `Scan ${scanExpectedStudent?.name || 'the selected student'}'s QR code to confirm the queue recommendation before saving the score.`
                   : 'Pick the score first, then point the camera at the student ID. The camera now scans across the full frame so it can locate the QR code automatically.' }}
@@ -1442,17 +1549,16 @@
             </div>
 
             <div class="mt-5 flex flex-wrap items-center gap-3">
-              <div class="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-[14px] font-semibold text-white">
+              <div class="inline-flex items-center rounded-full bg-[#e7f2ff] px-4 py-2 text-[14px] font-semibold text-[#1188f8]">
                 {{ selectedScanScoreLabel }}
               </div>
-              <div v-if="isQueueScanMode && scanExpectedStudent" class="inline-flex items-center rounded-full bg-[#1188f8]/20 px-4 py-2 text-[14px] font-semibold text-[#8cc5ff]">
+              <div v-if="isQueueScanMode && scanExpectedStudent" class="inline-flex items-center rounded-full bg-[#eef6ff] px-4 py-2 text-[14px] font-semibold text-[#1188f8]">
                 Expected: {{ scanExpectedStudent.name }}
               </div>
             </div>
 
-            <div class="mt-5 rounded-[26px] border border-white/10 bg-black/30 p-4">
+            <div class="mt-5 rounded-[26px] border border-[#d9e8fb] bg-[#f8fbff] p-4">
               <div class="w-full overflow-hidden rounded-[22px] bg-black">
-                <div :id="fileScannerElementId" class="hidden" />
                 <div class="relative aspect-[4/5] w-full overflow-hidden bg-[#0b1220] sm:aspect-[16/10]">
                   <div
                     v-show="!scannedStudentName"
@@ -1486,13 +1592,6 @@
                       @click="restartScanner"
                     >
                       Retry camera
-                    </button>
-                    <button
-                      type="button"
-                      class="mt-3 rounded-[18px] border border-[#1188f8] bg-white px-5 py-2 text-[16px] font-semibold text-[#1188f8]"
-                      @click="openQrUpload"
-                    >
-                      Upload QR image
                     </button>
                   </div>
 
@@ -1549,11 +1648,11 @@
                 min="0.1"
                 step="0.1"
                 placeholder="Custom score"
-                class="h-[50px] w-full max-w-[220px] rounded-[18px] border border-white/18 bg-white px-4 text-[16px] font-medium text-black outline-none transition focus:border-[#1188f8]"
+                class="h-[50px] w-full max-w-[220px] rounded-[18px] border border-[#d9e8fb] bg-white px-4 text-[16px] font-medium text-black outline-none transition focus:border-[#1188f8]"
               />
               <button
                 type="button"
-                class="flex h-[50px] min-w-[180px] items-center justify-center rounded-[22px] border border-[#1188f8] bg-transparent px-5 text-[16px] font-semibold text-[#8cc5ff] disabled:opacity-50"
+                class="flex h-[50px] min-w-[180px] items-center justify-center rounded-[22px] border border-[#1188f8] bg-white px-5 text-[16px] font-semibold text-[#1188f8] disabled:opacity-50"
                 :disabled="isSavingScanAward"
                 @click="armScanCustomScore"
               >
@@ -1561,32 +1660,16 @@
               </button>
             </div>
 
-            <div class="mt-4 flex flex-wrap items-center justify-center gap-3 text-center text-[13px] font-medium text-white/65">
+            <div class="mt-4 flex flex-wrap items-center justify-center gap-3 text-center text-[13px] font-medium text-[#5f5f5f]">
               <button
                 type="button"
-                class="rounded-[18px] border border-white/14 px-4 py-2 text-white transition hover:bg-white/8"
+                class="rounded-[18px] border border-[#d9e8fb] bg-white px-4 py-2 text-[#1188f8] transition hover:bg-[#eef6ff]"
                 :disabled="isSavingScanAward"
                 @click="restartScanner"
               >
                 Keep scanning
               </button>
-              <button
-                type="button"
-                class="rounded-[18px] border border-white/14 px-4 py-2 text-white transition hover:bg-white/8"
-                :disabled="isSavingScanAward"
-                @click="openQrUpload"
-              >
-                Upload QR image
-              </button>
             </div>
-
-            <input
-              ref="qrUploadInput"
-              type="file"
-              accept="image/*"
-              class="hidden"
-              @change="handleQrFileChange"
-            />
           </div>
         </div>
       </transition>
@@ -1686,10 +1769,14 @@
                 </button>
               </div>
 
-              <div class="mt-5 grid gap-3 sm:grid-cols-4">
+              <div class="mt-5 grid gap-3 sm:grid-cols-5">
                 <div class="rounded-[20px] bg-white/12 px-4 py-4">
                   <p class="text-[30px] font-bold leading-none">{{ selectedSessionRecord.recitationSummary.recitedCount }}</p>
                   <p class="mt-2 text-[14px] font-medium text-white/90">Recited</p>
+                </div>
+                <div class="rounded-[20px] bg-white/12 px-4 py-4">
+                  <p class="text-[30px] font-bold leading-none">{{ selectedSessionRecord.recitationSummary.absentCount }}</p>
+                  <p class="mt-2 text-[14px] font-medium text-white/90">Picked But Absent</p>
                 </div>
                 <div class="rounded-[20px] bg-white/12 px-4 py-4">
                   <p class="text-[30px] font-bold leading-none">{{ selectedSessionRecord.recitationSummary.notRecitedCount }}</p>
@@ -1742,6 +1829,31 @@
               </section>
 
               <section class="mt-6">
+                <p class="text-[16px] font-bold uppercase tracking-[0.08em] text-[#b66a00]">
+                  Picked by ReciCall but Absent ({{ selectedSessionRecord.recitationSummary.absentCount }})
+                </p>
+                <div v-if="selectedSessionRecord.recitationSummary.absentStudents.length" class="mt-4 space-y-[10px]">
+                  <div
+                    v-for="student in selectedSessionRecord.recitationSummary.absentStudents"
+                    :key="`absent-${student.id}`"
+                    class="flex items-center gap-3 rounded-[20px] border border-[#f2ddbb] bg-[#fffaf1] px-4 py-4"
+                  >
+                    <img :src="resolveStudentAvatar(student.avatarKey, student.photoURL)" alt="" class="h-[44px] w-[44px] rounded-full object-cover" />
+                    <div class="min-w-0">
+                      <p class="truncate text-[18px] font-semibold text-black">{{ student.name }}</p>
+                      <p class="truncate text-[13px] font-medium text-[#666]">{{ student.studentNumber || student.email || 'Selected by ReciCall but absent' }}</p>
+                    </div>
+                    <div class="ml-auto rounded-[14px] bg-[#ffe6b8] px-3 py-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#9c6200]">
+                      Picked But Absent
+                    </div>
+                  </div>
+                </div>
+                <p v-else class="mt-4 rounded-[20px] border border-dashed border-[#cccdce] bg-[#f8fbff] px-4 py-5 text-[15px] font-medium text-[#5d5d5d]">
+                  No students were marked absent after being picked for this session.
+                </p>
+              </section>
+
+              <section class="mt-6">
                 <p class="text-[16px] font-bold uppercase tracking-[0.08em] text-[#b81717]">
                   Did Not Recite ({{ selectedSessionRecord.recitationSummary.notRecitedCount }})
                 </p>
@@ -1770,14 +1882,14 @@
       <transition name="fade">
         <div
           v-if="isProfileModalOpen"
-          class="fixed inset-0 z-20 flex items-center justify-center bg-[rgba(224,224,224,0.44)] px-4 py-8 backdrop-blur-[1px]"
+          class="fixed inset-0 z-20 flex items-start justify-center overflow-y-auto bg-[rgba(224,224,224,0.44)] px-3 py-3 backdrop-blur-[1px] sm:px-4 sm:py-8 sm:items-center"
           @click.self="closeProfileModal"
         >
-          <div class="w-full max-w-[540px] rounded-[22px] bg-white px-6 py-5 shadow-[0_4px_39.3px_2px_rgba(0,0,0,0.2)]">
-            <div class="flex items-start justify-between border-b border-[#d7d7d7] pb-4">
+          <div class="w-full max-w-[560px] max-h-[calc(100vh-1.5rem)] overflow-y-auto rounded-[22px] bg-white px-4 py-4 shadow-[0_4px_39.3px_2px_rgba(0,0,0,0.2)] sm:max-h-[calc(100vh-4rem)] sm:px-6 sm:py-5">
+            <div class="sticky top-0 z-10 flex items-start justify-between border-b border-[#d7d7d7] bg-white pb-4">
               <div>
-                <h2 class="text-[40px] leading-none font-semibold">Edit Profile</h2>
-                <p class="mt-2 text-[20px] font-medium">Update your display name and choose a preset avatar.</p>
+                <h2 class="text-[30px] leading-none font-semibold sm:text-[40px]">Settings</h2>
+                <p class="mt-2 text-[15px] font-medium sm:text-[20px]">Manage your teacher profile, password access, and privacy options.</p>
               </div>
               <button type="button" class="grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8]" aria-label="Close profile modal" @click="closeProfileModal">
                 <AppIcon name="x" :size="20" />
@@ -1785,42 +1897,89 @@
             </div>
 
             <form class="space-y-4 pt-5" @submit.prevent="saveProfileChanges">
-              <div class="flex items-center gap-4">
-                <img :src="profilePreviewSrc" alt="" class="h-[88px] w-[88px] rounded-full border border-[#d7d7d7] object-cover" />
+              <div class="flex flex-wrap gap-2 rounded-[22px] bg-[#f6f6f6] p-2">
+                <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'profile' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'profile'">Profile</button>
+                <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'security' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'security'">Security</button>
+                <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'legal' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'legal'">Legal</button>
+                <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'danger' ? 'bg-white text-[#b81717] shadow-[0_8px_18px_rgba(184,23,23,0.12)]' : 'text-[#7a4a4a]'" @click="activeSettingsSection = 'danger'">Danger Zone</button>
               </div>
 
-              <label class="block">
-                <span class="mb-1 block text-[16px] font-semibold">Display Name</span>
-                <input
-                  v-model.trim="profileName"
-                  type="text"
-                  placeholder="Enter your name"
-                  class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
-                />
-              </label>
-
-              <div>
-                <div class="flex items-center justify-between gap-4">
-                  <p class="text-[16px] font-semibold">Preset Avatars</p>
-                  <p class="text-[13px] text-[#666]">Choose one avatar to use across the app.</p>
+              <div v-if="activeSettingsSection === 'profile'" class="space-y-4">
+                <div class="flex items-center gap-4">
+                  <img :src="profilePreviewSrc" alt="" class="h-[72px] w-[72px] rounded-full border border-[#d7d7d7] object-cover sm:h-[88px] sm:w-[88px]" />
                 </div>
-                <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+
+                <label class="block">
+                  <span class="mb-1 block text-[16px] font-semibold">Display Name</span>
+                  <input
+                    v-model.trim="profileName"
+                    type="text"
+                    placeholder="Enter your name"
+                    class="h-14 w-full rounded-[15px] border border-black px-4 text-[16px] font-medium outline-none placeholder:text-[#777]"
+                  />
+                </label>
+
+                <div>
+                  <div class="flex items-center justify-between gap-4">
+                    <p class="text-[16px] font-semibold">Preset Avatars</p>
+                    <p class="text-[13px] text-[#666]">Choose one avatar to use across the app.</p>
+                  </div>
+                  <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <button
+                      v-for="avatar in teacherAvatarOptions"
+                      :key="avatar.key"
+                      type="button"
+                      class="rounded-[18px] border px-3 py-3 text-center transition"
+                      :class="profileAvatarKey === avatar.key ? 'border-[#1188f8] bg-[#eef6ff] shadow-[0_0_0_2px_rgba(17,136,248,0.12)]' : 'border-[#d7d7d7] bg-[#fafafa] hover:border-[#1188f8]'"
+                      :disabled="isSavingProfile"
+                      @click="selectTeacherAvatarPreset(avatar.key)"
+                    >
+                      <img :src="avatar.src" :alt="avatar.label" class="mx-auto h-[64px] w-[64px] rounded-full object-cover" />
+                      <p class="mt-3 text-[13px] font-semibold text-black">{{ avatar.label }}</p>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div v-else-if="activeSettingsSection === 'security'" class="rounded-[20px] border border-[#d9e8fb] bg-[#f8fbff] px-4 py-4">
+                <p class="text-[18px] font-bold text-black">Password & Sign-In</p>
+                <p class="mt-2 text-[14px] leading-[1.5] text-[#5b5b5b]">Use your account email to receive a secure password reset link.</p>
+                <div class="mt-4 rounded-[16px] border border-[#d9e8fb] bg-white px-4 py-3">
+                  <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#6b7280]">Signed in email</p>
+                  <p class="mt-1 break-all text-[15px] font-semibold text-black">{{ signedInEmail }}</p>
+                </div>
+                <button
+                  type="button"
+                  class="mt-4 flex min-h-[46px] w-full items-center justify-center rounded-[18px] border border-[#1188f8] bg-white px-5 text-[15px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff] disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+                  :disabled="isSavingProfile || isSendingPasswordReset"
+                  @click="sendPasswordResetLink"
+                >
+                  {{ isSendingPasswordReset ? 'Sending reset link...' : 'Change Password' }}
+                </button>
+              </div>
+
+              <div v-else-if="activeSettingsSection === 'legal'" class="rounded-[20px] border border-[#d9e8fb] bg-[#f8fbff] px-4 py-4">
+                <p class="text-[18px] font-bold text-black">Terms & Privacy</p>
+                <p class="mt-2 text-[14px] leading-[1.5] text-[#5b5b5b]">Open the app policies in their own page with a simple back button.</p>
+                <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <button
-                    v-for="avatar in teacherAvatarOptions"
-                    :key="avatar.key"
                     type="button"
-                    class="rounded-[18px] border px-3 py-3 text-center transition"
-                    :class="profileAvatarKey === avatar.key ? 'border-[#1188f8] bg-[#eef6ff] shadow-[0_0_0_2px_rgba(17,136,248,0.12)]' : 'border-[#d7d7d7] bg-[#fafafa] hover:border-[#1188f8]'"
-                    :disabled="isSavingProfile"
-                    @click="selectTeacherAvatarPreset(avatar.key)"
+                    class="flex min-h-[46px] items-center justify-center rounded-[18px] border border-[#d7d7d7] bg-white px-5 text-[15px] font-semibold text-black transition hover:bg-[#f7f7f7]"
+                    @click="goToTerms"
                   >
-                    <img :src="avatar.src" :alt="avatar.label" class="mx-auto h-[64px] w-[64px] rounded-full object-cover" />
-                    <p class="mt-3 text-[13px] font-semibold text-black">{{ avatar.label }}</p>
+                    Terms of Service
+                  </button>
+                  <button
+                    type="button"
+                    class="flex min-h-[46px] items-center justify-center rounded-[18px] border border-[#d7d7d7] bg-white px-5 text-[15px] font-semibold text-black transition hover:bg-[#f7f7f7]"
+                    @click="goToPrivacy"
+                  >
+                    Privacy Policy
                   </button>
                 </div>
               </div>
 
-              <div class="rounded-[20px] border border-[#ffd6d6] bg-[#fff7f7] px-4 py-4">
+              <div v-else class="rounded-[20px] border border-[#ffd6d6] bg-[#fff7f7] px-4 py-4">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p class="text-[16px] font-bold text-[#b81717]">Delete Account</p>
@@ -1843,11 +2002,11 @@
               <p v-if="profileSuccess" class="text-sm font-medium text-green-600">{{ profileSuccess }}</p>
               <p v-if="deleteAccountError" class="text-sm font-medium text-red-600">{{ deleteAccountError }}</p>
 
-              <div class="flex justify-end gap-4 pt-2">
-                <button type="button" class="h-[57px] w-[151px] rounded-[33.5px] bg-[#c5c5c5] text-[20px] font-bold" @click="closeProfileModal">
+              <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+                <button type="button" class="h-[52px] w-full rounded-[24px] bg-[#c5c5c5] text-[18px] font-bold sm:h-[57px] sm:w-[151px] sm:rounded-[33.5px] sm:text-[20px]" @click="closeProfileModal">
                   Cancel
                 </button>
-                <button type="submit" class="h-[57px] w-[151px] rounded-[33.5px] bg-[#1188f8] text-[20px] font-bold text-white disabled:opacity-70" :disabled="isSavingProfile">
+                <button v-if="activeSettingsSection === 'profile'" type="submit" class="h-[52px] w-full rounded-[24px] bg-[#1188f8] text-[18px] font-bold text-white disabled:opacity-70 sm:h-[57px] sm:w-[151px] sm:rounded-[33.5px] sm:text-[20px]" :disabled="isSavingProfile">
                   {{ isSavingProfile ? 'Saving...' : 'Save' }}
                 </button>
               </div>
@@ -1961,7 +2120,7 @@ import ConfirmActionModal from '../../components/common/ConfirmActionModal.vue'
 import AppIcon from '../../components/common/AppIcon.vue'
 import ClassThemeArt from '../../components/common/ClassThemeArt.vue'
 import ParticipationChart from '../../components/charts/ParticipationChart.vue'
-import { logoutUser, updateCurrentUserAccount } from '../../services/authService'
+import { logoutUser, requestCurrentUserPasswordReset, updateCurrentUserAccount } from '../../services/authService'
 import {
   deleteTeacherAccount,
   getDeleteAccountErrorMessage,
@@ -1972,6 +2131,7 @@ import {
   buildSeatEnvironmentMap,
 } from '../../services/analyticsService'
 import {
+  archiveTeacherClass,
   endTeacherClassSession,
   getTeacherClassById,
   recordTeacherClassAbsence,
@@ -2005,11 +2165,16 @@ const isProfileModalOpen = ref(false)
 const isSavingProfile = ref(false)
 const isDeleteAccountConfirmOpen = ref(false)
 const isDeletingAccount = ref(false)
+const isClassOptionsOpen = ref(false)
+const isArchiveClassConfirmOpen = ref(false)
+const isSendingPasswordReset = ref(false)
+const activeSettingsSection = ref('profile')
 const isScanModalOpen = ref(false)
 const isPickNextStudentModalOpen = ref(false)
 const isStartingScanner = ref(false)
 const isSavingScanAward = ref(false)
 const isSavingQueueAbsence = ref(false)
+const isArchivingClass = ref(false)
 const isRefreshingRecentEngagement = ref(false)
 const isSeatEditMode = ref(false)
 const isLayoutLocked = ref(false)
@@ -2020,6 +2185,7 @@ const isSessionSetupModalOpen = ref(false)
 const isSessionRecordModalOpen = ref(false)
 const isStudentFeedbackModalOpen = ref(false)
 const isSavingStudentFeedback = ref(false)
+const isClassRecordsOpen = ref(true)
 const seatLayoutSaveStatus = ref('')
 const seatLayoutSaveError = ref(false)
 const sessionReportStartDate = ref('')
@@ -2027,15 +2193,16 @@ const sessionReportEndDate = ref('')
 const profileError = ref('')
 const profileSuccess = ref('')
 const deleteAccountError = ref('')
+const classActionError = ref('')
 const scanError = ref('')
 const pickNextStudentError = ref('')
 const sessionSetupError = ref('')
 const studentFeedbackError = ref('')
 const scannedPayload = ref(null)
 const scannerInstance = ref(null)
-const qrUploadInput = ref(null)
 const profileName = ref('')
 const profileAvatarKey = ref(defaultTeacherAvatarKey)
+const copiedJoinCode = ref('')
 const sessionDraftName = ref('')
 const sessionDraftTopic = ref('')
 const scanCustomScore = ref('')
@@ -2049,21 +2216,88 @@ const studentFeedbackDraft = ref('')
 const rawClassroom = ref(null)
 const loadError = ref('')
 const analyticsSubview = ref('overview')
+const activeClassroomTab = ref('class')
 const deskRowsLeft = ref([])
 const deskRowsRight = ref([])
 const draggedSeatPayload = ref(null)
 const excludedRecommendationIds = ref([])
 const scannerElementId = 'teacher-qr-scanner'
-const fileScannerElementId = 'teacher-qr-file-reader'
 const teacherPhoto = computed(() =>
   resolveTeacherAvatar(teacherAvatarKey.value, ''),
 )
+const signedInEmail = computed(() => auth.currentUser?.email || 'No email available')
 const profilePreviewSrc = computed(() =>
   resolveTeacherAvatar(profileAvatarKey.value || defaultTeacherAvatarKey, ''),
 )
 
+const normalizeSettingsSection = (value) =>
+  ['profile', 'security', 'legal', 'danger'].includes(value) ? value : 'profile'
+
+const syncProfileModalQuery = async (open, section = activeSettingsSection.value) => {
+  const normalizedSection = normalizeSettingsSection(section)
+  const nextQuery = { ...route.query }
+
+  if (open) {
+    nextQuery.settings = 'open'
+    nextQuery.settingsSection = normalizedSection
+  } else {
+    delete nextQuery.settings
+    delete nextQuery.settingsSection
+  }
+
+  const isOpenInRoute = route.query.settings === 'open'
+  const currentSection = normalizeSettingsSection(route.query.settingsSection)
+  if ((open && isOpenInRoute && currentSection === normalizedSection) || (!open && !isOpenInRoute)) {
+    return
+  }
+
+  await router.replace({
+    path: route.path,
+    query: nextQuery,
+  })
+}
+
+const buildSettingsReturnTo = (section = activeSettingsSection.value) =>
+  router.resolve({
+    path: route.path,
+    query: {
+      ...route.query,
+      settings: 'open',
+      settingsSection: normalizeSettingsSection(section),
+    },
+  }).fullPath
+
+const prefillProfileSettings = () => {
+  profileName.value = teacherName.value
+  profileAvatarKey.value = teacherAvatarKey.value || defaultTeacherAvatarKey
+}
+
+const recoverTeacherAccessFailure = async (error) => {
+  console.error('Unable to load the teacher profile or classroom.', error)
+
+  try {
+    await logoutUser()
+  } catch (signOutError) {
+    console.error('Unable to sign out after a teacher access failure.', signOutError)
+  }
+
+  await router.replace({
+    path: '/login',
+    query: { error: 'profile-access' },
+  })
+}
+
+const normalizeClassroomTab = (value) => {
+  const normalizedValue = Array.isArray(value) ? value[0] : value
+  if (normalizedValue === 'class-list' || normalizedValue === 'analytics') {
+    return normalizedValue
+  }
+
+  return 'class'
+}
+
 const isSessionActive = computed(() => Boolean(rawClassroom.value?.activeSession))
-const currentTab = computed(() => route.query.tab || 'class')
+const currentTab = computed(() => activeClassroomTab.value)
 const scannedStudentName = computed(() => scannedPayload.value?.name || '')
 const quickScoreOptions = [1, 3, 5]
 const isQueueScanMode = computed(() => scanMode.value === 'queue')
@@ -2073,14 +2307,93 @@ const selectedScanScoreLabel = computed(() =>
     : `+${formatScoreValue(selectedScanScore.value)} ready`,
 )
 
-const setTab = (tab) => {
-  router.push({
-    path: route.path,
-    query: {
-      ...route.query,
-      tab,
-    },
-  })
+const setTab = async (tab) => {
+  const normalizedTab = normalizeClassroomTab(tab)
+  activeClassroomTab.value = normalizedTab
+  closeClassOptions()
+
+  const nextQuery = { ...route.query }
+  if (normalizedTab === 'class') delete nextQuery.tab
+  else nextQuery.tab = normalizedTab
+
+  const hasRouteTab = Object.prototype.hasOwnProperty.call(route.query, 'tab')
+  const shouldSyncRoute =
+    normalizeClassroomTab(route.query.tab) !== normalizedTab || (normalizedTab === 'class' && hasRouteTab)
+
+  if (!shouldSyncRoute) return
+
+  try {
+    await router.replace({
+      path: route.path,
+      query: nextQuery,
+    })
+  } catch (error) {
+    console.error('Unable to switch classroom tabs:', error)
+  }
+}
+
+const toggleClassOptions = () => {
+  classActionError.value = ''
+  isClassOptionsOpen.value = !isClassOptionsOpen.value
+}
+
+const closeClassOptions = () => {
+  isClassOptionsOpen.value = false
+}
+
+const legacyCopyText = (value) => {
+  const textArea = document.createElement('textarea')
+  textArea.value = value
+  textArea.setAttribute('readonly', '')
+  textArea.style.position = 'fixed'
+  textArea.style.opacity = '0'
+  textArea.style.pointerEvents = 'none'
+  document.body.appendChild(textArea)
+  textArea.focus()
+  textArea.select()
+
+  let copied = false
+  try {
+    copied = document.execCommand('copy')
+  } catch (error) {
+    console.error(error)
+  }
+
+  document.body.removeChild(textArea)
+  return copied
+}
+
+const copyClassJoinCode = async () => {
+  const joinCode = classroom.value?.joinCode
+  if (!joinCode) return
+
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(joinCode)
+    } else if (!legacyCopyText(joinCode)) {
+      throw new Error('Clipboard copy is unavailable')
+    }
+
+    copiedJoinCode.value = joinCode
+    classActionError.value = ''
+    window.setTimeout(() => {
+      if (copiedJoinCode.value === joinCode) copiedJoinCode.value = ''
+    }, 1600)
+  } catch (error) {
+    console.error(error)
+    classActionError.value = 'We could not copy the join code right now.'
+  }
+}
+
+const openArchiveClassConfirm = () => {
+  closeClassOptions()
+  classActionError.value = ''
+  isArchiveClassConfirmOpen.value = true
+}
+
+const closeArchiveClassConfirm = () => {
+  if (isArchivingClass.value) return
+  isArchiveClassConfirmOpen.value = false
 }
 
 const classroom = computed(() => {
@@ -2128,12 +2441,28 @@ const buildSessionRecitationSummary = (session = {}, sessionEvents = []) => {
   )
   const rosterIndex = new Map(rosterSnapshot.map((student) => [student.id, student]))
   const recitedIndex = new Map()
+  const absentIndex = new Map()
 
   sessionEvents.forEach((event) => {
     const studentId = event.studentId
     if (!studentId) return
-
+    const eventType = event.eventType || 'participation'
     const rosterStudent = rosterIndex.get(studentId)
+
+    if (eventType === 'absence') {
+      if (!absentIndex.has(studentId)) {
+        absentIndex.set(studentId, {
+          id: studentId,
+          name: rosterStudent?.name || event.displayName || 'Joined student',
+          email: rosterStudent?.email || '',
+          studentNumber: rosterStudent?.studentNumber || event.studentNumber || '',
+          avatarKey: rosterStudent?.avatarKey || event.avatarKey || '',
+          photoURL: rosterStudent?.photoURL || event.photoURL || '',
+        })
+      }
+      return
+    }
+
     const existingStudent = recitedIndex.get(studentId) || {
       id: studentId,
       name: rosterStudent?.name || event.displayName || 'Joined student',
@@ -2160,9 +2489,12 @@ const buildSessionRecitationSummary = (session = {}, sessionEvents = []) => {
 
     return left.name.localeCompare(right.name)
   })
+  const absentStudents = [...absentIndex.values()].sort((left, right) =>
+    left.name.localeCompare(right.name),
+  )
 
   const notRecitedStudents = rosterSnapshot
-    .filter((student) => !recitedIndex.has(student.id))
+    .filter((student) => !recitedIndex.has(student.id) && !absentIndex.has(student.id))
     .sort((left, right) => left.name.localeCompare(right.name))
 
   const totalPoints = recitedStudents.reduce((sum, student) => sum + student.totalPoints, 0)
@@ -2170,10 +2502,12 @@ const buildSessionRecitationSummary = (session = {}, sessionEvents = []) => {
   return {
     totalStudents: rosterSnapshot.length,
     recitedCount: recitedStudents.length,
+    absentCount: absentStudents.length,
     notRecitedCount: notRecitedStudents.length,
     totalPoints,
     averageScore: recitedStudents.length ? Math.round((totalPoints / recitedStudents.length) * 10) / 10 : 0,
     recitedStudents,
+    absentStudents,
     notRecitedStudents,
   }
 }
@@ -2221,7 +2555,7 @@ const completedSessionRecords = computed(() =>
       const endedAt = toEventDate(session.endedAt)
       const sessionStart = startedAt?.getTime() || 0
       const sessionEnd = endedAt?.getTime() || Number.MAX_SAFE_INTEGER
-      const sessionEvents = participationOnlyEvents.value.filter((event) => {
+      const sessionEvents = participationEvents.value.filter((event) => {
         if (session.id && event.sessionId) {
           return event.sessionId === session.id
         }
@@ -2262,6 +2596,21 @@ const filteredSessionReportSessions = computed(() =>
       started: formatDateTime(session.startedAt),
       ended: formatDateTime(session.endedAt),
       duration: formatSessionDuration(session.startedAt, session.endedAt),
+      recitedStudentsLabel: session.recitationSummary.recitedStudents.length
+        ? session.recitationSummary.recitedStudents
+          .map((student) => `${student.name} (${formatScoreValue(student.totalPoints)})`)
+          .join(', ')
+        : 'No recorded recitations',
+      absentStudentsLabel: session.recitationSummary.absentStudents.length
+        ? session.recitationSummary.absentStudents
+          .map((student) => student.name)
+          .join(', ')
+        : 'No absences recorded',
+      notRecitedStudentsLabel: session.recitationSummary.notRecitedStudents.length
+        ? session.recitationSummary.notRecitedStudents
+          .map((student) => student.name)
+          .join(', ')
+        : 'Everyone recited',
     }))
     .sort((left, right) => (right.startedAt?.getTime() || 0) - (left.startedAt?.getTime() || 0)),
 )
@@ -2513,28 +2862,6 @@ const teacherRiskChartOptions = {
   },
 }
 
-const teacherTopStudentsChartData = computed(() => ({
-  labels: classAnalytics.value.topPointsBreakdown.map((entry) => entry.label),
-  datasets: [
-    {
-      label: 'Participation Points',
-      data: classAnalytics.value.topPointsBreakdown.map((entry) => entry.value),
-      backgroundColor: ['#1188F8', '#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE'],
-      borderRadius: 12,
-      borderSkipped: false,
-    },
-  ],
-}))
-
-const teacherTopStudentsChartOptions = {
-  ...teacherChartAxisOptions,
-  indexAxis: 'y',
-  plugins: {
-    ...teacherChartAxisOptions.plugins,
-    legend: { display: false },
-  },
-}
-
 const classListStudents = computed(() =>
   (classroom.value?.enrolledStudents || []).map((student, index) => ({
     id: student.studentId || student.id || `student-${index}`,
@@ -2549,6 +2876,23 @@ const classListStudents = computed(() =>
     avatarSrc: resolveStudentAvatar(student.avatarKey, student.photoURL),
   })),
 )
+
+const teacherLeaderboardRows = computed(() => {
+  const rosterById = new Map(classListStudents.value.map((student) => [student.id, student]))
+  const highestPoints = Math.max(...classAnalytics.value.mostActiveStudents.map((student) => student.points || 0), 0)
+
+  return classAnalytics.value.mostActiveStudents.slice(0, 5).map((student, index) => {
+    const rosterMatch = rosterById.get(student.id)
+    const points = Number(student.points) || 0
+
+    return {
+      ...student,
+      rank: index + 1,
+      avatarSrc: rosterMatch?.avatarSrc || resolveStudentAvatar(student.avatarKey, student.photoURL),
+      barWidth: highestPoints > 0 ? Math.max((points / highestPoints) * 100, 6) : 0,
+    }
+  })
+})
 
 const selectedFeedbackStudent = computed(
   () => classListStudents.value.find((student) => student.id === selectedFeedbackStudentId.value) || null,
@@ -3108,6 +3452,31 @@ const clearDraggedSeat = () => {
 }
 
 watch(
+  () => [route.query.settings, route.query.settingsSection],
+  ([settings, section]) => {
+    if (settings === 'open') {
+      activeSettingsSection.value = normalizeSettingsSection(section)
+      prefillProfileSettings()
+      isProfileModalOpen.value = true
+      return
+    }
+
+    if (isProfileModalOpen.value) {
+      closeProfileModal({ skipRouteSync: true })
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  () => route.query.tab,
+  (tab) => {
+    activeClassroomTab.value = normalizeClassroomTab(tab)
+  },
+  { immediate: true },
+)
+
+watch(
   classListStudents,
   () => {
     initializeDeskLayout()
@@ -3124,12 +3493,13 @@ watch(
   { deep: true },
 )
 
-const openProfileModal = () => {
+const openProfileModal = async (section = 'profile') => {
   profileError.value = ''
   profileSuccess.value = ''
-  profileName.value = teacherName.value
-  profileAvatarKey.value = teacherAvatarKey.value || defaultTeacherAvatarKey
+  prefillProfileSettings()
+  activeSettingsSection.value = normalizeSettingsSection(section)
   isProfileModalOpen.value = true
+  await syncProfileModalQuery(true, activeSettingsSection.value)
 }
 
 const openDeleteAccountConfirm = () => {
@@ -3142,6 +3512,24 @@ const openDeleteAccountConfirm = () => {
 const closeDeleteAccountConfirm = () => {
   if (isDeletingAccount.value) return
   isDeleteAccountConfirmOpen.value = false
+}
+
+const handleArchiveCurrentClass = async () => {
+  if (!teacherId.value || !route.params.classId || isArchivingClass.value) return
+
+  isArchivingClass.value = true
+  classActionError.value = ''
+
+  try {
+    await archiveTeacherClass(teacherId.value, route.params.classId)
+    isArchiveClassConfirmOpen.value = false
+    await router.replace('/teacher')
+  } catch (error) {
+    console.error('Unable to delete class:', error)
+    classActionError.value = 'We could not delete this class right now. Please try again.'
+  } finally {
+    isArchivingClass.value = false
+  }
 }
 
 const resetScanState = ({ keepSelectedScore = false, keepScanContext = false } = {}) => {
@@ -3241,17 +3629,17 @@ const downloadSessionReport = async () => {
     columns: [
       { key: 'date', label: 'Date' },
       { key: 'sessionLabel', label: 'Session' },
-      { key: 'started', label: 'Started' },
-      { key: 'ended', label: 'Ended' },
-      { key: 'participantLabel', label: 'Participants' },
+      { key: 'recitedStudentsLabel', label: 'Recited Students' },
+      { key: 'absentStudentsLabel', label: 'Picked but Absent' },
+      { key: 'notRecitedStudentsLabel', label: 'Did Not Recite' },
       { key: 'pointsLabel', label: 'Points' },
     ],
     rows: filteredSessionReportSessions.value.map((session) => ({
       date: session.date,
       sessionLabel: session.title,
-      started: session.started,
-      ended: session.ended,
-      participantLabel: `${session.participantCount}`,
+      recitedStudentsLabel: session.recitedStudentsLabel,
+      absentStudentsLabel: session.absentStudentsLabel,
+      notRecitedStudentsLabel: session.notRecitedStudentsLabel,
       pointsLabel: `${session.points}`,
     })),
   })
@@ -3457,35 +3845,6 @@ const closeScanModal = async () => {
 const restartScanner = async () => {
   await stopScanner()
   await startScanner()
-}
-
-const openQrUpload = () => {
-  qrUploadInput.value?.click()
-}
-
-const handleQrFileChange = async (event) => {
-  const [file] = event.target.files || []
-  event.target.value = ''
-
-  if (!file) return
-
-  isStartingScanner.value = true
-  scanError.value = ''
-
-  try {
-    await stopScanner()
-    const fileScanner = new Html5Qrcode(fileScannerElementId)
-    const decodedText = await fileScanner.scanFile(file, true)
-    await fileScanner.clear()
-    await handleScanSuccess(decodedText)
-  } catch (error) {
-    console.error(error)
-    const message =
-      error?.message || error?.name || 'We could not read a QR code from that image.'
-    scanError.value = `Unable to read that QR image. ${message}`
-  } finally {
-    isStartingScanner.value = false
-  }
 }
 
 const persistParticipationAward = async (studentPayload, points) => {
@@ -3721,11 +4080,50 @@ const saveStudentFeedback = async () => {
   }
 }
 
-const closeProfileModal = () => {
+const closeProfileModal = async ({ skipRouteSync = false } = {}) => {
   isProfileModalOpen.value = false
   profileError.value = ''
   profileSuccess.value = ''
   deleteAccountError.value = ''
+  if (!skipRouteSync) {
+    await syncProfileModalQuery(false)
+  }
+}
+
+const sendPasswordResetLink = async () => {
+  if (isSendingPasswordReset.value) return
+
+  isSendingPasswordReset.value = true
+  profileError.value = ''
+  profileSuccess.value = ''
+
+  try {
+    await requestCurrentUserPasswordReset()
+    profileSuccess.value = 'Password reset instructions were sent to your email.'
+  } catch (error) {
+    console.error(error)
+    profileError.value = error?.message || 'We could not send a password reset link right now.'
+  } finally {
+    isSendingPasswordReset.value = false
+  }
+}
+
+const goToTerms = () => {
+  router.push({
+    path: '/terms',
+    query: {
+      returnTo: buildSettingsReturnTo('legal'),
+    },
+  })
+}
+
+const goToPrivacy = () => {
+  router.push({
+    path: '/privacy',
+    query: {
+      returnTo: buildSettingsReturnTo('legal'),
+    },
+  })
 }
 
 const selectTeacherAvatarPreset = (avatarKey) => {
@@ -3928,6 +4326,10 @@ const loadClassroomData = async ({ silent = false } = {}) => {
     }
   } catch (error) {
     console.error('Unable to load classroom:', error)
+    if (error?.code === 'permission-denied' || error?.code === 'firestore/permission-denied') {
+      await recoverTeacherAccessFailure(error)
+      return
+    }
     rawClassroom.value = null
     loadError.value = 'We could not load this class right now. Please refresh and try again.'
   } finally {
@@ -3963,14 +4365,24 @@ onMounted(async () => {
   const user = auth.currentUser
   if (!user) return
 
-  teacherId.value = user.uid
-  const profile = await getUserById(user.uid)
-  if (profile?.displayName) teacherName.value = profile.displayName
-  else if (user.displayName) teacherName.value = user.displayName
-  teacherAvatarKey.value = sanitizeTeacherAvatarKey(profile?.avatarKey)
-  profileName.value = teacherName.value
+  try {
+    teacherId.value = user.uid
+    const profile = await getUserById(user.uid)
+    if (!profile?.role) {
+      throw new Error('Authenticated teacher profile is missing a role.')
+    }
+    if (profile?.displayName) teacherName.value = profile.displayName
+    else if (user.displayName) teacherName.value = user.displayName
+    teacherAvatarKey.value = sanitizeTeacherAvatarKey(profile?.avatarKey)
+    profileName.value = teacherName.value
+    if (route.query.settings === 'open') {
+      prefillProfileSettings()
+    }
 
-  await loadClassroomData()
+    await loadClassroomData()
+  } catch (error) {
+    await recoverTeacherAccessFailure(error)
+  }
 })
 </script>
 

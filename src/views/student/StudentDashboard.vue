@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-[#f6f6f6] font-sans text-black">
     <div class="w-full">
-      <header class="flex items-start justify-between px-4 pt-4 sm:px-6 lg:px-[30px] lg:pt-[13px]">
+      <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
           <button
             type="button"
@@ -23,9 +23,48 @@
         </div>
       </header>
 
+      <transition name="fade">
+        <div
+          v-if="isSidebarExpanded"
+          class="fixed inset-0 z-30 bg-[rgba(12,18,28,0.45)] backdrop-blur-[2px] lg:hidden"
+          @click.self="isSidebarExpanded = false"
+        >
+          <aside class="flex h-full w-[272px] max-w-[86vw] flex-col justify-between bg-white px-4 pb-6 pt-5 shadow-[0_18px_44px_rgba(0,0,0,0.18)]">
+            <div>
+              <div class="flex items-center justify-between">
+                <p class="text-[26px] font-black leading-none tracking-[-0.03em]">ReciCall</p>
+                <button type="button" class="grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8]" aria-label="Close sidebar" @click="isSidebarExpanded = false">
+                  <AppIcon name="x" :size="20" />
+                </button>
+              </div>
+              <div class="mt-8 space-y-3">
+                <div class="flex h-[56px] items-center rounded-[18px] bg-[rgba(46,130,239,0.25)] px-4">
+                  <AppIcon name="classes" :size="24" class="text-[#174ca0]" />
+                  <span class="ml-4 text-[16px] font-semibold text-[#174ca0]">Classes</span>
+                </div>
+                <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(46,130,239,0.12)]" aria-label="Student ID" @click="isSidebarExpanded = false; router.push('/student/id')">
+                  <AppIcon name="badge" :size="22" class="text-[#707070]" />
+                  <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Student ID</span>
+                </button>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(46,130,239,0.12)]" aria-label="Settings" @click="isSidebarExpanded = false; openStudentSettings()">
+                <AppIcon name="settings" :size="22" class="text-[#707070]" />
+                <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Settings</span>
+              </button>
+              <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(255,84,84,0.08)]" aria-label="Logout" @click="isSidebarExpanded = false; openLogoutConfirm()">
+                <AppIcon name="logout" :size="22" class="text-[#707070]" />
+                <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Logout</span>
+              </button>
+            </div>
+          </aside>
+        </div>
+      </transition>
+
       <div class="flex gap-4 px-4 pb-4 pt-2 sm:px-6 lg:gap-0 lg:px-0">
         <aside
-          class="hidden shrink-0 flex-col justify-between pb-[40px] pt-[77px] transition-[width,padding] duration-200 lg:ml-[7px] lg:flex lg:h-[650px]"
+          class="hidden shrink-0 self-start flex-col justify-between pb-[40px] pt-[77px] transition-[width,padding] duration-200 lg:sticky lg:top-[118px] lg:ml-[7px] lg:flex lg:h-[650px]"
           :class="isSidebarExpanded ? 'w-[220px] px-[12px]' : 'w-[72px]'"
         >
           <div class="flex flex-col gap-[18px]">
@@ -161,23 +200,6 @@
             </div>
           </section>
         </main>
-      </div>
-
-      <div class="px-4 pb-6 sm:px-6 lg:hidden">
-        <div class="flex items-center justify-center gap-8 rounded-[20px] border border-[#d9e8fb] bg-white px-4 py-3 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
-          <button type="button" class="grid h-10 w-10 place-items-center rounded-[12px] bg-[rgba(46,130,239,0.25)]" aria-label="Dashboard">
-            <AppIcon name="classes" :size="22" class="text-[#174ca0]" />
-          </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Student ID" @click="router.push('/student/id')">
-            <AppIcon name="badge" :size="22" class="text-[#707070]" />
-          </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Settings" @click="openStudentSettings">
-            <AppIcon name="settings" :size="22" class="text-[#707070]" />
-          </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Logout" @click="openLogoutConfirm">
-            <AppIcon name="logout" :size="22" class="text-[#707070]" />
-          </button>
-        </div>
       </div>
 
       <ConfirmActionModal

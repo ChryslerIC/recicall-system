@@ -258,8 +258,8 @@ const workflowSteps = [
   },
   {
     label: 'Step 2',
-    title: 'Run attendance and recitation sessions',
-    description: 'Use QR scans and structured participation tools to keep classroom interactions consistent.',
+    title: 'Run recitation and participation sessions',
+    description: 'Use QR scans and structured participation tools to keep classroom interactions organized and consistent.',
   },
   {
     label: 'Step 3',

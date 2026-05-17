@@ -72,7 +72,9 @@ service cloud.firestore {
       match /enrolledClasses/{classId} {
         allow get, list: if isSelf(userId)
           || (currentUserIsTeacher() && resource.data.teacherId == request.auth.uid);
-        allow create, update, delete: if isStudent(userId);
+        allow create, update: if isStudent(userId);
+        allow delete: if isStudent(userId)
+          || (currentUserIsTeacher() && resource.data.teacherId == request.auth.uid);
       }
     }
 

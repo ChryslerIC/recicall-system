@@ -48,51 +48,54 @@ const literatureArtsKeywords = [
 ]
 
 export const classThemeCatalog = {
-  math: {
-    id: 'math',
-    label: 'Math',
-    shortLabel: 'Math',
-    gradient: 'linear-gradient(135deg, rgb(22, 101, 216) 0%, rgb(29, 78, 216) 42%, rgb(30, 64, 175) 100%)',
+  'focus-flow': {
+    id: 'focus-flow',
+    label: 'Focus Flow',
+    shortLabel: 'Focus Flow',
+    gradient: 'linear-gradient(135deg, rgb(16, 102, 214) 0%, rgb(36, 90, 194) 46%, rgb(25, 60, 144) 100%)',
     accent: '#93c5fd',
     surface: '#eff6ff',
     glow: 'rgba(147,197,253,0.34)',
-    decoration: 'math',
+    decoration: 'focus-flow',
     engagementFallback: 'High',
   },
-  science: {
-    id: 'science',
-    label: 'Science',
-    shortLabel: 'Science',
-    gradient: 'linear-gradient(135deg, rgb(5, 150, 105) 0%, rgb(13, 148, 136) 44%, rgb(6, 95, 70) 100%)',
+  'wonder-mode': {
+    id: 'wonder-mode',
+    label: 'Wonder Mode',
+    shortLabel: 'Wonder Mode',
+    gradient: 'linear-gradient(135deg, rgb(21, 163, 74) 0%, rgb(45, 212, 191) 44%, rgb(8, 145, 178) 100%)',
     accent: '#6ee7b7',
     surface: '#ecfdf5',
     glow: 'rgba(110,231,183,0.32)',
-    decoration: 'science',
+    decoration: 'wonder-mode',
     engagementFallback: 'Moderate',
   },
-  'literature-arts': {
-    id: 'literature-arts',
-    label: 'Literature & Arts',
-    shortLabel: 'Lit & Arts',
-    gradient: 'linear-gradient(135deg, rgb(217, 119, 6) 0%, rgb(234, 88, 12) 44%, rgb(190, 24, 93) 100%)',
+  'creative-spark': {
+    id: 'creative-spark',
+    label: 'Creative Spark',
+    shortLabel: 'Creative Spark',
+    gradient: 'linear-gradient(135deg, rgb(245, 129, 0) 0%, rgb(249, 115, 22) 38%, rgb(225, 29, 72) 100%)',
     accent: '#fdba74',
     surface: '#fff7ed',
     glow: 'rgba(251,191,36,0.28)',
-    decoration: 'literature-arts',
+    decoration: 'creative-spark',
     engagementFallback: 'Low',
   },
 }
 
 const themeKeywordMap = {
-  math: mathKeywords,
-  science: scienceKeywords,
-  'literature-arts': literatureArtsKeywords,
+  'focus-flow': mathKeywords,
+  'wonder-mode': scienceKeywords,
+  'creative-spark': literatureArtsKeywords,
 }
 
 const legacyThemeIdMap = {
-  blue: 'math',
-  green: 'science',
-  yellow: 'literature-arts',
+  blue: 'focus-flow',
+  green: 'wonder-mode',
+  yellow: 'creative-spark',
+  math: 'focus-flow',
+  science: 'wonder-mode',
+  'literature-arts': 'creative-spark',
 }
 
 export const classThemeOptions = Object.values(classThemeCatalog)
@@ -121,26 +124,26 @@ export const inferSubjectThemeId = (subject = '') => {
   const normalizedSubject = String(subject || '').trim().toLowerCase()
 
   if (!normalizedSubject) {
-    return 'literature-arts'
+    return 'creative-spark'
   }
 
-  if (themeKeywordMap.math.some((keyword) => subjectIncludesKeyword(normalizedSubject, keyword))) {
-    return 'math'
+  if (themeKeywordMap['focus-flow'].some((keyword) => subjectIncludesKeyword(normalizedSubject, keyword))) {
+    return 'focus-flow'
   }
 
-  if (themeKeywordMap.science.some((keyword) => subjectIncludesKeyword(normalizedSubject, keyword))) {
-    return 'science'
+  if (themeKeywordMap['wonder-mode'].some((keyword) => subjectIncludesKeyword(normalizedSubject, keyword))) {
+    return 'wonder-mode'
   }
 
   if (
-    themeKeywordMap['literature-arts'].some((keyword) =>
+    themeKeywordMap['creative-spark'].some((keyword) =>
       subjectIncludesKeyword(normalizedSubject, keyword),
     )
   ) {
-    return 'literature-arts'
+    return 'creative-spark'
   }
 
-  return 'literature-arts'
+  return 'creative-spark'
 }
 
 export const resolveClassThemeId = ({ subject = '', gradientId = '' } = {}) => {
@@ -154,12 +157,12 @@ export const resolveClassThemeId = ({ subject = '', gradientId = '' } = {}) => {
     return inferSubjectThemeId(subject)
   }
 
-  return normalizedThemeId || 'literature-arts'
+  return normalizedThemeId || 'creative-spark'
 }
 
 export const getClassTheme = (classLike = {}) => {
   const themeId = resolveClassThemeId(classLike)
-  return classThemeCatalog[themeId] || classThemeCatalog['literature-arts']
+  return classThemeCatalog[themeId] || classThemeCatalog['creative-spark']
 }
 
 export const decorateClassWithTheme = (classLike = {}) => {
