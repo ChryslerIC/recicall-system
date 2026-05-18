@@ -89,6 +89,70 @@ const addWrappedList = (doc, entries, x, y, maxWidth, lineHeight = 5.2) => {
   return cursorY
 }
 
+const drawCompactTable = (doc, {
+  x,
+  y,
+  width,
+  columns = [],
+  rows = [],
+  headerFill = [238, 246, 255],
+  headerText = [17, 136, 248],
+  bodyText = [24, 24, 27],
+}) => {
+  const columnWidths = columns.map((column) => width * (column.widthRatio || 1))
+  const headerHeight = 8
+  let cursorY = y
+
+  doc.setFillColor(...headerFill)
+  doc.roundedRect(x, cursorY, width, headerHeight, 3, 3, 'F')
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(8)
+  doc.setTextColor(...headerText)
+
+  let cursorX = x
+  columns.forEach((column, index) => {
+    doc.text(String(column.label || '').toUpperCase(), cursorX + 2, cursorY + 5)
+    if (index > 0) {
+      doc.setDrawColor(217, 221, 227)
+      doc.line(cursorX, cursorY, cursorX, cursorY + headerHeight)
+    }
+    cursorX += columnWidths[index]
+  })
+
+  cursorY += headerHeight
+
+  rows.forEach((row) => {
+    const rowLinesByColumn = columns.map((column, index) =>
+      doc.splitTextToSize(String(row[column.key] ?? ''), columnWidths[index] - 4),
+    )
+    const rowHeight = Math.max(
+      ...rowLinesByColumn.map((lines) => Math.max(lines.length, 1) * 4.5 + 4),
+      9,
+    )
+
+    doc.setDrawColor(232, 236, 242)
+    doc.rect(x, cursorY, width, rowHeight)
+
+    let rowX = x
+    columns.forEach((column, index) => {
+      if (index > 0) {
+        doc.line(rowX, cursorY, rowX, cursorY + rowHeight)
+      }
+      doc.setFont(column.fontWeight === 'bold' ? 'helvetica' : 'helvetica', column.fontWeight === 'bold' ? 'bold' : 'normal')
+      doc.setFontSize(9)
+      doc.setTextColor(...bodyText)
+      rowLinesByColumn[index].forEach((line, lineIndex) => {
+        doc.text(line, rowX + 2, cursorY + 5 + lineIndex * 4.5)
+      })
+      rowX += columnWidths[index]
+    })
+
+    cursorY += rowHeight
+  })
+
+  return cursorY
+}
+
 const loadJsPdf = async () => {
   const { jsPDF } = await import('jspdf')
   return jsPDF
@@ -309,6 +373,54 @@ export const downloadSessionRecordsPdfReport = async ({
     cursorY = addWrappedList(doc, safeEntries, margin + labelWidth, cursorY, listWidth, 4.8) + 1.5
   }
 
+  const drawRecitedSection = (rows = []) => {
+    const safeRows = Array.isArray(rows) && rows.length ? rows : [{ studentName: 'No recorded recitations', score: '-', turns: '-' }]
+    const estimatedHeight = safeRows.length * 9 + 18
+    ensureSpace(Math.max(estimatedHeight, 18))
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.setTextColor(17, 136, 248)
+    doc.text('RECITED', margin, cursorY)
+    cursorY += 4
+    cursorY = drawCompactTable(doc, {
+      x: margin,
+      y: cursorY,
+      width: contentWidth,
+      columns: [
+        { key: 'studentName', label: 'Student', widthRatio: 0.58, fontWeight: 'bold' },
+        { key: 'score', label: 'Score', widthRatio: 0.2 },
+        { key: 'turns', label: 'Turns', widthRatio: 0.22 },
+      ],
+      rows: safeRows,
+    }) + 3
+  }
+
+  const drawRecordingSheet = (rows = []) => {
+    const safeRows = Array.isArray(rows) && rows.length
+      ? rows
+      : [{ studentName: 'No students recorded', studentNumber: '-', status: '-', score: '-', turns: '-' }]
+    const estimatedHeight = safeRows.length * 9 + 18
+    ensureSpace(Math.max(estimatedHeight, 18))
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.setTextColor(17, 136, 248)
+    doc.text('SESSION RECORDING SHEET', margin, cursorY)
+    cursorY += 4
+    cursorY = drawCompactTable(doc, {
+      x: margin,
+      y: cursorY,
+      width: contentWidth,
+      columns: [
+        { key: 'studentName', label: 'Student', widthRatio: 0.34, fontWeight: 'bold' },
+        { key: 'studentNumber', label: 'Student No.', widthRatio: 0.18 },
+        { key: 'status', label: 'Status', widthRatio: 0.24 },
+        { key: 'score', label: 'Score', widthRatio: 0.12 },
+        { key: 'turns', label: 'Turns', widthRatio: 0.12 },
+      ],
+      rows: safeRows,
+    }) + 3
+  }
+
   drawHeader()
 
   if (summaryItems.length) {
@@ -374,7 +486,8 @@ export const downloadSessionRecordsPdfReport = async ({
     )
     cursorY += 1
 
-    drawSectionList('Recited', session.recitedStudentEntries, [17, 136, 248])
+    drawRecordingSheet(session.sessionRosterRows)
+    drawRecitedSection(session.recitedStudentRows)
     drawSectionList('Picked But Absent', session.absentStudentEntries, [182, 106, 0])
     drawSectionList('Did Not Recite', session.notRecitedStudentEntries, [209, 17, 17])
     cursorY += 4

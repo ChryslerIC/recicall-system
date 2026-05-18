@@ -2640,6 +2640,36 @@ const filteredSessionReportSessions = computed(() =>
       duration: formatSessionDuration(session.startedAt, session.endedAt),
       averageScoreLabel: formatScoreValue(session.recitationSummary.averageScore),
       pointsLabel: formatScoreValue(session.recitationSummary.totalPoints),
+      sessionRosterRows: [
+        ...session.recitationSummary.recitedStudents.map((student) => ({
+          studentName: student.name,
+          studentNumber: student.studentNumber || '-',
+          status: 'Recited',
+          score: formatScoreValue(student.totalPoints),
+          turns: `${student.turnCount}`,
+        })),
+        ...session.recitationSummary.absentStudents.map((student) => ({
+          studentName: student.name,
+          studentNumber: student.studentNumber || '-',
+          status: 'Picked But Absent',
+          score: '-',
+          turns: '0',
+        })),
+        ...session.recitationSummary.notRecitedStudents.map((student) => ({
+          studentName: student.name,
+          studentNumber: student.studentNumber || '-',
+          status: 'Did Not Recite',
+          score: '-',
+          turns: '0',
+        })),
+      ],
+      recitedStudentRows: session.recitationSummary.recitedStudents.length
+        ? session.recitationSummary.recitedStudents.map((student) => ({
+          studentName: student.name,
+          score: `${formatScoreValue(student.totalPoints)} pts`,
+          turns: `${student.turnCount}`,
+        }))
+        : [],
       recitedStudentEntries: session.recitationSummary.recitedStudents.length
         ? session.recitationSummary.recitedStudents.map(
           (student) =>
