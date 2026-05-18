@@ -1415,10 +1415,10 @@
       <transition name="fade">
         <div
           v-if="isPickNextStudentModalOpen"
-          class="fixed inset-0 z-30 flex items-center justify-center bg-[rgba(217,217,217,0.24)] px-3 py-4 backdrop-blur-[1px] sm:px-4 sm:py-8"
+          class="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto bg-[rgba(217,217,217,0.24)] px-3 py-3 backdrop-blur-[1px] sm:items-center sm:px-4 sm:py-8"
           @click.self="closePickNextStudentModal"
         >
-          <div class="relative w-full max-w-[720px] max-h-[calc(100vh-2rem)] overflow-y-auto rounded-[22px] bg-white px-4 pb-5 pt-6 shadow-[0_4px_39.3px_2px_rgba(0,0,0,0.2)] sm:max-h-[calc(100vh-4rem)] sm:px-6 sm:pb-7 sm:pt-8">
+          <div class="relative flex h-[min(760px,calc(100dvh-1.5rem))] w-full max-w-[720px] flex-col overflow-hidden rounded-[22px] bg-white px-4 pb-5 pt-6 shadow-[0_4px_39.3px_2px_rgba(0,0,0,0.2)] sm:h-[min(820px,calc(100dvh-4rem))] sm:px-6 sm:pb-7 sm:pt-8">
             <button
               type="button"
               class="absolute right-[12px] top-[10px] grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8] sm:right-[18px] sm:top-[14px]"
@@ -1428,12 +1428,13 @@
               <AppIcon name="x" :size="22" />
             </button>
 
-            <h2 class="pr-8 text-center text-[26px] leading-none font-bold text-black sm:text-[32px]">Pick Next Student</h2>
-            <p class="mx-auto mt-3 max-w-[520px] text-center text-[15px] leading-[1.35] font-medium text-[#5b5b5b] sm:text-[18px] sm:leading-[1.2]">
-              ReciCall ranks who to call on next using participation balance, inactivity, attendance history, class engagement trends, and seat environment. The selected student is still confirmed through QR scanning before any score is saved.
-            </p>
+            <div class="min-h-0 flex-1 overflow-y-auto pr-1">
+              <h2 class="pr-8 text-center text-[26px] leading-none font-bold text-black sm:text-[32px]">Pick Next Student</h2>
+              <p class="mx-auto mt-3 max-w-[520px] text-center text-[15px] leading-[1.35] font-medium text-[#5b5b5b] sm:text-[18px] sm:leading-[1.2]">
+                ReciCall ranks who to call on next using participation balance, inactivity, attendance history, class engagement trends, and seat environment. The selected student is still confirmed through QR scanning before any score is saved.
+              </p>
 
-            <div v-if="selectedQueuedStudent" class="mt-6 rounded-[28px] border border-[#d8d8d8] bg-[#f8fbff] px-4 py-4 sm:mt-8 sm:px-6 sm:py-6">
+              <div v-if="selectedQueuedStudent" class="mt-6 rounded-[28px] border border-[#d8d8d8] bg-[#f8fbff] px-4 py-4 sm:mt-8 sm:px-6 sm:py-6">
               <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                 <div class="min-w-0">
                   <p class="text-[14px] font-semibold tracking-[0.16em] text-[#1188f8] uppercase">Next in Queue</p>
@@ -1508,16 +1509,17 @@
                   </div>
                 </div>
               </div>
-            </div>
+              </div>
 
-            <div v-else class="mt-6 rounded-[24px] border border-dashed border-[#d7d7d7] bg-[#f8f8f8] px-4 py-8 text-center sm:mt-8 sm:px-6 sm:py-10">
-              <p class="text-[20px] font-semibold text-black">No students are available for the queue yet.</p>
-              <p class="mt-2 text-[15px] font-medium text-[#6b7280]">
-                Add students to the class first so the priority queue has someone to rank.
-              </p>
-            </div>
+              <div v-else class="mt-6 rounded-[24px] border border-dashed border-[#d7d7d7] bg-[#f8f8f8] px-4 py-8 text-center sm:mt-8 sm:px-6 sm:py-10">
+                <p class="text-[20px] font-semibold text-black">No students are available for the queue yet.</p>
+                <p class="mt-2 text-[15px] font-medium text-[#6b7280]">
+                  Add students to the class first so the priority queue has someone to rank.
+                </p>
+              </div>
 
-            <p v-if="pickNextStudentError" class="mt-5 text-center text-[15px] font-semibold text-[#d11111]">{{ pickNextStudentError }}</p>
+              <p v-if="pickNextStudentError" class="mt-5 text-center text-[15px] font-semibold text-[#d11111]">{{ pickNextStudentError }}</p>
+            </div>
           </div>
         </div>
       </transition>
@@ -2534,7 +2536,7 @@ const analyticsClassroom = computed(() => {
 
 const classAnalytics = computed(() => buildClassAnalytics(analyticsClassroom.value))
 const queueRecommendation = computed(() =>
-  buildPriorityQueueRecommendation(analyticsClassroom.value, excludedRecommendationIds.value),
+  buildPriorityQueueRecommendation(analyticsClassroom.value, queueExcludedStudentIds.value),
 )
 const selectedQueuedStudent = computed(() => queueRecommendation.value.selectedStudent)
 const participationEvents = computed(() => rawClassroom.value?.participationEvents || [])
@@ -2554,6 +2556,26 @@ const activeSessionEvents = computed(() => {
     return timestamp >= sessionStart
   })
 })
+const activeSessionAbsenceEvents = computed(() => {
+  if (!activeSessionRecord.value) return []
+
+  const sessionStart = toEventDate(activeSessionRecord.value.startedAt)?.getTime() || 0
+  return participationEvents.value.filter((event) => {
+    if (event?.eventType !== 'absence') return false
+    if (activeSessionRecord.value?.id && event?.sessionId) {
+      return event.sessionId === activeSessionRecord.value.id
+    }
+
+    const timestamp = toEventDate(event.createdAt)?.getTime() || 0
+    return timestamp >= sessionStart
+  })
+})
+const currentSessionAbsentStudentIds = computed(() =>
+  [...new Set(activeSessionAbsenceEvents.value.map((event) => event?.studentId).filter(Boolean))],
+)
+const queueExcludedStudentIds = computed(() =>
+  [...new Set([...excludedRecommendationIds.value, ...currentSessionAbsentStudentIds.value])],
+)
 const completedSessionRecords = computed(() =>
   sessionHistory.value
     .map((session, index) => {
@@ -3575,7 +3597,6 @@ const closeSessionSetupModal = () => {
 }
 
 const openPickNextStudentModal = () => {
-  excludedRecommendationIds.value = []
   pickNextStudentError.value = ''
   queueCustomScore.value = ''
   selectedScanScore.value = quickScoreOptions[1]
@@ -4260,6 +4281,7 @@ const startSession = async () => {
       ...rawClassroom.value,
       activeSession,
     }
+    excludedRecommendationIds.value = []
     isSessionSetupModalOpen.value = false
     sessionSetupError.value = ''
 
@@ -4304,6 +4326,7 @@ const endSession = async () => {
       activeSession: null,
       sessionHistory: [...sessionHistory.value, completedSession].filter(Boolean),
     }
+    excludedRecommendationIds.value = []
 
     const nextQuery = { ...route.query }
     delete nextQuery.session
