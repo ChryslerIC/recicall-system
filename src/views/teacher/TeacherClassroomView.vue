@@ -1754,10 +1754,10 @@
       <transition name="fade">
         <div
           v-if="isSessionRecordModalOpen && selectedSessionRecord"
-          class="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto bg-[rgba(12,18,28,0.45)] px-3 py-3 backdrop-blur-[2px] sm:items-center sm:px-4 sm:py-8"
+          class="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto overscroll-contain bg-[rgba(12,18,28,0.45)] px-3 py-3 backdrop-blur-[2px] [webkit-overflow-scrolling:touch] sm:items-center sm:px-4 sm:py-8"
           @click.self="closeSessionRecordModal"
         >
-          <div class="flex h-[min(860px,calc(100dvh-1.5rem))] w-full max-w-[860px] flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_22px_52px_rgba(0,0,0,0.22)] sm:h-[min(900px,calc(100dvh-4rem))]">
+          <div class="flex h-[min(860px,calc(100svh-1.5rem))] w-full max-w-[860px] flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_22px_52px_rgba(0,0,0,0.22)] sm:h-[min(900px,calc(100svh-4rem))]">
             <div class="shrink-0 bg-[linear-gradient(90deg,#257aff_0%,#2476f7_44.712%,#1d60c9_90.385%,#164999_100%)] px-4 py-5 text-white sm:px-6 sm:py-6">
               <div class="flex items-start justify-between gap-4">
                 <div>
@@ -1799,7 +1799,7 @@
               </div>
             </div>
 
-            <div class="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
+            <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 [webkit-overflow-scrolling:touch] sm:px-6 sm:py-6">
               <section>
                 <p class="text-[16px] font-bold uppercase tracking-[0.08em] text-[#4a4a4a]">
                   Recited ({{ selectedSessionRecord.recitationSummary.recitedCount }})
