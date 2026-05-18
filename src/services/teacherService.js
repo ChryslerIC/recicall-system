@@ -14,6 +14,7 @@ import {
 import { db } from '../config/firebase'
 
 const teacherClassesCollection = (teacherId) => collection(db, 'users', teacherId, 'classes')
+const teacherClassRef = (teacherId, classId) => doc(db, 'users', teacherId, 'classes', classId)
 const teacherClassStudentsCollection = (teacherId, classId) => collection(db, 'users', teacherId, 'classes', classId, 'students')
 const teacherClassStudentRef = (teacherId, classId, studentId) =>
   doc(db, 'users', teacherId, 'classes', classId, 'students', studentId)
@@ -149,8 +150,7 @@ export const getTeacherClasses = async (teacherId, { archived = false } = {}) =>
 }
 
 export const getTeacherClassById = async (teacherId, classId) => {
-  const classRef = doc(db, 'users', teacherId, 'classes', classId)
-  const snapshot = await getDoc(classRef)
+  const snapshot = await getDoc(teacherClassRef(teacherId, classId))
 
   if (!snapshot.exists()) {
     return null
@@ -190,8 +190,7 @@ export const createTeacherClass = async (teacherId, classData) => {
 
 export const updateTeacherClass = async (teacherId, classId, classData) => {
   const { students: _ignoredStudents, ...restClassData } = classData
-  const classRef = doc(db, 'users', teacherId, 'classes', classId)
-  await updateDoc(classRef, {
+  await updateDoc(teacherClassRef(teacherId, classId), {
     ...restClassData,
     updatedAt: serverTimestamp(),
   })
@@ -222,8 +221,7 @@ export const updateTeacherClassStudentFeedback = async (
 }
 
 export const archiveTeacherClass = async (teacherId, classId) => {
-  const classRef = doc(db, 'users', teacherId, 'classes', classId)
-  await updateDoc(classRef, {
+  await updateDoc(teacherClassRef(teacherId, classId), {
     archived: true,
     archivedAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -231,8 +229,7 @@ export const archiveTeacherClass = async (teacherId, classId) => {
 }
 
 export const restoreTeacherClass = async (teacherId, classId) => {
-  const classRef = doc(db, 'users', teacherId, 'classes', classId)
-  await updateDoc(classRef, {
+  await updateDoc(teacherClassRef(teacherId, classId), {
     archived: false,
     archivedAt: null,
     updatedAt: serverTimestamp(),
@@ -240,8 +237,96 @@ export const restoreTeacherClass = async (teacherId, classId) => {
 }
 
 export const permanentlyDeleteTeacherClass = async (teacherId, classId) => {
-  const classRef = doc(db, 'users', teacherId, 'classes', classId)
-  await deleteDoc(classRef)
+  await deleteDoc(teacherClassRef(teacherId, classId))
+}
+
+export const deleteTeacherClassSession = async (teacherId, classId, sessionId) => {
+  if (!teacherId || !classId || !sessionId) {
+    throw new Error('Missing teacher, class, or session information.')
+  }
+
+  const classRef = teacherClassRef(teacherId, classId)
+  const classSnapshot = await getDoc(classRef)
+
+  if (!classSnapshot.exists()) {
+    throw new Error('This class could not be found.')
+  }
+
+  const classData = classSnapshot.data()
+  const nextSessionHistory = (Array.isArray(classData.sessionHistory) ? classData.sessionHistory : [])
+    .filter((session) => session?.id !== sessionId)
+
+  const participationSnapshot = await getDocs(teacherClassParticipationCollection(teacherId, classId))
+  const sessionEventDocs = participationSnapshot.docs.filter((eventDoc) => eventDoc.data()?.sessionId === sessionId)
+
+  await Promise.all(sessionEventDocs.map((eventDoc) => deleteDoc(eventDoc.ref)))
+
+  await updateDoc(classRef, {
+    sessionHistory: nextSessionHistory,
+    updatedAt: serverTimestamp(),
+  })
+}
+
+export const deleteAllTeacherClassSessions = async (teacherId, classId) => {
+  if (!teacherId || !classId) {
+    throw new Error('Missing teacher or class information.')
+  }
+
+  const classRef = teacherClassRef(teacherId, classId)
+  const classSnapshot = await getDoc(classRef)
+
+  if (!classSnapshot.exists()) {
+    throw new Error('This class could not be found.')
+  }
+
+  if (classSnapshot.data()?.activeSession) {
+    throw new Error('End the active session before deleting the session history.')
+  }
+
+  const participationSnapshot = await getDocs(teacherClassParticipationCollection(teacherId, classId))
+
+  await Promise.all(participationSnapshot.docs.map((eventDoc) => deleteDoc(eventDoc.ref)))
+
+  await updateDoc(classRef, {
+    sessionHistory: [],
+    updatedAt: serverTimestamp(),
+  })
+}
+
+export const removeStudentFromTeacherClass = async (teacherId, classId, studentId) => {
+  if (!teacherId || !classId || !studentId) {
+    throw new Error('Missing teacher, class, or student information.')
+  }
+
+  const classRef = teacherClassRef(teacherId, classId)
+  const classSnapshot = await getDoc(classRef)
+
+  if (!classSnapshot.exists()) {
+    throw new Error('This class could not be found.')
+  }
+
+  const classData = classSnapshot.data()
+  const activeSession = classData?.activeSession
+  const nextActiveSession = activeSession
+    ? {
+        ...activeSession,
+        rosterSnapshot: sanitizeSessionRosterSnapshot(activeSession.rosterSnapshot || []).filter(
+          (student) => (student.studentId || student.id) !== studentId,
+        ),
+      }
+    : null
+
+  await Promise.all([
+    deleteDoc(studentEnrolledClassRef(studentId, classId)),
+    deleteDoc(teacherClassStudentRef(teacherId, classId, studentId)),
+  ])
+
+  if (activeSession) {
+    await updateDoc(classRef, {
+      activeSession: nextActiveSession,
+      updatedAt: serverTimestamp(),
+    })
+  }
 }
 
 export const deleteTeacherAccountData = async (teacherId) => {
@@ -345,7 +430,6 @@ export const recordTeacherClassAbsence = async (teacherId, classId, studentPaylo
 }
 
 export const startTeacherClassSession = async (teacherId, classId, sessionData = {}) => {
-  const classRef = doc(db, 'users', teacherId, 'classes', classId)
   const startedAt = Timestamp.now()
 
   const activeSession = removeUndefinedValues({
@@ -356,7 +440,7 @@ export const startTeacherClassSession = async (teacherId, classId, sessionData =
     rosterSnapshot: sanitizeSessionRosterSnapshot(sessionData.rosterSnapshot),
   })
 
-  await updateDoc(classRef, {
+  await updateDoc(teacherClassRef(teacherId, classId), {
     activeSession,
     updatedAt: serverTimestamp(),
   })
@@ -373,14 +457,13 @@ export const endTeacherClassSession = async (
 ) => {
   if (!activeSession) return null
 
-  const classRef = doc(db, 'users', teacherId, 'classes', classId)
   const endedAt = Timestamp.now()
   const completedSession = removeUndefinedValues({
     ...activeSession,
     endedAt,
   })
 
-  await updateDoc(classRef, {
+  await updateDoc(teacherClassRef(teacherId, classId), {
     activeSession: null,
     sessionHistory: [...(Array.isArray(sessionHistory) ? sessionHistory : []), completedSession],
     updatedAt: serverTimestamp(),

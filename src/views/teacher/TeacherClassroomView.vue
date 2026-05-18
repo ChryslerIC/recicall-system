@@ -374,6 +374,15 @@
                       </div>
 
                       <div class="flex flex-wrap items-center gap-3">
+                        <button
+                          v-if="completedSessionRecords.length"
+                          type="button"
+                          class="rounded-[16px] border border-[#b81717] bg-white px-4 py-3 text-[13px] font-semibold text-[#b81717] transition hover:bg-[#fff4f4] disabled:cursor-not-allowed disabled:opacity-60"
+                          :disabled="isDeletingAllSessions || isSessionActive"
+                          @click.stop="openDeleteAllSessionsConfirm"
+                        >
+                          {{ isDeletingAllSessions ? 'Deleting...' : 'Delete All Sessions' }}
+                        </button>
                         <div class="rounded-[16px] bg-white px-4 py-3 text-left">
                           <p class="text-[11px] font-bold uppercase tracking-[0.08em] text-[#777]">Sessions</p>
                           <p class="mt-1 text-[20px] font-bold leading-none text-[#1188f8]">{{ filteredSessionReportSummary.sessions }}</p>
@@ -507,6 +516,10 @@
                             <p class="mt-1 text-[24px] font-bold leading-none text-[#1188f8]">{{ completedSessionRecords.length }}</p>
                           </div>
                         </div>
+
+                        <p v-if="sessionRecordsActionError" class="mt-4 text-[14px] font-semibold text-[#b81717]">
+                          {{ sessionRecordsActionError }}
+                        </p>
 
                         <div v-if="completedSessionRecords.length" class="mt-5 space-y-[14px]">
                       <button
@@ -735,13 +748,22 @@
                               </div>
                             </div>
 
-                            <button
-                              type="button"
-                              class="shrink-0 rounded-[18px] border border-[#1188f8] bg-white px-3 py-2 text-[13px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff]"
-                              @click="openStudentFeedbackModal(student)"
-                            >
-                              {{ student.teacherFeedback ? 'Edit note' : 'Add note' }}
-                            </button>
+                            <div class="flex shrink-0 flex-col gap-2">
+                              <button
+                                type="button"
+                                class="rounded-[18px] border border-[#1188f8] bg-white px-3 py-2 text-[13px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff]"
+                                @click="openStudentFeedbackModal(student)"
+                              >
+                                {{ student.teacherFeedback ? 'Edit note' : 'Add note' }}
+                              </button>
+                              <button
+                                type="button"
+                                class="rounded-[18px] border border-[#b81717] bg-white px-3 py-2 text-[13px] font-semibold text-[#b81717] transition hover:bg-[#fff4f4]"
+                                @click="openRemoveStudentConfirm(student)"
+                              >
+                                Remove
+                              </button>
+                            </div>
                           </div>
 
                           <div class="mt-[14px] rounded-[20px] bg-white px-[14px] py-[12px]">
@@ -764,6 +786,10 @@
                           </p>
                         </article>
                       </div>
+
+                      <p v-if="classListActionError" class="mt-4 text-[14px] font-semibold text-[#b81717]">
+                        {{ classListActionError }}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1392,6 +1418,39 @@
         @confirm="handleArchiveCurrentClass"
       />
 
+      <ConfirmActionModal
+        :open="isDeleteSessionConfirmOpen"
+        title="Delete Session?"
+        :message="deleteSessionConfirmMessage"
+        confirm-text="Delete Session"
+        loading-text="Deleting..."
+        :loading="isDeletingSession"
+        @cancel="closeDeleteSessionConfirm"
+        @confirm="handleDeleteSelectedSession"
+      />
+
+      <ConfirmActionModal
+        :open="isDeleteAllSessionsConfirmOpen"
+        title="Delete All Sessions?"
+        message="This will permanently remove every completed session record and its linked participation data for this class. This action cannot be undone."
+        confirm-text="Delete All"
+        loading-text="Deleting..."
+        :loading="isDeletingAllSessions"
+        @cancel="closeDeleteAllSessionsConfirm"
+        @confirm="handleDeleteAllSessions"
+      />
+
+      <ConfirmActionModal
+        :open="isRemoveStudentConfirmOpen"
+        title="Remove Student?"
+        :message="removeStudentConfirmMessage"
+        confirm-text="Remove Student"
+        loading-text="Removing..."
+        :loading="isRemovingStudent"
+        @cancel="closeRemoveStudentConfirm"
+        @confirm="handleRemoveSelectedStudent"
+      />
+
       <transition name="fade">
         <div
           v-if="isPickNextStudentModalOpen"
@@ -1755,6 +1814,14 @@
                   </button>
                   <button
                     type="button"
+                    class="rounded-full bg-[#b81717] px-3 py-2 text-[12px] font-semibold text-white transition hover:bg-[#9f1111] disabled:cursor-not-allowed disabled:opacity-70 sm:px-4 sm:text-[13px]"
+                    :disabled="isDeletingSession"
+                    @click="openDeleteSessionConfirm(selectedSessionRecord)"
+                  >
+                    {{ isDeletingSession ? 'Deleting...' : 'Delete Session' }}
+                  </button>
+                  <button
+                    type="button"
                     class="grid h-9 w-9 place-items-center rounded-full bg-white/15 text-white transition hover:bg-white/25 sm:h-10 sm:w-10"
                     aria-label="Close recitation record modal"
                     @click="closeSessionRecordModal"
@@ -1789,6 +1856,9 @@
             </div>
 
             <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 [touch-action:pan-y] [webkit-overflow-scrolling:touch] sm:px-6 sm:py-6">
+              <p v-if="sessionRecordsActionError" class="mb-4 text-[14px] font-semibold text-[#b81717]">
+                {{ sessionRecordsActionError }}
+              </p>
               <section>
                 <p class="text-[16px] font-bold uppercase tracking-[0.08em] text-[#4a4a4a]">
                   Recited ({{ selectedSessionRecord.recitationSummary.recitedCount }})
@@ -2129,10 +2199,13 @@ import {
 } from '../../services/analyticsService'
 import {
   archiveTeacherClass,
+  deleteAllTeacherClassSessions,
+  deleteTeacherClassSession,
   endTeacherClassSession,
   getTeacherClassById,
   recordTeacherClassAbsence,
   recordStudentParticipation,
+  removeStudentFromTeacherClass,
   startTeacherClassSession,
   updateTeacherClass,
   updateTeacherClassStudentFeedback,
@@ -2164,6 +2237,8 @@ const isDeleteAccountConfirmOpen = ref(false)
 const isDeletingAccount = ref(false)
 const isClassOptionsOpen = ref(false)
 const isArchiveClassConfirmOpen = ref(false)
+const isDeleteSessionConfirmOpen = ref(false)
+const isDeleteAllSessionsConfirmOpen = ref(false)
 const isSendingPasswordReset = ref(false)
 const activeSettingsSection = ref('profile')
 const isScanModalOpen = ref(false)
@@ -2182,6 +2257,10 @@ const isSessionSetupModalOpen = ref(false)
 const isSessionRecordModalOpen = ref(false)
 const isStudentFeedbackModalOpen = ref(false)
 const isSavingStudentFeedback = ref(false)
+const isDeletingSession = ref(false)
+const isDeletingAllSessions = ref(false)
+const isRemoveStudentConfirmOpen = ref(false)
+const isRemovingStudent = ref(false)
 const isClassRecordsOpen = ref(true)
 const seatLayoutSaveStatus = ref('')
 const seatLayoutSaveError = ref(false)
@@ -2195,6 +2274,8 @@ const scanError = ref('')
 const pickNextStudentError = ref('')
 const sessionSetupError = ref('')
 const studentFeedbackError = ref('')
+const sessionRecordsActionError = ref('')
+const classListActionError = ref('')
 const scannedPayload = ref(null)
 const scannerInstance = ref(null)
 const profileName = ref('')
@@ -2208,7 +2289,9 @@ const selectedScanScore = ref(3)
 const scanMode = ref('general')
 const scanExpectedStudent = ref(null)
 const selectedSessionRecordId = ref('')
+const pendingDeleteSessionId = ref('')
 const selectedFeedbackStudentId = ref('')
+const selectedStudentRemovalId = ref('')
 const studentFeedbackDraft = ref('')
 const rawClassroom = ref(null)
 const loadError = ref('')
@@ -2391,6 +2474,17 @@ const openArchiveClassConfirm = () => {
 const closeArchiveClassConfirm = () => {
   if (isArchivingClass.value) return
   isArchiveClassConfirmOpen.value = false
+}
+
+const openDeleteAllSessionsConfirm = () => {
+  if (isDeletingAllSessions.value) return
+  sessionRecordsActionError.value = ''
+  isDeleteAllSessionsConfirmOpen.value = true
+}
+
+const closeDeleteAllSessionsConfirm = () => {
+  if (isDeletingAllSessions.value) return
+  isDeleteAllSessionsConfirmOpen.value = false
 }
 
 const classroom = computed(() => {
@@ -2601,6 +2695,72 @@ const completedSessionRecords = computed(() =>
     })
     .filter((session) => session.startedAt),
 )
+const buildExportSessionRowData = (session) => ({
+  ...session,
+  date: formatFullDate(session.startedAt),
+  started: formatDateTime(session.startedAt),
+  ended: formatDateTime(session.endedAt),
+  duration: formatSessionDuration(session.startedAt, session.endedAt),
+  averageScoreLabel: formatScoreValue(session.recitationSummary.averageScore),
+  pointsLabel: formatScoreValue(session.recitationSummary.totalPoints),
+  sessionRosterRows: [
+    ...session.recitationSummary.recitedStudents.map((student) => ({
+      studentName: student.name,
+      studentNumber: student.studentNumber || '-',
+      status: 'Recited',
+      score: formatScoreValue(student.totalPoints),
+      turns: `${student.turnCount}`,
+    })),
+    ...session.recitationSummary.absentStudents.map((student) => ({
+      studentName: student.name,
+      studentNumber: student.studentNumber || '-',
+      status: 'Picked But Absent',
+      score: '-',
+      turns: '0',
+    })),
+    ...session.recitationSummary.notRecitedStudents.map((student) => ({
+      studentName: student.name,
+      studentNumber: student.studentNumber || '-',
+      status: 'Did Not Recite',
+      score: '-',
+      turns: '0',
+    })),
+  ],
+  recitedStudentRows: session.recitationSummary.recitedStudents.length
+    ? session.recitationSummary.recitedStudents.map((student) => ({
+      studentName: student.name,
+      score: `${formatScoreValue(student.totalPoints)} pts`,
+      turns: `${student.turnCount}`,
+    }))
+    : [],
+  recitedStudentEntries: session.recitationSummary.recitedStudents.length
+    ? session.recitationSummary.recitedStudents.map(
+      (student) =>
+        `- ${student.name} - ${formatScoreValue(student.totalPoints)} pts${student.turnCount > 1 ? ` across ${student.turnCount} turns` : ' in 1 turn'}`,
+    )
+    : ['No recorded recitations'],
+  absentStudentEntries: session.recitationSummary.absentStudents.length
+    ? session.recitationSummary.absentStudents.map((student) => `- ${student.name}`)
+    : ['No absences recorded'],
+  notRecitedStudentEntries: session.recitationSummary.notRecitedStudents.length
+    ? session.recitationSummary.notRecitedStudents.map((student) => `- ${student.name}`)
+    : ['Everyone recited'],
+  recitedStudentsLabel: session.recitationSummary.recitedStudents.length
+    ? session.recitationSummary.recitedStudents
+      .map((student) => `${student.name} (${formatScoreValue(student.totalPoints)})`)
+      .join(', ')
+    : 'No recorded recitations',
+  absentStudentsLabel: session.recitationSummary.absentStudents.length
+    ? session.recitationSummary.absentStudents
+      .map((student) => student.name)
+      .join(', ')
+    : 'No absences recorded',
+  notRecitedStudentsLabel: session.recitationSummary.notRecitedStudents.length
+    ? session.recitationSummary.notRecitedStudents
+      .map((student) => student.name)
+      .join(', ')
+    : 'Everyone recited',
+})
 const filteredSessionReportSessions = computed(() =>
   filterParticipationEventsByDate(
     completedSessionRecords.value.map((session) => ({
@@ -2877,6 +3037,25 @@ const activeSessionParticipantCount = computed(() =>
 const nextSessionDefaultName = computed(() => `Participation ${completedSessionRecords.value.length + 1}`)
 const selectedSessionRecord = computed(
   () => completedSessionRecords.value.find((session) => session.id === selectedSessionRecordId.value) || null,
+)
+const selectedSessionReportExport = computed(() =>
+  selectedSessionRecord.value ? buildExportSessionRowData(selectedSessionRecord.value) : null,
+)
+const pendingDeleteSession = computed(
+  () => completedSessionRecords.value.find((session) => session.id === pendingDeleteSessionId.value) || null,
+)
+const selectedRemovalStudent = computed(
+  () => classListStudents.value.find((student) => student.id === selectedStudentRemovalId.value) || null,
+)
+const deleteSessionConfirmMessage = computed(() =>
+  pendingDeleteSession.value
+    ? `This will permanently delete ${pendingDeleteSession.value.title} and all of its recitation and absence entries from this class. This action cannot be undone.`
+    : 'This will permanently delete the selected session and its linked recitation data.',
+)
+const removeStudentConfirmMessage = computed(() =>
+  selectedRemovalStudent.value
+    ? `This will remove ${selectedRemovalStudent.value.name} from the class roster and unenroll them from this class. Past session records will stay in your history.`
+    : 'This will remove the selected student from the class roster.',
 )
 const recentStudents = computed(() => {
   const sourceEvents = activeSessionEvents.value.length ? activeSessionEvents.value : participationOnlyEvents.value
@@ -3718,6 +3897,7 @@ const openPickNextStudentModal = () => {
 }
 
 const openSessionRecordModal = (session) => {
+  sessionRecordsActionError.value = ''
   selectedSessionRecordId.value = session?.id || ''
   isSessionRecordModalOpen.value = true
 }
@@ -3725,6 +3905,19 @@ const openSessionRecordModal = (session) => {
 const closeSessionRecordModal = () => {
   isSessionRecordModalOpen.value = false
   selectedSessionRecordId.value = ''
+}
+
+const openDeleteSessionConfirm = (session) => {
+  if (!session || isDeletingSession.value) return
+  sessionRecordsActionError.value = ''
+  pendingDeleteSessionId.value = session.id || ''
+  isDeleteSessionConfirmOpen.value = true
+}
+
+const closeDeleteSessionConfirm = () => {
+  if (isDeletingSession.value) return
+  isDeleteSessionConfirmOpen.value = false
+  pendingDeleteSessionId.value = ''
 }
 
 const openRecentParticipationLog = async () => {
@@ -3771,9 +3964,25 @@ const buildSessionReportSummaryItems = (sessions, dateRangeLabel) => {
   ]
 }
 
+const resolveDetailedSessionRecord = (session) => {
+  if (!session) return null
+
+  const sessionStartedAt = toEventDate(session.startedAt)?.getTime() || null
+
+  return completedSessionRecords.value.find((candidate) => {
+    if (session.id && candidate.id === session.id) {
+      return true
+    }
+
+    const candidateStartedAt = toEventDate(candidate.startedAt)?.getTime() || null
+    return candidateStartedAt === sessionStartedAt && candidate.title === (session.title || session.name || '')
+  }) || session
+}
+
 const downloadSpecificSessionReport = async (session) => {
   if (!classroom.value || !session) return
-  const exportSession = buildSessionReportExportData(session)
+  const detailedSession = resolveDetailedSessionRecord(session)
+  const exportSession = buildExportSessionRowData(detailedSession)
 
   await downloadSessionRecordsPdfReport({
     fileName: `${slugifyReportValue(classroom.value.subject, 'class')}-${slugifyReportValue(classroom.value.classLabel, 'session')}-${slugifyReportValue(session.title, 'session')}-record.pdf`,
@@ -3804,6 +4013,63 @@ const downloadSessionReport = async () => {
     ),
     sessions: filteredSessionReportSessions.value,
   })
+}
+
+const handleDeleteSelectedSession = async () => {
+  if (!teacherId.value || !route.params.classId || !pendingDeleteSession.value || isDeletingSession.value) return
+
+  isDeletingSession.value = true
+  sessionRecordsActionError.value = ''
+
+  try {
+    await deleteTeacherClassSession(
+      teacherId.value,
+      route.params.classId,
+      pendingDeleteSession.value.id,
+    )
+
+    rawClassroom.value = {
+      ...rawClassroom.value,
+      sessionHistory: sessionHistory.value.filter((session) => session.id !== pendingDeleteSession.value.id),
+      participationEvents: (rawClassroom.value?.participationEvents || []).filter(
+        (event) => event.sessionId !== pendingDeleteSession.value.id,
+      ),
+    }
+
+    isDeleteSessionConfirmOpen.value = false
+    pendingDeleteSessionId.value = ''
+    closeSessionRecordModal()
+  } catch (error) {
+    console.error('Unable to delete session:', error)
+    sessionRecordsActionError.value = error?.message || 'We could not delete this session right now.'
+  } finally {
+    isDeletingSession.value = false
+  }
+}
+
+const handleDeleteAllSessions = async () => {
+  if (!teacherId.value || !route.params.classId || isDeletingAllSessions.value) return
+
+  isDeletingAllSessions.value = true
+  sessionRecordsActionError.value = ''
+
+  try {
+    await deleteAllTeacherClassSessions(teacherId.value, route.params.classId)
+
+    rawClassroom.value = {
+      ...rawClassroom.value,
+      sessionHistory: [],
+      participationEvents: [],
+    }
+
+    isDeleteAllSessionsConfirmOpen.value = false
+    closeSessionRecordModal()
+  } catch (error) {
+    console.error('Unable to delete all sessions:', error)
+    sessionRecordsActionError.value = error?.message || 'We could not delete the session history right now.'
+  } finally {
+    isDeletingAllSessions.value = false
+  }
 }
 
 const closePickNextStudentModal = () => {
@@ -4208,6 +4474,53 @@ const markQueuedStudentAbsent = async () => {
   }
 }
 
+const openRemoveStudentConfirm = (student) => {
+  if (!student || isRemovingStudent.value) return
+  classListActionError.value = ''
+  selectedStudentRemovalId.value = student.id || ''
+  isRemoveStudentConfirmOpen.value = true
+}
+
+const closeRemoveStudentConfirm = () => {
+  if (isRemovingStudent.value) return
+  isRemoveStudentConfirmOpen.value = false
+  selectedStudentRemovalId.value = ''
+}
+
+const applyRemovedStudentLocally = (studentId) => {
+  if (!rawClassroom.value || !studentId) return
+
+  const nextEnrolledStudents = (rawClassroom.value.enrolledStudents || []).filter(
+    (student) => (student.studentId || student.id) !== studentId,
+  )
+  const activeSession = rawClassroom.value.activeSession
+    ? {
+        ...rawClassroom.value.activeSession,
+        rosterSnapshot: (rawClassroom.value.activeSession.rosterSnapshot || []).filter(
+          (student) => (student.studentId || student.id) !== studentId,
+        ),
+      }
+    : null
+
+  rawClassroom.value = {
+    ...rawClassroom.value,
+    enrolledStudents: nextEnrolledStudents,
+    activeSession,
+  }
+
+  excludedRecommendationIds.value = excludedRecommendationIds.value.filter((id) => id !== studentId)
+
+  if (selectedFeedbackStudentId.value === studentId) {
+    closeStudentFeedbackModal()
+  }
+
+  if (scanExpectedStudent.value?.id === studentId) {
+    scanExpectedStudent.value = null
+  }
+
+  initializeDeskLayout({ useSaved: true })
+}
+
 const openStudentFeedbackModal = (student) => {
   selectedFeedbackStudentId.value = student?.id || ''
   studentFeedbackDraft.value = student?.teacherFeedback || ''
@@ -4262,6 +4575,29 @@ const saveStudentFeedback = async () => {
     studentFeedbackError.value = 'We could not save this feedback right now. Please try again.'
   } finally {
     isSavingStudentFeedback.value = false
+  }
+}
+
+const handleRemoveSelectedStudent = async () => {
+  if (!teacherId.value || !route.params.classId || !selectedRemovalStudent.value || isRemovingStudent.value) return
+
+  isRemovingStudent.value = true
+  classListActionError.value = ''
+
+  try {
+    await removeStudentFromTeacherClass(
+      teacherId.value,
+      route.params.classId,
+      selectedRemovalStudent.value.id,
+    )
+    applyRemovedStudentLocally(selectedRemovalStudent.value.id)
+    isRemoveStudentConfirmOpen.value = false
+    selectedStudentRemovalId.value = ''
+  } catch (error) {
+    console.error('Unable to remove student from class:', error)
+    classListActionError.value = error?.message || 'We could not remove this student from the class right now.'
+  } finally {
+    isRemovingStudent.value = false
   }
 }
 
