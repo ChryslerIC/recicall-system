@@ -1754,15 +1754,15 @@
       <transition name="fade">
         <div
           v-if="isSessionRecordModalOpen && selectedSessionRecord"
-          class="fixed inset-0 z-30 flex items-center justify-center bg-[rgba(12,18,28,0.45)] px-4 py-8 backdrop-blur-[2px]"
+          class="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto bg-[rgba(12,18,28,0.45)] px-3 py-3 backdrop-blur-[2px] sm:items-center sm:px-4 sm:py-8"
           @click.self="closeSessionRecordModal"
         >
-          <div class="w-full max-w-[860px] overflow-hidden rounded-[28px] bg-white shadow-[0_22px_52px_rgba(0,0,0,0.22)]">
-            <div class="bg-[linear-gradient(90deg,#257aff_0%,#2476f7_44.712%,#1d60c9_90.385%,#164999_100%)] px-6 py-6 text-white">
+          <div class="flex h-[min(860px,calc(100dvh-1.5rem))] w-full max-w-[860px] flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_22px_52px_rgba(0,0,0,0.22)] sm:h-[min(900px,calc(100dvh-4rem))]">
+            <div class="shrink-0 bg-[linear-gradient(90deg,#257aff_0%,#2476f7_44.712%,#1d60c9_90.385%,#164999_100%)] px-4 py-5 text-white sm:px-6 sm:py-6">
               <div class="flex items-start justify-between gap-4">
                 <div>
-                  <h3 class="text-[34px] leading-none font-bold">{{ selectedSessionRecord.title }}</h3>
-                  <p v-if="selectedSessionRecord.topic" class="mt-3 text-[18px] font-semibold">{{ selectedSessionRecord.topic }}</p>
+                  <h3 class="text-[28px] leading-none font-bold sm:text-[34px]">{{ selectedSessionRecord.title }}</h3>
+                  <p v-if="selectedSessionRecord.topic" class="mt-3 text-[16px] font-semibold sm:text-[18px]">{{ selectedSessionRecord.topic }}</p>
                   <p class="mt-2 text-[15px] font-medium">{{ formatFullDate(selectedSessionRecord.startedAt) }}</p>
                 </div>
                 <button
@@ -1775,7 +1775,7 @@
                 </button>
               </div>
 
-              <div class="mt-5 grid gap-3 sm:grid-cols-5">
+              <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
                 <div class="rounded-[20px] bg-white/12 px-4 py-4">
                   <p class="text-[30px] font-bold leading-none">{{ selectedSessionRecord.recitationSummary.recitedCount }}</p>
                   <p class="mt-2 text-[14px] font-medium text-white/90">Recited</p>
@@ -1799,7 +1799,7 @@
               </div>
             </div>
 
-            <div class="max-h-[70vh] overflow-y-auto px-6 py-6">
+            <div class="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
               <section>
                 <p class="text-[16px] font-bold uppercase tracking-[0.08em] text-[#4a4a4a]">
                   Recited ({{ selectedSessionRecord.recitationSummary.recitedCount }})
