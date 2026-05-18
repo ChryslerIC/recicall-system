@@ -430,8 +430,8 @@ export const buildClassAnalytics = (classroom = {}) => {
     .slice(0, 5)
   const mostActiveStudents = [...studentPredictions]
     .sort((left, right) => {
-      if (right.sessions !== left.sessions) return right.sessions - left.sessions
       if (right.points !== left.points) return right.points - left.points
+      if (right.sessions !== left.sessions) return right.sessions - left.sessions
       return left.name.localeCompare(right.name)
     })
     .slice(0, 5)
