@@ -1522,7 +1522,7 @@
                   <button
                     type="button"
                     class="flex min-h-[60px] w-full items-center justify-center rounded-[22px] border border-[#1188f8] px-4 py-[14px] text-center text-[15px] font-semibold text-[#1188f8] disabled:opacity-50 sm:min-h-[64px] sm:px-5 sm:text-[16px]"
-                    :disabled="queueRecommendation.candidateCount <= 1 || isSavingQueueAbsence"
+                    :disabled="queueEligibleStudentIds.length <= 1 || isSavingQueueAbsence"
                     @click="rerollQueuedStudent"
                   >
                     Advance Queue
@@ -3189,6 +3189,10 @@ const classListStudents = computed(() =>
   })),
 )
 
+const enrolledStudentIds = computed(() =>
+  new Set(classListStudents.value.map((student) => student.id).filter(Boolean)),
+)
+
 const alphabetizedClassListStudents = computed(() =>
   [...classListStudents.value].sort((leftStudent, rightStudent) =>
     leftStudent.name.localeCompare(rightStudent.name, undefined, {
@@ -4208,6 +4212,11 @@ const handleScanSuccess = async (decodedText) => {
       return
     }
 
+    if (!enrolledStudentIds.value.has(payload?.uid)) {
+      scanError.value = `${payload?.name || 'This student'} is not enrolled in this class. Only enrolled students can be recorded in this session.`
+      return
+    }
+
     scannedPayload.value = payload
     scanError.value = ''
     await stopScanner()
@@ -4300,6 +4309,12 @@ const restartScanner = async () => {
 
 const persistParticipationAward = async (studentPayload, points) => {
   if (!studentPayload?.uid) return { ok: false, error: 'Missing student information.' }
+  if (!enrolledStudentIds.value.has(studentPayload.uid)) {
+    return {
+      ok: false,
+      error: `${studentPayload.name || 'This student'} is not enrolled in this class.`,
+    }
+  }
 
   const studentName = studentPayload.name || 'Joined student'
   const currentStudents = (rawClassroom.value?.enrolledStudents || []).map((student) => ({ ...student }))
