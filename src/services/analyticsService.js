@@ -352,15 +352,36 @@ const enqueuePriorityCandidate = (queue, candidate) => {
 
 const buildStudentPredictions = (classroom = {}) => {
   const enrolledStudents = classroom.enrolledStudents || []
+  const participationEvents = getParticipationOnlyEvents(classroom.participationEvents || [])
+  const statsByStudentId = new Map()
+
+  participationEvents.forEach((event) => {
+    if (!event?.studentId) return
+
+    const existingStats = statsByStudentId.get(event.studentId) || {
+      points: 0,
+      sessions: 0,
+      latestPoints: 0,
+      lastParticipationAt: null,
+    }
+
+    existingStats.points += toNumber(event.points)
+    existingStats.sessions += 1
+    existingStats.latestPoints = toNumber(event.points)
+    existingStats.lastParticipationAt = event.createdAt || existingStats.lastParticipationAt
+    statsByStudentId.set(event.studentId, existingStats)
+  })
 
   return enrolledStudents.map((student, index) => {
-    const points = getStudentPoints(student)
-    const sessions = getStudentSessions(student)
+    const studentId = student.studentId || student.id || `student-${index}`
+    const eventStats = statsByStudentId.get(studentId) || null
+    const points = eventStats ? eventStats.points : 0
+    const sessions = eventStats ? eventStats.sessions : 0
     const score = clamp(points * 14 + sessions * 18, 0, 100)
     const riskLevel = getRiskLevel(score)
 
     return {
-      id: student.studentId || student.id || `student-${index}`,
+      id: studentId,
       name: getStudentName(student, index),
       email: student.email || student.gradeLevel || 'Joined student',
       studentNumber: student.studentNumber,
