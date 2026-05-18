@@ -352,26 +352,6 @@
                     </div>
                   </template>
 
-                  <div class="mt-[12px] flex">
-                    <button
-                      type="button"
-                      class="interactive-card-button flex min-h-[84px] w-full max-w-[374px] items-center rounded-[32px] border border-[#cccdce] bg-[#f6f6f6] px-[18px] py-3 text-left transition-colors hover:bg-[#eef6ff]"
-                      @click="openRecentParticipationLog"
-                    >
-                      <div class="mr-[14px] grid h-[57px] w-[64px] place-items-center rounded-[14px] bg-[#50d24a]">
-                        <AppIcon name="sparkles" :size="28" class="text-[#072b10]" />
-                      </div>
-                      <div class="min-w-0">
-                        <p class="truncate text-[22px] font-bold leading-none text-black sm:text-[24px]">
-                          {{ latestParticipationTitle }}
-                        </p>
-                        <p class="mt-[10px] text-[16px] font-semibold leading-none text-[#4a4a4a]">
-                          {{ latestParticipationSummary }}
-                        </p>
-                      </div>
-                    </button>
-                  </div>
-
                   <section class="mt-[16px] rounded-[28px] border border-[#cccdce] bg-[#f8fbff] px-5 py-5">
                     <button
                       type="button"
@@ -734,7 +714,7 @@
 
                       <div class="mt-[18px] grid gap-[14px] md:grid-cols-2 xl:grid-cols-3">
                         <article
-                          v-for="student in classListStudents"
+                          v-for="student in alphabetizedClassListStudents"
                           :key="student.id"
                           class="rounded-[22px] border border-[#d7d7d7] bg-[#fafafa] px-[16px] py-[14px]"
                         >
@@ -3028,6 +3008,15 @@ const classListStudents = computed(() =>
     teacherFeedbackUpdatedAt: student.teacherFeedbackUpdatedAt || null,
     avatarSrc: resolveStudentAvatar(student.avatarKey, student.photoURL),
   })),
+)
+
+const alphabetizedClassListStudents = computed(() =>
+  [...classListStudents.value].sort((leftStudent, rightStudent) =>
+    leftStudent.name.localeCompare(rightStudent.name, undefined, {
+      sensitivity: 'base',
+      numeric: true,
+    }),
+  ),
 )
 
 const teacherLeaderboardRows = computed(() => {
