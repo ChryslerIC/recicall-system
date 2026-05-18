@@ -1754,20 +1754,20 @@
       <transition name="fade">
         <div
           v-if="isSessionRecordModalOpen && selectedSessionRecord"
-          class="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto overscroll-contain bg-[rgba(12,18,28,0.45)] px-3 py-3 backdrop-blur-[2px] [webkit-overflow-scrolling:touch] sm:items-center sm:px-4 sm:py-8"
+          class="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto overscroll-contain bg-[rgba(12,18,28,0.45)] px-3 py-3 backdrop-blur-[2px] [touch-action:pan-y] [webkit-overflow-scrolling:touch] sm:items-center sm:px-4 sm:py-8"
           @click.self="closeSessionRecordModal"
         >
-          <div class="flex h-[min(860px,calc(100svh-1.5rem))] w-full max-w-[860px] flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_22px_52px_rgba(0,0,0,0.22)] sm:h-[min(900px,calc(100svh-4rem))]">
-            <div class="shrink-0 bg-[linear-gradient(90deg,#257aff_0%,#2476f7_44.712%,#1d60c9_90.385%,#164999_100%)] px-4 py-5 text-white sm:px-6 sm:py-6">
+          <div class="flex h-[min(760px,calc(100svh-0.75rem))] w-full max-w-[860px] flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_22px_52px_rgba(0,0,0,0.22)] sm:h-[min(900px,calc(100svh-4rem))]">
+            <div class="shrink-0 bg-[linear-gradient(90deg,#257aff_0%,#2476f7_44.712%,#1d60c9_90.385%,#164999_100%)] px-4 py-4 text-white sm:px-6 sm:py-6">
               <div class="flex items-start justify-between gap-4">
                 <div>
-                  <h3 class="text-[28px] leading-none font-bold sm:text-[34px]">{{ selectedSessionRecord.title }}</h3>
-                  <p v-if="selectedSessionRecord.topic" class="mt-3 text-[16px] font-semibold sm:text-[18px]">{{ selectedSessionRecord.topic }}</p>
-                  <p class="mt-2 text-[15px] font-medium">{{ formatFullDate(selectedSessionRecord.startedAt) }}</p>
+                  <h3 class="text-[24px] leading-none font-bold sm:text-[34px]">{{ selectedSessionRecord.title }}</h3>
+                  <p v-if="selectedSessionRecord.topic" class="mt-2 text-[15px] font-semibold sm:mt-3 sm:text-[18px]">{{ selectedSessionRecord.topic }}</p>
+                  <p class="mt-2 text-[14px] font-medium sm:text-[15px]">{{ formatFullDate(selectedSessionRecord.startedAt) }}</p>
                 </div>
                 <button
                   type="button"
-                  class="grid h-10 w-10 place-items-center rounded-full bg-white/15 text-white transition hover:bg-white/25"
+                  class="grid h-9 w-9 place-items-center rounded-full bg-white/15 text-white transition hover:bg-white/25 sm:h-10 sm:w-10"
                   aria-label="Close recitation record modal"
                   @click="closeSessionRecordModal"
                 >
@@ -1775,31 +1775,31 @@
                 </button>
               </div>
 
-              <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-                <div class="rounded-[20px] bg-white/12 px-4 py-4">
-                  <p class="text-[30px] font-bold leading-none">{{ selectedSessionRecord.recitationSummary.recitedCount }}</p>
-                  <p class="mt-2 text-[14px] font-medium text-white/90">Recited</p>
+              <div class="mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:gap-3 xl:grid-cols-5">
+                <div class="rounded-[18px] bg-white/12 px-3 py-3 sm:rounded-[20px] sm:px-4 sm:py-4">
+                  <p class="text-[24px] font-bold leading-none sm:text-[30px]">{{ selectedSessionRecord.recitationSummary.recitedCount }}</p>
+                  <p class="mt-1 text-[12px] font-medium text-white/90 sm:mt-2 sm:text-[14px]">Recited</p>
                 </div>
-                <div class="rounded-[20px] bg-white/12 px-4 py-4">
-                  <p class="text-[30px] font-bold leading-none">{{ selectedSessionRecord.recitationSummary.absentCount }}</p>
-                  <p class="mt-2 text-[14px] font-medium text-white/90">Picked But Absent</p>
+                <div class="rounded-[18px] bg-white/12 px-3 py-3 sm:rounded-[20px] sm:px-4 sm:py-4">
+                  <p class="text-[24px] font-bold leading-none sm:text-[30px]">{{ selectedSessionRecord.recitationSummary.absentCount }}</p>
+                  <p class="mt-1 text-[12px] font-medium text-white/90 sm:mt-2 sm:text-[14px]">Picked But Absent</p>
                 </div>
-                <div class="rounded-[20px] bg-white/12 px-4 py-4">
-                  <p class="text-[30px] font-bold leading-none">{{ selectedSessionRecord.recitationSummary.notRecitedCount }}</p>
-                  <p class="mt-2 text-[14px] font-medium text-white/90">Did Not Recite</p>
+                <div class="rounded-[18px] bg-white/12 px-3 py-3 sm:rounded-[20px] sm:px-4 sm:py-4">
+                  <p class="text-[24px] font-bold leading-none sm:text-[30px]">{{ selectedSessionRecord.recitationSummary.notRecitedCount }}</p>
+                  <p class="mt-1 text-[12px] font-medium text-white/90 sm:mt-2 sm:text-[14px]">Did Not Recite</p>
                 </div>
-                <div class="rounded-[20px] bg-white/12 px-4 py-4">
-                  <p class="text-[30px] font-bold leading-none">{{ formatScoreValue(selectedSessionRecord.recitationSummary.totalPoints) }}</p>
-                  <p class="mt-2 text-[14px] font-medium text-white/90">Total Points</p>
+                <div class="rounded-[18px] bg-white/12 px-3 py-3 sm:rounded-[20px] sm:px-4 sm:py-4">
+                  <p class="text-[24px] font-bold leading-none sm:text-[30px]">{{ formatScoreValue(selectedSessionRecord.recitationSummary.totalPoints) }}</p>
+                  <p class="mt-1 text-[12px] font-medium text-white/90 sm:mt-2 sm:text-[14px]">Total Points</p>
                 </div>
-                <div class="rounded-[20px] bg-white/12 px-4 py-4">
-                  <p class="text-[30px] font-bold leading-none">{{ formatScoreValue(selectedSessionRecord.recitationSummary.averageScore) }}</p>
-                  <p class="mt-2 text-[14px] font-medium text-white/90">Average Score</p>
+                <div class="col-span-2 rounded-[18px] bg-white/12 px-3 py-3 sm:col-span-1 sm:rounded-[20px] sm:px-4 sm:py-4">
+                  <p class="text-[24px] font-bold leading-none sm:text-[30px]">{{ formatScoreValue(selectedSessionRecord.recitationSummary.averageScore) }}</p>
+                  <p class="mt-1 text-[12px] font-medium text-white/90 sm:mt-2 sm:text-[14px]">Average Score</p>
                 </div>
               </div>
             </div>
 
-            <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 [webkit-overflow-scrolling:touch] sm:px-6 sm:py-6">
+            <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 [touch-action:pan-y] [webkit-overflow-scrolling:touch] sm:px-6 sm:py-6">
               <section>
                 <p class="text-[16px] font-bold uppercase tracking-[0.08em] text-[#4a4a4a]">
                   Recited ({{ selectedSessionRecord.recitationSummary.recitedCount }})
