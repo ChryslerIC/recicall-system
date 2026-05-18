@@ -2626,6 +2626,45 @@ const participationEvents = computed(() => rawClassroom.value?.participationEven
 const participationOnlyEvents = computed(() =>
   participationEvents.value.filter((event) => event?.eventType !== 'absence'),
 )
+const rebuildEnrolledStudentsFromEvents = (students = [], events = []) => {
+  const statsByStudentId = new Map()
+
+  events
+    .filter((event) => event?.eventType !== 'absence' && event?.studentId)
+    .forEach((event) => {
+      const studentId = event.studentId
+      const existingStats = statsByStudentId.get(studentId) || {
+        totalPoints: 0,
+        participatedSessions: 0,
+        latestPoints: 0,
+        lastParticipationAt: null,
+      }
+
+      existingStats.totalPoints += Number(event.points) || 0
+      existingStats.participatedSessions += 1
+      existingStats.latestPoints = Number(event.points) || 0
+      existingStats.lastParticipationAt = event.createdAt || existingStats.lastParticipationAt
+      statsByStudentId.set(studentId, existingStats)
+    })
+
+  return students.map((student) => {
+    const studentId = student.studentId || student.id
+    const stats = statsByStudentId.get(studentId) || {
+      totalPoints: 0,
+      participatedSessions: 0,
+      latestPoints: 0,
+      lastParticipationAt: null,
+    }
+
+    return {
+      ...student,
+      totalPoints: stats.totalPoints,
+      participatedSessions: stats.participatedSessions,
+      latestPoints: stats.latestPoints,
+      lastParticipationAt: stats.lastParticipationAt,
+    }
+  })
+}
 const sessionHistory = computed(() =>
   Array.isArray(rawClassroom.value?.sessionHistory) ? rawClassroom.value.sessionHistory : [],
 )
@@ -4032,12 +4071,19 @@ const handleDeleteSelectedSession = async () => {
       pendingDeleteSession.value.id,
     )
 
+    const nextParticipationEvents = (rawClassroom.value?.participationEvents || []).filter(
+      (event) => event.sessionId !== pendingDeleteSession.value.id,
+    )
+    const nextEnrolledStudents = rebuildEnrolledStudentsFromEvents(
+      rawClassroom.value?.enrolledStudents || [],
+      nextParticipationEvents,
+    )
+
     rawClassroom.value = {
       ...rawClassroom.value,
       sessionHistory: sessionHistory.value.filter((session) => session.id !== pendingDeleteSession.value.id),
-      participationEvents: (rawClassroom.value?.participationEvents || []).filter(
-        (event) => event.sessionId !== pendingDeleteSession.value.id,
-      ),
+      participationEvents: nextParticipationEvents,
+      enrolledStudents: nextEnrolledStudents,
     }
 
     isDeleteSessionConfirmOpen.value = false
@@ -4060,10 +4106,16 @@ const handleDeleteAllSessions = async () => {
   try {
     await deleteAllTeacherClassSessions(teacherId.value, route.params.classId)
 
+    const nextEnrolledStudents = rebuildEnrolledStudentsFromEvents(
+      rawClassroom.value?.enrolledStudents || [],
+      [],
+    )
+
     rawClassroom.value = {
       ...rawClassroom.value,
       sessionHistory: [],
       participationEvents: [],
+      enrolledStudents: nextEnrolledStudents,
     }
 
     isDeleteAllSessionsConfirmOpen.value = false

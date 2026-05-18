@@ -25,6 +25,13 @@ const teacherClassParticipationCollection = (teacherId, classId) =>
 const createJoinCode = () => Math.random().toString(36).slice(2, 8).toUpperCase()
 const removeUndefinedValues = (value) =>
   Object.fromEntries(Object.entries(value).filter(([, entryValue]) => entryValue !== undefined))
+const toFirestoreDate = (value) => {
+  if (!value) return null
+  if (typeof value.toDate === 'function') return value.toDate()
+  if (typeof value.seconds === 'number') return new Date(value.seconds * 1000)
+  const parsedDate = new Date(value)
+  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate
+}
 const sanitizeSessionRosterSnapshot = (rosterSnapshot = []) =>
   Array.isArray(rosterSnapshot)
     ? rosterSnapshot.map((student, index) =>
@@ -81,6 +88,66 @@ const getParticipationEventsForTeacherClass = async (teacherId, classId) => {
       const rightTime = right.createdAt?.seconds || 0
       return leftTime - rightTime
     })
+}
+
+const syncTeacherClassStudentStatsFromEvents = async (teacherId, classId, participationDocs = null) => {
+  const [studentsSnapshot, loadedParticipationDocs] = await Promise.all([
+    getDocs(teacherClassStudentsCollection(teacherId, classId)),
+    participationDocs ? Promise.resolve(participationDocs) : getDocs(teacherClassParticipationCollection(teacherId, classId)),
+  ])
+
+  const participationEntries = loadedParticipationDocs.docs
+    .map((eventDoc) => ({
+      id: eventDoc.id,
+      ...eventDoc.data(),
+    }))
+    .filter((event) => event?.eventType !== 'absence' && event?.studentId)
+    .sort((left, right) => {
+      const leftTime = toFirestoreDate(left.createdAt)?.getTime() || 0
+      const rightTime = toFirestoreDate(right.createdAt)?.getTime() || 0
+      return leftTime - rightTime
+    })
+
+  const statsByStudentId = new Map()
+
+  participationEntries.forEach((event) => {
+    const studentId = event.studentId
+    const existingStats = statsByStudentId.get(studentId) || {
+      totalPoints: 0,
+      participatedSessions: 0,
+      latestPoints: 0,
+      lastParticipationAt: null,
+    }
+
+    existingStats.totalPoints += Number(event.points) || 0
+    existingStats.participatedSessions += 1
+    existingStats.latestPoints = Number(event.points) || 0
+    existingStats.lastParticipationAt = event.createdAt || existingStats.lastParticipationAt
+    statsByStudentId.set(studentId, existingStats)
+  })
+
+  await Promise.all(
+    studentsSnapshot.docs.map((studentDoc) => {
+      const stats = statsByStudentId.get(studentDoc.id) || {
+        totalPoints: 0,
+        participatedSessions: 0,
+        latestPoints: 0,
+        lastParticipationAt: null,
+      }
+
+      return setDoc(
+        studentDoc.ref,
+        {
+          totalPoints: stats.totalPoints,
+          participatedSessions: stats.participatedSessions,
+          latestPoints: stats.latestPoints,
+          lastParticipationAt: stats.lastParticipationAt,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      )
+    }),
+  )
 }
 
 const getClassEngagementLabel = ({ studentsCount = 0, participationEvents = [] } = {}) => {
@@ -258,8 +325,10 @@ export const deleteTeacherClassSession = async (teacherId, classId, sessionId) =
 
   const participationSnapshot = await getDocs(teacherClassParticipationCollection(teacherId, classId))
   const sessionEventDocs = participationSnapshot.docs.filter((eventDoc) => eventDoc.data()?.sessionId === sessionId)
+  const remainingParticipationDocs = participationSnapshot.docs.filter((eventDoc) => eventDoc.data()?.sessionId !== sessionId)
 
   await Promise.all(sessionEventDocs.map((eventDoc) => deleteDoc(eventDoc.ref)))
+  await syncTeacherClassStudentStatsFromEvents(teacherId, classId, { docs: remainingParticipationDocs })
 
   await updateDoc(classRef, {
     sessionHistory: nextSessionHistory,
@@ -286,6 +355,7 @@ export const deleteAllTeacherClassSessions = async (teacherId, classId) => {
   const participationSnapshot = await getDocs(teacherClassParticipationCollection(teacherId, classId))
 
   await Promise.all(participationSnapshot.docs.map((eventDoc) => deleteDoc(eventDoc.ref)))
+  await syncTeacherClassStudentStatsFromEvents(teacherId, classId, { docs: [] })
 
   await updateDoc(classRef, {
     sessionHistory: [],
