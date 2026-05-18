@@ -2,24 +2,29 @@
   <transition name="fade">
     <div
       v-if="open"
-      class="fixed inset-0 z-40 flex items-center justify-center bg-[rgba(0,0,0,0.35)] px-4 py-6"
+      class="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-[rgba(0,0,0,0.35)] px-3 py-3 sm:items-center sm:px-4 sm:py-6"
       @click.self="$emit('close')"
     >
-      <div class="w-full max-w-[640px] rounded-[28px] bg-white px-5 py-5 shadow-[0_20px_60px_rgba(0,0,0,0.2)] sm:px-7 sm:py-6">
-        <div class="flex items-start justify-between gap-4 border-b border-[#e5e5e5] pb-4">
+      <div class="flex max-h-[calc(100dvh-0.75rem)] w-full max-w-[640px] flex-col overflow-y-auto rounded-[24px] bg-white px-4 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.2)] sm:max-h-[calc(100dvh-3rem)] sm:rounded-[28px] sm:px-7 sm:py-6">
+        <div class="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-[#e5e5e5] bg-white pb-4">
           <div>
-            <h2 class="text-[28px] leading-none font-bold sm:text-[34px]">{{ title }}</h2>
-            <p class="mt-3 text-[15px] leading-[1.45] text-[#4b4b4b] sm:text-[16px]">
+            <h2 class="text-[24px] leading-none font-bold sm:text-[34px]">{{ title }}</h2>
+            <p class="mt-2 text-[14px] leading-[1.45] text-[#4b4b4b] sm:mt-3 sm:text-[16px]">
               {{ description }}
             </p>
           </div>
 
-          <button type="button" class="text-[28px] leading-none text-[#555]" aria-label="Close" @click="$emit('close')">
+          <button
+            type="button"
+            class="grid h-10 w-10 shrink-0 place-items-center rounded-full text-[24px] leading-none text-[#555] transition hover:bg-[#eef4ff] hover:text-[#1188f8]"
+            aria-label="Close"
+            @click="$emit('close')"
+          >
             x
           </button>
         </div>
 
-        <div class="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="mt-4 flex flex-col gap-4 sm:mt-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p class="text-[16px] font-semibold text-black">{{ previewLabel }}</p>
             <p class="mt-2 text-[13px] text-[#666]">{{ previewHint }}</p>
@@ -27,7 +32,7 @@
           <img :src="previewSrc" alt="" class="h-[88px] w-[88px] rounded-full border border-[#d7d7d7] object-cover sm:h-[98px] sm:w-[98px]" />
         </div>
 
-        <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <div class="mt-4 grid grid-cols-2 gap-3 sm:mt-5 sm:grid-cols-3 lg:grid-cols-4">
           <button
             v-for="avatar in options"
             :key="avatar.key"
@@ -37,14 +42,14 @@
             :disabled="saving"
             @click="$emit('update:selectedKey', avatar.key)"
           >
-            <img :src="avatar.src" :alt="avatar.label" class="mx-auto h-[74px] w-[74px] rounded-full object-cover" />
-            <p class="mt-3 text-[13px] font-semibold text-black">{{ avatar.label }}</p>
+            <img :src="avatar.src" :alt="avatar.label" class="mx-auto h-[64px] w-[64px] rounded-full object-cover sm:h-[74px] sm:w-[74px]" />
+            <p class="mt-3 text-[12px] font-semibold text-black sm:text-[13px]">{{ avatar.label }}</p>
           </button>
         </div>
 
         <p v-if="error" class="mt-4 text-[15px] font-medium text-red-600">{{ error }}</p>
 
-        <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <div class="sticky bottom-0 mt-4 flex flex-col-reverse gap-3 border-t border-[#e5e5e5] bg-white pt-4 sm:mt-6 sm:flex-row sm:justify-end">
           <button
             v-if="showLater"
             type="button"

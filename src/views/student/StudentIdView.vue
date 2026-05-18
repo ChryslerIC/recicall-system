@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-[#f6f6f6] font-sans text-black">
     <div class="w-full">
-      <header class="flex items-start justify-between px-4 pt-4 sm:px-6 lg:px-[30px] lg:pt-[13px]">
+      <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
           <button
             type="button"
@@ -9,7 +9,7 @@
             aria-label="Toggle sidebar"
             @click="isSidebarExpanded = !isSidebarExpanded"
           >
-            <img :src="imgMenu" alt="" class="block h-full w-full" />
+            <AppIcon name="menu" class="h-full w-full text-[#111]" />
           </button>
 
           <img :src="imgStar" alt="" class="ml-4 mt-1 h-[40px] w-[44px] object-contain sm:ml-6 sm:mt-2 sm:h-[48px] sm:w-[53px] lg:ml-[31px] lg:mt-[15px] lg:h-[55px] lg:w-[61px]" />
@@ -20,14 +20,7 @@
           </p>
         </div>
 
-        <div class="ml-4 flex items-start gap-4 sm:gap-5 lg:mr-[34px] lg:gap-[24px]">
-          <button type="button" class="mt-1 sm:mt-2 lg:mt-[18px]" aria-label="Notifications">
-            <img
-              :src="imgBell"
-              alt=""
-              class="block h-[52px] w-[40px] object-contain sm:h-[56px] sm:w-[44px] lg:h-[55px] lg:w-[70px]"
-            />
-          </button>
+        <div class="ml-4 flex items-start sm:gap-5 lg:mr-[34px]">
           <button type="button" class="mt-0 sm:mt-1 lg:mt-[12px]" aria-label="Profile" @click="openEditModal">
             <img
               :src="studentAvatarSrc"
@@ -38,50 +31,89 @@
         </div>
       </header>
 
+      <transition name="fade">
+        <div
+          v-if="isSidebarExpanded"
+          class="fixed inset-0 z-30 bg-[rgba(12,18,28,0.45)] backdrop-blur-[2px] lg:hidden"
+          @click.self="isSidebarExpanded = false"
+        >
+          <aside class="flex h-full w-[272px] max-w-[86vw] flex-col justify-between overflow-y-auto bg-white px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-5 shadow-[0_18px_44px_rgba(0,0,0,0.18)]">
+            <div>
+              <div class="flex items-center justify-between">
+                <p class="text-[26px] font-black leading-none tracking-[-0.03em]">ReciCall</p>
+                <button type="button" class="grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8]" aria-label="Close sidebar" @click="isSidebarExpanded = false">
+                  <AppIcon name="x" :size="20" />
+                </button>
+              </div>
+              <div class="mt-8 space-y-3">
+                <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(46,130,239,0.12)]" aria-label="Classes" @click="isSidebarExpanded = false; router.push('/student')">
+                  <AppIcon name="classes" :size="22" class="text-[#707070]" />
+                  <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Classes</span>
+                </button>
+                <div class="flex h-[56px] items-center rounded-[18px] bg-[rgba(46,130,239,0.25)] px-4">
+                  <AppIcon name="badge" :size="22" class="text-[#174ca0]" />
+                  <span class="ml-4 text-[16px] font-semibold text-[#174ca0]">Student ID</span>
+                </div>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(46,130,239,0.12)]" aria-label="Settings" @click="isSidebarExpanded = false; openEditModal()">
+                <AppIcon name="settings" :size="22" class="text-[#707070]" />
+                <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Settings</span>
+              </button>
+              <button type="button" class="flex h-[52px] w-full items-center rounded-[18px] px-4 text-left transition hover:bg-[rgba(255,84,84,0.08)]" aria-label="Logout" @click="isSidebarExpanded = false; openLogoutConfirm()">
+                <AppIcon name="logout" :size="22" class="text-[#707070]" />
+                <span class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Logout</span>
+              </button>
+            </div>
+          </aside>
+        </div>
+      </transition>
+
       <div class="flex gap-4 px-4 pb-4 pt-2 sm:px-6 lg:gap-0 lg:px-0">
         <aside
-          class="hidden shrink-0 flex-col justify-between pb-[40px] pt-[77px] transition-[width,padding] duration-200 lg:ml-[7px] lg:flex lg:h-[650px]"
-          :class="isSidebarExpanded ? 'w-[220px] px-[12px]' : 'w-[72px]'"
+          class="hidden shrink-0 self-start flex-col justify-between pb-[44px] pt-[84px] transition-[width,padding] duration-200 lg:sticky lg:top-[118px] lg:flex lg:h-[650px]"
+          :class="isSidebarExpanded ? 'w-[220px] px-[12px]' : 'w-[88px] px-[10px]'"
         >
-          <div class="flex flex-col gap-[18px]">
+          <div class="flex flex-col gap-5">
             <button
               type="button"
               class="flex h-[63px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
-              :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center'"
+              :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center pl-[4px]'"
               aria-label="Dashboard"
               @click="router.push('/student')"
             >
-              <img :src="imgRectangle14" alt="" class="h-[36px] w-[45px] shrink-0" :style="inactiveNavIconStyle" />
+              <AppIcon name="classes" :size="26" class="shrink-0 text-[#707070]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Classes</span>
             </button>
             <div
               class="flex h-[63px] w-full items-center rounded-[17px] bg-[rgba(46,130,239,0.25)]"
-              :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center'"
+              :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center pl-[4px]'"
             >
-              <img :src="imgRectangle77Active" alt="" class="h-[54px] w-[42px] shrink-0" />
+              <AppIcon name="badge" :size="24" class="shrink-0 text-[#174ca0]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-semibold text-[#174ca0]">Student ID</span>
             </div>
           </div>
 
-          <div class="flex flex-col gap-[18px]">
+          <div class="flex flex-col gap-5">
             <button
               type="button"
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
-              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
+              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center pl-[4px]'"
               aria-label="Settings"
               @click="openEditModal"
             >
-              <img :src="imgRectangle18" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
+              <AppIcon name="settings" :size="24" class="shrink-0 text-[#707070]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Settings</span>
             </button>
             <button
               type="button"
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(255,84,84,0.08)]"
-              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
+              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center pl-[4px]'"
               aria-label="Logout"
-              @click="handleLogout"
+              @click="openLogoutConfirm"
             >
-              <img :src="imgRectangle17" alt="" class="h-[40px] w-[38px] shrink-0" :style="inactiveNavIconStyle" />
+              <AppIcon name="logout" :size="24" class="shrink-0 text-[#707070]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-medium text-[#3a3a3a]">Logout</span>
             </button>
           </div>
@@ -98,36 +130,19 @@
 
               <button
                 type="button"
-                style="
-                  margin-top: 6px;
-                  width: min(100%, 116px);
-                  height: 42px;
-                  border-radius: 20px;
-                  background: #1188f8;
-                  display: flex;
-                  align-items: center;
-                  padding-left: 14px;
-                  padding-right: 14px;
-                  box-sizing: border-box;
-                "
+                :disabled="isSavingIdPdf"
+                class="mt-[6px] inline-flex h-[42px] w-full max-w-[132px] items-center justify-center gap-[8px] rounded-[20px] bg-[#1188f8] px-[14px] text-[13px] font-semibold text-white disabled:opacity-60"
+                @click="saveStudentIdAsPdf"
               >
-                <span class="block h-[24px] w-[24px] shrink-0 bg-white" :style="saveMaskStyle" />
-                <span
-                  style="
-                    margin-left: 7px;
-                    font-size: 13px;
-                    font-weight: 600;
-                    color: white;
-                    line-height: 1;
-                  "
-                  >Save Id</span
-                >
+                <AppIcon name="download" :size="18" class="text-white" />
+                <span>{{ isSavingIdPdf ? 'Saving...' : 'Save ID' }}</span>
               </button>
             </div>
 
             <div class="mt-[34px] hidden sm:flex sm:justify-center">
               <div class="mx-auto flex w-full max-w-[860px] flex-col items-center">
                 <div
+                  ref="desktopIdCardRef"
                   class="relative overflow-hidden border-2 border-black"
                   style="
                     width: 640px;
@@ -147,16 +162,7 @@
                       gap: 12px;
                     "
                   >
-                    <svg
-                      viewBox="0 0 52 47"
-                      aria-hidden="true"
-                      style="width: 40px; height: 36px; display: block"
-                    >
-                      <path
-                        d="M26 0L31.5 17.5L52 23.5L31.5 29.5L26 47L20.5 29.5L0 23.5L20.5 17.5L26 0Z"
-                        fill="#1f88f5"
-                      />
-                    </svg>
+                    <img :src="imgStar" alt="" style="width: 40px; height: 36px; display: block; object-fit: contain" />
                     <p style="margin: 0; font-size: 20px; font-weight: 700; line-height: 1">
                       ReciCall
                     </p>
@@ -244,7 +250,7 @@
                     "
                     @click="openEditModal"
                   >
-                    <img :src="imgEdit" alt="" style="width: 30px; height: 30px; display: block" />
+                    <AppIcon name="pencil" :size="24" class="text-white" />
                     <span style="font-size: 19px; font-weight: 700; color: white; line-height: 1"
                       >Edit Id</span
                     >
@@ -254,14 +260,9 @@
             </div>
 
             <div class="mt-10 sm:hidden">
-              <div class="mx-auto w-full max-w-[360px] overflow-hidden rounded-[34px] border-2 border-black bg-[linear-gradient(135deg,#dce8fb_0%,#c7d9f8_46%,#2e82ef_100%)] px-3 py-4">
+              <div ref="mobileIdCardRef" class="mx-auto w-full max-w-[360px] overflow-hidden rounded-[34px] border-2 border-black bg-[linear-gradient(135deg,#dce8fb_0%,#c7d9f8_46%,#2e82ef_100%)] px-3 py-4">
                 <div class="flex items-center gap-2">
-                  <svg viewBox="0 0 52 47" aria-hidden="true" class="h-[26px] w-[28px] shrink-0">
-                    <path
-                      d="M26 0L31.5 17.5L52 23.5L31.5 29.5L26 47L20.5 29.5L0 23.5L20.5 17.5L26 0Z"
-                      fill="#1f88f5"
-                    />
-                  </svg>
+                  <img :src="imgStar" alt="" class="h-[26px] w-[28px] shrink-0 object-contain" />
                   <p class="text-[16px] leading-none font-bold">ReciCall</p>
                 </div>
 
@@ -307,7 +308,7 @@
                 "
                 @click="openEditModal"
               >
-                <img :src="imgEdit" alt="" style="width: 22px; height: 22px; display: block" />
+                <AppIcon name="pencil" :size="18" class="text-white" />
                 <span style="font-size: 16px; font-weight: 700; color: white; line-height: 1"
                   >Edit Id</span
                 >
@@ -317,120 +318,182 @@
         </main>
       </div>
 
-      <div class="px-4 pb-6 sm:px-6 lg:hidden">
-        <div
-          class="flex items-center justify-center gap-8 rounded-[20px] border border-[#d9e8fb] bg-white px-4 py-3 shadow-[0_4px_18px_rgba(0,0,0,0.04)]"
-        >
-          <button
-            type="button"
-            class="grid h-10 w-10 place-items-center"
-            aria-label="Dashboard"
-            @click="router.push('/student')"
-          >
-            <img :src="imgRectangle14" alt="" class="h-[24px] w-[30px]" :style="inactiveNavIconStyle" />
-          </button>
-          <button
-            type="button"
-            class="grid h-10 w-10 place-items-center rounded-[12px] bg-[rgba(46,130,239,0.25)]"
-            aria-label="Student ID"
-          >
-            <img :src="imgRectangle77Active" alt="" class="h-[26px] w-[20px]" />
-          </button>
-          <button type="button" class="grid h-10 w-10 place-items-center" aria-label="Settings" @click="openEditModal">
-            <img :src="imgRectangle18" alt="" class="h-[24px] w-[24px]" :style="inactiveNavIconStyle" />
-          </button>
-          <button
-            type="button"
-            class="grid h-10 w-10 place-items-center"
-            aria-label="Logout"
-            @click="handleLogout"
-          >
-            <img :src="imgRectangle17" alt="" class="h-[24px] w-[24px]" :style="inactiveNavIconStyle" />
-          </button>
-        </div>
-      </div>
     </div>
   </div>
 
+  <ConfirmActionModal
+    :open="isLogoutConfirmOpen"
+    title="Log out?"
+    message="Are you sure you want to log out?"
+    confirm-text="Log out"
+    loading-text="Logging out..."
+    :loading="isLoggingOut"
+    @cancel="closeLogoutConfirm"
+    @confirm="handleLogout"
+  />
+
+  <ConfirmActionModal
+    :open="isDeleteAccountConfirmOpen"
+    title="Delete Account?"
+    message="This will permanently delete your student account, joined classes, mirrored class records, and profile data. This action cannot be restored."
+    confirm-text="Delete Forever"
+    loading-text="Deleting..."
+    :loading="isDeletingAccount"
+    @cancel="closeDeleteAccountConfirm"
+    @confirm="handleDeleteAccount"
+  />
+
   <div
     v-if="isEditModalOpen"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.35)] px-4"
+    class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[rgba(0,0,0,0.35)] px-3 py-3 sm:px-4 sm:py-8 sm:items-center"
   >
-    <div class="w-full max-w-[460px] rounded-[28px] bg-white px-6 py-6 shadow-[0_20px_60px_rgba(0,0,0,0.2)]">
-      <div class="flex items-start justify-between gap-4">
+    <div class="w-full max-w-[520px] max-h-[calc(100vh-1.5rem)] overflow-y-auto rounded-[28px] bg-white px-4 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.2)] sm:max-h-[calc(100vh-4rem)] sm:px-6 sm:py-6">
+      <div class="sticky top-0 z-10 flex items-start justify-between gap-4 bg-white pb-4">
         <div>
-          <h2 class="text-[34px] leading-none font-bold">Edit Id</h2>
-          <p class="mt-3 text-[16px] leading-[1.35] text-[#444]">
-            Update your full name and choose a student avatar. Name changes are limited to
-            {{ maxNameChanges }} for the lifetime of the account.
+          <h2 class="text-[30px] leading-none font-bold sm:text-[34px]">Settings</h2>
+          <p class="mt-3 text-[15px] leading-[1.35] text-[#444] sm:text-[16px]">
+            Update your student profile, manage password access, and review privacy details.
           </p>
         </div>
 
         <button
           type="button"
-          class="text-[26px] leading-none"
+          class="grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8]"
           aria-label="Close"
           @click="closeEditModal"
         >
-          x
+          <AppIcon name="x" :size="20" />
         </button>
       </div>
 
-      <div class="mt-6">
+      <div class="mt-5 flex flex-wrap gap-2 rounded-[22px] bg-[#f6f6f6] p-2">
+        <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'profile' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'profile'">Profile</button>
+        <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'security' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'security'">Security</button>
+        <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'legal' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'legal'">Legal</button>
+        <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'danger' ? 'bg-white text-[#b81717] shadow-[0_8px_18px_rgba(184,23,23,0.12)]' : 'text-[#7a4a4a]'" @click="activeSettingsSection = 'danger'">Delete Account</button>
+      </div>
+
+      <div v-if="activeSettingsSection === 'profile'" class="mt-6">
         <label class="text-[16px] font-medium" for="student-id-name">Full Name</label>
         <input
           id="student-id-name"
           v-model="editNameValue"
           type="text"
-          class="mt-3 w-full rounded-[16px] border-2 border-black px-4 py-3 text-[20px] outline-none"
+          class="mt-3 w-full rounded-[16px] border-2 border-black px-4 py-3 text-[18px] outline-none sm:text-[20px]"
           :disabled="isSavingName || !canEditName"
           maxlength="60"
         />
         <p class="mt-3 text-[14px] text-[#666]">
           Remaining lifetime changes: {{ remainingNameChanges }}
         </p>
+
+        <div class="mt-6">
+          <div class="flex items-center justify-between gap-4">
+            <p class="text-[16px] font-medium">Student Avatar</p>
+            <img :src="editAvatarPreview" alt="" class="h-[56px] w-[56px] rounded-full border border-[#d7d7d7] object-cover" />
+          </div>
+          <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
+            <button
+              v-for="avatar in studentAvatarOptions"
+              :key="avatar.key"
+              type="button"
+              class="rounded-[18px] border px-3 py-3 text-center transition"
+              :class="editAvatarKey === avatar.key ? 'border-[#1188f8] bg-[#eef6ff] shadow-[0_0_0_2px_rgba(17,136,248,0.12)]' : 'border-[#d7d7d7] bg-[#fafafa] hover:border-[#1188f8]'"
+              :disabled="isSavingName"
+              @click="editAvatarKey = avatar.key"
+            >
+              <img :src="avatar.src" :alt="avatar.label" class="mx-auto h-[70px] w-[70px] rounded-full object-cover" />
+              <p class="mt-3 text-[13px] font-semibold text-black">{{ avatar.label }}</p>
+            </button>
+          </div>
+          <p class="mt-3 text-[14px] text-[#666]">
+            Your selected avatar will appear on your ID, your class list, and your teacher's class
+            list.
+          </p>
+        </div>
       </div>
 
-      <div class="mt-6">
-        <div class="flex items-center justify-between gap-4">
-          <p class="text-[16px] font-medium">Student Avatar</p>
-          <img :src="editAvatarPreview" alt="" class="h-[56px] w-[56px] rounded-full border border-[#d7d7d7] object-cover" />
+      <div v-else-if="activeSettingsSection === 'security'" class="mt-6 rounded-[20px] border border-[#d9e8fb] bg-[#f8fbff] px-4 py-4">
+        <p class="text-[18px] font-bold text-black">Password & Sign-In</p>
+        <p class="mt-2 text-[14px] leading-[1.5] text-[#5b5b5b]">Use your account email to receive a secure password reset link.</p>
+        <div class="mt-4 rounded-[16px] border border-[#d9e8fb] bg-white px-4 py-3">
+          <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#6b7280]">Signed in email</p>
+          <p class="mt-1 break-all text-[15px] font-semibold text-black">{{ signedInEmail }}</p>
         </div>
-        <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
-          <button
-            v-for="avatar in studentAvatarOptions"
-            :key="avatar.key"
-            type="button"
-            class="rounded-[18px] border px-3 py-3 text-center transition"
-            :class="editAvatarKey === avatar.key ? 'border-[#1188f8] bg-[#eef6ff] shadow-[0_0_0_2px_rgba(17,136,248,0.12)]' : 'border-[#d7d7d7] bg-[#fafafa] hover:border-[#1188f8]'"
-            :disabled="isSavingName"
-            @click="editAvatarKey = avatar.key"
-          >
-            <img :src="avatar.src" :alt="avatar.label" class="mx-auto h-[70px] w-[70px] rounded-full object-cover" />
-            <p class="mt-3 text-[13px] font-semibold text-black">{{ avatar.label }}</p>
-          </button>
-        </div>
-        <p class="mt-3 text-[14px] text-[#666]">
-          Your selected avatar will appear on your ID, your class list, and your teacher's class
-          list.
-        </p>
-        <p v-if="editError" class="mt-3 text-[15px] font-medium text-red-600">
-          {{ editError }}
-        </p>
-      </div>
-
-      <div class="mt-8 flex justify-end gap-4">
         <button
           type="button"
-          class="h-[52px] min-w-[130px] rounded-[22px] bg-[#d9d9d9] px-6 text-[18px] font-semibold"
+          class="mt-4 flex min-h-[46px] w-full items-center justify-center rounded-[18px] border border-[#1188f8] bg-white px-5 text-[15px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff] disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+          :disabled="isSavingName || isSendingPasswordReset"
+          @click="sendPasswordResetLink"
+        >
+          {{ isSendingPasswordReset ? 'Sending reset link...' : 'Change Password' }}
+        </button>
+      </div>
+
+      <div v-else-if="activeSettingsSection === 'legal'" class="mt-6 rounded-[20px] border border-[#d9e8fb] bg-[#f8fbff] px-4 py-4">
+        <p class="text-[18px] font-bold text-black">Terms & Privacy</p>
+        <p class="mt-2 text-[14px] leading-[1.5] text-[#5b5b5b]">Open the app policies in their own page with a simple back button.</p>
+        <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <button
+            type="button"
+            class="flex min-h-[46px] items-center justify-center rounded-[18px] border border-[#d7d7d7] bg-white px-5 text-[15px] font-semibold text-black transition hover:bg-[#f7f7f7]"
+            @click="goToTerms"
+          >
+            Terms of Service
+          </button>
+          <button
+            type="button"
+            class="flex min-h-[46px] items-center justify-center rounded-[18px] border border-[#d7d7d7] bg-white px-5 text-[15px] font-semibold text-black transition hover:bg-[#f7f7f7]"
+            @click="goToPrivacy"
+          >
+            Privacy Policy
+          </button>
+        </div>
+      </div>
+
+      <div v-else class="mt-6 rounded-[20px] border border-[#ffd6d6] bg-[#fff7f7] px-4 py-4">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="text-[16px] font-bold text-[#b81717]">Delete Account</p>
+            <p class="mt-1 text-[14px] leading-[1.4] text-[#6b1d1d]">
+              Permanently remove this student account, joined classes, and profile data. This cannot be undone.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="h-[46px] min-w-[148px] rounded-[18px] bg-[#b81717] px-5 text-[16px] font-semibold text-white transition hover:bg-[#9f1111] disabled:cursor-not-allowed disabled:opacity-70"
+            :disabled="isSavingName || isDeletingAccount"
+            @click="openDeleteAccountConfirm"
+          >
+            Delete Account
+          </button>
+        </div>
+      </div>
+
+      <p v-if="deleteAccountError" class="mt-4 text-[15px] font-medium text-red-600">
+        {{ deleteAccountError }}
+      </p>
+      <p v-if="settingsSuccess" class="mt-4 text-[15px] font-medium text-green-600">
+        {{ settingsSuccess }}
+      </p>
+
+      <p v-if="editError" class="mt-4 text-[15px] font-medium text-red-600">
+        {{ editError }}
+      </p>
+
+      <div class="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          class="h-[52px] w-full rounded-[22px] bg-[#d9d9d9] px-6 text-[18px] font-semibold sm:min-w-[130px] sm:w-auto"
           :disabled="isSavingName"
           @click="closeEditModal"
         >
           Cancel
         </button>
         <button
+          v-if="activeSettingsSection === 'profile'"
           type="button"
-          class="h-[52px] min-w-[148px] rounded-[22px] bg-[#1188f8] px-6 text-[18px] font-semibold text-white disabled:opacity-60"
+          class="h-[52px] w-full rounded-[22px] bg-[#1188f8] px-6 text-[18px] font-semibold text-white disabled:opacity-60 sm:min-w-[148px] sm:w-auto"
           :disabled="isSavingName || !hasProfileChanges"
           @click="saveProfileChanges"
         >
@@ -442,67 +505,52 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import AppIcon from '../../components/common/AppIcon.vue'
+import ConfirmActionModal from '../../components/common/ConfirmActionModal.vue'
 import { auth } from '../../config/firebase'
-import { logoutUser, updateCurrentUserAccount } from '../../services/authService'
+import { logoutUser, requestCurrentUserPasswordReset, updateCurrentUserAccount } from '../../services/authService'
+import {
+  deleteStudentAccount,
+  getDeleteAccountErrorMessage,
+} from '../../services/accountService'
 import { syncStudentProfileAcrossClasses } from '../../services/studentService'
 import { getUserById, upsertUserProfile } from '../../services/userService'
-import imgRectangle17 from '../../assets/icons/recicall-logout.svg'
-import imgRectangle18 from '../../assets/icons/recicall-settings.svg'
-import imgRectangle14 from '../../assets/icons/recicall-classes.svg'
-import imgRectangle77Active from '../../assets/icons/recicall-student-id-active.svg'
-import imgMenu from '../../assets/icons/recicall-menu.svg'
+import { downloadElementAsPdf } from '../../utils/participationReports'
 import imgStar from '../../assets/icons/recicall-logo.png'
-import imgBell from '../../assets/icons/notification-bell-svgrepo-com.svg'
-import { inactiveNavIconStyle } from '../../utils/navIconStyles'
 import {
   defaultStudentAvatarKey,
   resolveStudentAvatar,
   studentAvatarOptions,
 } from '../../utils/studentAvatarOptions'
-
-const svgDataUri = (svg) => `data:image/svg+xml;utf8,${encodeURIComponent(svg.trim())}`
-const imgRectangle78 = svgDataUri(`
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-    <path d="M12 4v11" stroke="black" stroke-width="2.3" stroke-linecap="round"/>
-    <path d="m7.5 11.5 4.5 4.5 4.5-4.5" stroke="black" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M5 20h14" stroke="black" stroke-width="2.3" stroke-linecap="round"/>
-  </svg>
-`)
-const imgEdit = svgDataUri(`
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-    <path d="M7 25h5l12-12-5-5L7 20v5Z" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="m17 8 5 5" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M6 27h20" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-  </svg>
-`)
 const router = useRouter()
+const route = useRoute()
 const isLoggingOut = ref(false)
+const isLogoutConfirmOpen = ref(false)
+const isDeleteAccountConfirmOpen = ref(false)
+const isDeletingAccount = ref(false)
 const displayName = ref('Alonso Von Leopard')
 const studentNumber = ref('20232023')
 const studentUid = ref('')
 const studentProfileRecord = ref(null)
 const isSidebarExpanded = ref(false)
 const isEditModalOpen = ref(false)
+const activeSettingsSection = ref('profile')
 const editNameValue = ref('')
 const editAvatarKey = ref(defaultStudentAvatarKey)
 const editError = ref('')
+const settingsSuccess = ref('')
+const deleteAccountError = ref('')
 const isSavingName = ref(false)
+const isSendingPasswordReset = ref(false)
+const isSavingIdPdf = ref(false)
 const nameChangeCount = ref(0)
 const avatarKey = ref(defaultStudentAvatarKey)
 const maxNameChanges = 2
-
-const saveMaskStyle = {
-  maskImage: `url('${imgRectangle78}')`,
-  WebkitMaskImage: `url('${imgRectangle78}')`,
-  maskRepeat: 'no-repeat',
-  WebkitMaskRepeat: 'no-repeat',
-  maskPosition: 'center',
-  WebkitMaskPosition: 'center',
-  maskSize: 'contain',
-  WebkitMaskSize: 'contain',
-}
+const qrImageUrl = ref('')
+const desktopIdCardRef = ref(null)
+const mobileIdCardRef = ref(null)
 
 const nameParts = computed(() => displayName.value.trim().split(/\s+/).filter(Boolean))
 const firstNameValue = computed(() => {
@@ -523,9 +571,52 @@ const studentAvatarSrc = computed(() =>
 const editAvatarPreview = computed(() =>
   resolveStudentAvatar(editAvatarKey.value, fallbackStudentPhotoURL.value),
 )
+const signedInEmail = computed(() => auth.currentUser?.email || 'No email available')
 const hasProfileChanges = computed(
   () => normalizedEditName.value !== displayName.value || editAvatarKey.value !== avatarKey.value,
 )
+
+const normalizeSettingsSection = (value) =>
+  ['profile', 'security', 'legal', 'danger'].includes(value) ? value : 'profile'
+
+const syncSettingsModalQuery = async (open, section = activeSettingsSection.value) => {
+  const normalizedSection = normalizeSettingsSection(section)
+  const nextQuery = { ...route.query }
+
+  if (open) {
+    nextQuery.settings = 'open'
+    nextQuery.settingsSection = normalizedSection
+  } else {
+    delete nextQuery.settings
+    delete nextQuery.settingsSection
+  }
+
+  const isOpenInRoute = route.query.settings === 'open'
+  const currentSection = normalizeSettingsSection(route.query.settingsSection)
+  if ((open && isOpenInRoute && currentSection === normalizedSection) || (!open && !isOpenInRoute)) {
+    return
+  }
+
+  await router.replace({
+    path: route.path,
+    query: nextQuery,
+  })
+}
+
+const buildSettingsReturnTo = (section = activeSettingsSection.value) =>
+  router.resolve({
+    path: route.path,
+    query: {
+      ...route.query,
+      settings: 'open',
+      settingsSection: normalizeSettingsSection(section),
+    },
+  }).fullPath
+
+const prefillStudentSettings = () => {
+  editNameValue.value = displayName.value
+  editAvatarKey.value = avatarKey.value
+}
 
 const qrPayload = computed(() =>
   JSON.stringify({
@@ -537,10 +628,73 @@ const qrPayload = computed(() =>
   }),
 )
 
-const qrImageUrl = computed(
-  () =>
-    `https://api.qrserver.com/v1/create-qr-code/?size=244x244&data=${encodeURIComponent(qrPayload.value)}`,
+const refreshQrImage = async () => {
+  const { default: QRCode } = await import('qrcode')
+  qrImageUrl.value = await QRCode.toDataURL(qrPayload.value, {
+    width: 244,
+    margin: 1,
+    color: {
+      dark: '#000000',
+      light: '#ffffff',
+    },
+  })
+}
+
+watch(qrPayload, () => {
+  refreshQrImage().catch((error) => {
+    console.error('Unable to generate QR code:', error)
+  })
+}, { immediate: true })
+
+watch(
+  () => [route.query.settings, route.query.settingsSection],
+  ([settings, section]) => {
+    if (settings === 'open') {
+      activeSettingsSection.value = normalizeSettingsSection(section)
+      prefillStudentSettings()
+      editError.value = canEditName.value
+        ? ''
+        : `You have already used all ${maxNameChanges} lifetime name changes, but you can still change your avatar.`
+      isEditModalOpen.value = true
+      return
+    }
+
+    if (isEditModalOpen.value) {
+      closeEditModal(false, true)
+    }
+  },
+  { immediate: true },
 )
+
+const getVisibleIdCardElement = () => {
+  const candidates = [desktopIdCardRef.value, mobileIdCardRef.value]
+  return candidates.find((element) => {
+    if (!element) return false
+    const styles = window.getComputedStyle(element)
+    return styles.display !== 'none' && styles.visibility !== 'hidden'
+  }) || desktopIdCardRef.value || mobileIdCardRef.value
+}
+
+const saveStudentIdAsPdf = async () => {
+  const target = getVisibleIdCardElement()
+  if (!target || isSavingIdPdf.value) return
+
+  isSavingIdPdf.value = true
+  try {
+    await downloadElementAsPdf({
+      element: target,
+      fileName: `${displayName.value.trim().replace(/\s+/g, '-').toLowerCase() || 'student-id'}-recicall-id.pdf`,
+      orientation: 'landscape',
+      format: 'a4',
+      margin: 12,
+      backgroundColor: '#ffffff',
+    })
+  } catch (error) {
+    console.error('Unable to save student ID PDF:', error)
+  } finally {
+    isSavingIdPdf.value = false
+  }
+}
 
 const generateStudentNumber = (uid) => {
   const digits = uid.replace(/\D/g, '')
@@ -554,6 +708,16 @@ const generateStudentNumber = (uid) => {
   return String(hash).padStart(8, '0')
 }
 
+const openLogoutConfirm = () => {
+  if (isLoggingOut.value) return
+  isLogoutConfirmOpen.value = true
+}
+
+const closeLogoutConfirm = () => {
+  if (isLoggingOut.value) return
+  isLogoutConfirmOpen.value = false
+}
+
 const handleLogout = async () => {
   if (isLoggingOut.value) return
   isLoggingOut.value = true
@@ -564,22 +728,79 @@ const handleLogout = async () => {
     console.error(error)
   } finally {
     isLoggingOut.value = false
+    isLogoutConfirmOpen.value = false
   }
 }
 
 const openEditModal = () => {
-  editNameValue.value = displayName.value
-  editAvatarKey.value = avatarKey.value
+  activeSettingsSection.value = 'profile'
+  prefillStudentSettings()
   editError.value = canEditName.value
     ? ''
     : `You have already used all ${maxNameChanges} lifetime name changes, but you can still change your avatar.`
+  settingsSuccess.value = ''
+  deleteAccountError.value = ''
   isEditModalOpen.value = true
+  syncSettingsModalQuery(true, activeSettingsSection.value)
 }
 
-const closeEditModal = (force = false) => {
+const closeEditModal = (force = false, skipRouteSync = false) => {
   if (isSavingName.value && !force) return
   isEditModalOpen.value = false
   editError.value = ''
+  settingsSuccess.value = ''
+  deleteAccountError.value = ''
+  if (!skipRouteSync) {
+    syncSettingsModalQuery(false)
+  }
+}
+
+const sendPasswordResetLink = async () => {
+  if (isSendingPasswordReset.value) return
+
+  isSendingPasswordReset.value = true
+  editError.value = ''
+  settingsSuccess.value = ''
+
+  try {
+    await requestCurrentUserPasswordReset()
+    settingsSuccess.value = 'Password reset instructions were sent to your email.'
+  } catch (error) {
+    console.error(error)
+    editError.value = error?.message || 'We could not send a password reset link right now.'
+  } finally {
+    isSendingPasswordReset.value = false
+  }
+}
+
+const goToTerms = () => {
+  router.push({
+    path: '/terms',
+    query: {
+      returnTo: buildSettingsReturnTo('legal'),
+    },
+  })
+}
+
+const goToPrivacy = () => {
+  router.push({
+    path: '/privacy',
+    query: {
+      returnTo: buildSettingsReturnTo('legal'),
+    },
+  })
+}
+
+const openDeleteAccountConfirm = () => {
+  if (isSavingName.value || isDeletingAccount.value) return
+
+  deleteAccountError.value = ''
+  isDeleteAccountConfirmOpen.value = true
+}
+
+const closeDeleteAccountConfirm = () => {
+  if (isDeletingAccount.value) return
+  isDeleteAccountConfirmOpen.value = false
 }
 
 const saveProfileChanges = async () => {
@@ -657,6 +878,25 @@ const saveProfileChanges = async () => {
   }
 }
 
+const handleDeleteAccount = async () => {
+  if (!studentUid.value || isDeletingAccount.value) return
+
+  isDeletingAccount.value = true
+  deleteAccountError.value = ''
+
+  try {
+    await deleteStudentAccount(studentUid.value)
+    isDeleteAccountConfirmOpen.value = false
+    isEditModalOpen.value = false
+    await router.replace('/')
+  } catch (error) {
+    console.error(error)
+    deleteAccountError.value = getDeleteAccountErrorMessage(error, 'student account')
+  } finally {
+    isDeletingAccount.value = false
+  }
+}
+
 onMounted(async () => {
   const user = auth.currentUser
   if (!user) return
@@ -689,6 +929,10 @@ onMounted(async () => {
       ...(studentProfileRecord.value || {}),
       avatarKey: defaultStudentAvatarKey,
     }
+  }
+
+  if (route.query.settings === 'open') {
+    prefillStudentSettings()
   }
 })
 </script>

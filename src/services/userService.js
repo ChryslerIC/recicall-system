@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '../config/firebase'
 
 export const getUserById = async (uid) => {
@@ -20,4 +20,9 @@ export const createUserProfile = async (uid, userData) => {
 export const upsertUserProfile = async (uid, userData) => {
   const userRef = doc(db, 'users', uid)
   await setDoc(userRef, userData, { merge: true })
+}
+
+export const deleteUserProfile = async (uid) => {
+  const userRef = doc(db, 'users', uid)
+  await deleteDoc(userRef)
 }

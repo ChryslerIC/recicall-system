@@ -9,22 +9,22 @@
       <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,20,43,0.76)_0%,rgba(8,20,43,0.58)_45%,rgba(8,20,43,0.42)_100%)]" />
 
       <header class="relative z-10 px-4 pt-4 sm:px-6 lg:px-10 lg:pt-6">
-        <div class="mx-auto flex w-full max-w-[1240px] items-center justify-between">
-          <RouterLink to="/" class="flex items-center gap-3">
+        <div class="mx-auto flex w-full max-w-[1240px] flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <RouterLink to="/" class="flex items-center gap-3 self-start">
             <img :src="imgLogo" alt="" class="h-[48px] w-[48px] object-contain sm:h-[56px] sm:w-[56px]" />
             <span class="text-[28px] font-black leading-none text-white sm:text-[34px]">ReciCall</span>
           </RouterLink>
 
-          <div class="flex items-center gap-3">
+          <div class="grid w-full grid-cols-2 gap-3 sm:flex sm:w-auto sm:items-center">
             <RouterLink
               to="/login"
-              class="flex h-[44px] items-center justify-center rounded-full border border-white/60 px-5 text-[15px] font-semibold text-white transition hover:border-white hover:bg-white/10"
+              class="flex h-[44px] items-center justify-center rounded-full border border-white/60 px-4 text-[15px] font-semibold text-white transition hover:border-white hover:bg-white/10 sm:px-5"
             >
               Log In
             </RouterLink>
             <RouterLink
               to="/signup"
-              class="flex h-[44px] items-center justify-center rounded-full bg-[#1188f8] px-5 text-[15px] font-semibold text-white transition hover:bg-[#0c78dd]"
+              class="flex h-[44px] items-center justify-center rounded-full bg-[#1188f8] px-4 text-[15px] font-semibold text-white transition hover:bg-[#0c78dd] sm:px-5"
             >
               Create Account
             </RouterLink>
@@ -42,7 +42,7 @@
               ReciCall
             </h1>
             <p class="mt-5 max-w-[560px] text-[18px] leading-[1.5] text-white/92 sm:text-[20px]">
-              Streamline classroom participation with QR-based attendance, fair student selection,
+              Streamline classroom participation with QR-based recitation tracking, fair student selection,
               and analytics that help teachers see engagement patterns in real time.
             </p>
 
@@ -107,7 +107,7 @@
             class="rounded-[18px] border border-[#d6e6fa] bg-white px-5 py-6 shadow-[0_12px_30px_rgba(17,136,248,0.06)]"
           >
             <div class="flex h-[52px] w-[52px] items-center justify-center rounded-[16px] bg-[#eef6ff]">
-              <img :src="feature.icon" alt="" class="h-[28px] w-[28px] object-contain" />
+              <AppIcon :name="feature.icon" :size="28" class="text-[#1188f8]" />
             </div>
             <h3 class="mt-5 text-[22px] font-bold leading-[1.1]">{{ feature.title }}</h3>
             <p class="mt-3 text-[16px] leading-[1.55] text-[#475467]">
@@ -208,9 +208,7 @@
 </template>
 
 <script setup>
-import imgAnalytics from '../assets/icons/recicall-analytics.svg'
-import imgClasses from '../assets/icons/recicall-classes.svg'
-import imgStudentId from '../assets/icons/recicall-student-id.svg'
+import AppIcon from '../components/common/AppIcon.vue'
 import imgLogo from '../assets/icons/recicall-logo.png'
 import collaborationVisual from '../assets/landing/landing-collaboration-classroom.png'
 import digitalClassroomVisual from '../assets/landing/landing-digital-classroom.png'
@@ -220,7 +218,7 @@ const headlineMetrics = [
   {
     title: 'Session Tracking',
     value: 'QR-Based Check-In',
-    description: 'Move attendance and participation capture into one structured classroom routine.',
+    description: 'Move recitation and participation tracking into one structured classroom routine.',
   },
   {
     title: 'Student Selection',
@@ -238,17 +236,17 @@ const featureHighlights = [
   {
     title: 'Classroom Control',
     description: 'Manage classes, start sessions, and keep recitation flow organized from one teacher dashboard.',
-    icon: imgClasses,
+    icon: 'classes',
   },
   {
     title: 'Participation Analytics',
     description: 'Surface trends, recent activity, and visibility into which students need more speaking opportunities.',
-    icon: imgAnalytics,
+    icon: 'insights',
   },
   {
     title: 'Student Identity',
     description: 'Give students a clear profile, QR-backed ID, and a simple way to see their classroom standing.',
-    icon: imgStudentId,
+    icon: 'badge',
   },
 ]
 
@@ -260,8 +258,8 @@ const workflowSteps = [
   },
   {
     label: 'Step 2',
-    title: 'Run attendance and recitation sessions',
-    description: 'Use QR scans and structured participation tools to keep classroom interactions consistent.',
+    title: 'Run recitation and participation sessions',
+    description: 'Use QR scans and structured participation tools to keep classroom interactions organized and consistent.',
   },
   {
     label: 'Step 3',

@@ -1,19 +1,35 @@
 import {
   collection,
+  collectionGroup,
   deleteDoc,
   doc,
   getDoc,
   getDocs,
+  limit,
+  query,
   serverTimestamp,
   setDoc,
+  where,
 } from 'firebase/firestore'
 import { db } from '../config/firebase'
 
 const studentClassesCollection = (studentId) => collection(db, 'users', studentId, 'enrolledClasses')
+const teacherClassRef = (teacherId, classId) => doc(db, 'users', teacherId, 'classes', classId)
+const teacherClassStudentsCollection = (teacherId, classId) =>
+  collection(db, 'users', teacherId, 'classes', classId, 'students')
+const teacherClassParticipationCollection = (teacherId, classId) =>
+  collection(db, 'users', teacherId, 'classes', classId, 'participationEvents')
 const teacherClassStudentRef = (teacherId, classId, studentId) =>
   doc(db, 'users', teacherId, 'classes', classId, 'students', studentId)
 const removeUndefinedValues = (value) =>
   Object.fromEntries(Object.entries(value).filter(([, entryValue]) => entryValue !== undefined))
+
+const sortParticipationEvents = (events = []) =>
+  [...events].sort((left, right) => {
+    const leftTime = left.createdAt?.seconds || 0
+    const rightTime = right.createdAt?.seconds || 0
+    return leftTime - rightTime
+  })
 
 export const getStudentClasses = async (studentId) => {
   const snapshot = await getDocs(studentClassesCollection(studentId))
@@ -23,27 +39,55 @@ export const getStudentClasses = async (studentId) => {
   }))
 }
 
-export const findTeacherClassByJoinCode = async (joinCode) => {
-  const normalizedCode = joinCode.trim().toUpperCase()
-  const usersSnapshot = await getDocs(collection(db, 'users'))
+export const getStudentClassroomView = async (teacherId, classId) => {
+  const classSnapshot = await getDoc(teacherClassRef(teacherId, classId))
 
-  for (const teacherDoc of usersSnapshot.docs) {
-    const classesSnapshot = await getDocs(collection(db, 'users', teacherDoc.id, 'classes'))
-    const classDoc = classesSnapshot.docs.find((item) => {
-      const data = item.data()
-      return String(data.joinCode || '').trim().toUpperCase() === normalizedCode && !data.archived
-    })
-
-    if (classDoc) {
-      return {
-        id: classDoc.id,
-        teacherId: teacherDoc.id,
-        ...classDoc.data(),
-      }
-    }
+  if (!classSnapshot.exists()) {
+    return null
   }
 
-  return null
+  const [studentsSnapshot, participationSnapshot] = await Promise.all([
+    getDocs(teacherClassStudentsCollection(teacherId, classId)),
+    getDocs(teacherClassParticipationCollection(teacherId, classId)),
+  ])
+
+  const enrolledStudents = studentsSnapshot.docs.map((studentDoc) => ({
+    id: studentDoc.id,
+    ...studentDoc.data(),
+  }))
+
+  const participationEvents = sortParticipationEvents(
+    participationSnapshot.docs.map((eventDoc) => ({
+      id: eventDoc.id,
+      ...eventDoc.data(),
+    })),
+  )
+
+  return {
+    id: classSnapshot.id,
+    ...classSnapshot.data(),
+    enrolledStudents,
+    participationEvents,
+    students: enrolledStudents.length,
+  }
+}
+
+export const findTeacherClassByJoinCode = async (joinCode) => {
+  const normalizedCode = joinCode.trim().toUpperCase()
+  const classesSnapshot = await getDocs(
+    query(collectionGroup(db, 'classes'), where('joinCode', '==', normalizedCode), limit(1)),
+  )
+  const classDoc = classesSnapshot.docs.find((item) => !item.data().archived)
+
+  if (!classDoc) {
+    return null
+  }
+
+  return {
+    id: classDoc.id,
+    teacherId: classDoc.ref.parent.parent?.id || '',
+    ...classDoc.data(),
+  }
 }
 
 export const enrollStudentInClass = async (studentId, classData, studentProfile = {}) => {
@@ -131,4 +175,20 @@ export const leaveStudentClass = async (studentId, classId) => {
   }
 
   await deleteDoc(classRef)
+}
+
+export const deleteStudentAccountData = async (studentId) => {
+  const enrolledClassesSnapshot = await getDocs(studentClassesCollection(studentId))
+
+  await Promise.all(
+    enrolledClassesSnapshot.docs.map(async (classDoc) => {
+      const classData = classDoc.data()
+
+      if (classData.teacherId) {
+        await deleteDoc(teacherClassStudentRef(classData.teacherId, classDoc.id, studentId))
+      }
+
+      await deleteDoc(classDoc.ref)
+    }),
+  )
 }

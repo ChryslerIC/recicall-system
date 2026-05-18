@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { onAuthStateChanged } from 'firebase/auth'
+import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from '../config/firebase'
 import { getUserById } from '../services/userService'
 import LandingView from '../views/LandingView.vue'
 import LoginView from '../views/auth/LoginView.vue'
 import SignUpView from '../views/auth/SignUpView.vue'
+import PrivacyView from '../views/legal/PrivacyView.vue'
+import TermsView from '../views/legal/TermsView.vue'
 import TeacherDashboard from '../views/teacher/TeacherDashboard.vue'
 import TeacherArchiveView from '../views/teacher/TeacherArchiveView.vue'
 import TeacherClassroomView from '../views/teacher/TeacherClassroomView.vue'
@@ -16,6 +18,8 @@ const routes = [
   { path: '/', name: 'landing', component: LandingView, meta: { redirectIfAuth: true } },
   { path: '/login', name: 'login', component: LoginView, meta: { guestOnly: true, redirectIfAuth: true } },
   { path: '/signup', name: 'signup', component: SignUpView, meta: { guestOnly: true, redirectIfAuth: true } },
+  { path: '/terms', name: 'terms', component: TermsView },
+  { path: '/privacy', name: 'privacy', component: PrivacyView },
   { path: '/teacher', name: 'teacher', component: TeacherDashboard, meta: { requiresAuth: true, role: 'teacher' } },
   { path: '/teacher/class/:classId', name: 'teacher-classroom', component: TeacherClassroomView, meta: { requiresAuth: true, role: 'teacher' } },
   { path: '/teacher/archive', name: 'teacher-archive', component: TeacherArchiveView, meta: { requiresAuth: true, role: 'teacher' } },
@@ -29,6 +33,8 @@ const router = createRouter({
   routes,
 })
 
+const PROFILE_ACCESS_ERROR = 'profile-access'
+
 const getCurrentUser = () =>
   new Promise((resolve, reject) => {
     const unsubscribe = onAuthStateChanged(
@@ -41,15 +47,38 @@ const getCurrentUser = () =>
     )
   })
 
+const buildLoginRecoveryLocation = () => ({
+  path: '/login',
+  query: { error: PROFILE_ACCESS_ERROR },
+})
+
+const recoverFromProfileAccessFailure = async (error) => {
+  console.error('Unable to load the authenticated user profile.', error)
+
+  try {
+    await signOut(auth)
+  } catch (signOutError) {
+    console.error('Unable to sign out after a profile access failure.', signOutError)
+  }
+
+  return buildLoginRecoveryLocation()
+}
+
 router.beforeEach(async (to) => {
   const user = await getCurrentUser()
 
   if (to.meta.redirectIfAuth && user) {
-    const userProfile = await getUserById(user.uid)
+    try {
+      const userProfile = await getUserById(user.uid)
 
-    if (userProfile?.role) {
-      return `/${userProfile.role}`
+      if (userProfile?.role) {
+        return `/${userProfile.role}`
+      }
+    } catch (error) {
+      return recoverFromProfileAccessFailure(error)
     }
+
+    return recoverFromProfileAccessFailure(new Error('Authenticated user profile is missing a role.'))
   }
 
   if (!to.meta.requiresAuth) {
@@ -60,10 +89,16 @@ router.beforeEach(async (to) => {
     return '/login'
   }
 
-  const userProfile = await getUserById(user.uid)
+  let userProfile = null
+
+  try {
+    userProfile = await getUserById(user.uid)
+  } catch (error) {
+    return recoverFromProfileAccessFailure(error)
+  }
 
   if (!userProfile || !userProfile.role) {
-    return '/login'
+    return recoverFromProfileAccessFailure(new Error('Authenticated user profile is missing a role.'))
   }
 
   if (to.meta.role && userProfile.role !== to.meta.role) {
