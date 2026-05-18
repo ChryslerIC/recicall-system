@@ -2795,6 +2795,73 @@ const formatDateTime = (value) => {
   return `${formatFullDate(date)} • ${formatClockTime(date)}`
 }
 
+const buildSessionReportExportData = (session) => ({
+  ...session,
+  date: formatFullDate(session.startedAt),
+  started: formatDateTime(session.startedAt),
+  ended: formatDateTime(session.endedAt),
+  duration: formatSessionDuration(session.startedAt, session.endedAt),
+  averageScoreLabel: formatScoreValue(session.recitationSummary.averageScore),
+  pointsLabel: formatScoreValue(session.recitationSummary.totalPoints),
+  sessionRosterRows: [
+    ...session.recitationSummary.recitedStudents.map((student) => ({
+      studentName: student.name,
+      studentNumber: student.studentNumber || '-',
+      status: 'Recited',
+      score: formatScoreValue(student.totalPoints),
+      turns: `${student.turnCount}`,
+    })),
+    ...session.recitationSummary.absentStudents.map((student) => ({
+      studentName: student.name,
+      studentNumber: student.studentNumber || '-',
+      status: 'Picked But Absent',
+      score: '-',
+      turns: '0',
+    })),
+    ...session.recitationSummary.notRecitedStudents.map((student) => ({
+      studentName: student.name,
+      studentNumber: student.studentNumber || '-',
+      status: 'Did Not Recite',
+      score: '-',
+      turns: '0',
+    })),
+  ],
+  recitedStudentRows: session.recitationSummary.recitedStudents.length
+    ? session.recitationSummary.recitedStudents.map((student) => ({
+      studentName: student.name,
+      score: `${formatScoreValue(student.totalPoints)} pts`,
+      turns: `${student.turnCount}`,
+    }))
+    : [],
+  recitedStudentEntries: session.recitationSummary.recitedStudents.length
+    ? session.recitationSummary.recitedStudents.map(
+      (student) =>
+        `- ${student.name} — ${formatScoreValue(student.totalPoints)} pts${student.turnCount > 1 ? ` across ${student.turnCount} turns` : ' in 1 turn'}`,
+    )
+    : ['No recorded recitations'],
+  absentStudentEntries: session.recitationSummary.absentStudents.length
+    ? session.recitationSummary.absentStudents.map((student) => `- ${student.name}`)
+    : ['No absences recorded'],
+  notRecitedStudentEntries: session.recitationSummary.notRecitedStudents.length
+    ? session.recitationSummary.notRecitedStudents.map((student) => `- ${student.name}`)
+    : ['Everyone recited'],
+  recitedStudentsLabel: session.recitationSummary.recitedStudents.length
+    ? session.recitationSummary.recitedStudents
+      .map((student) => `${student.name} (${formatScoreValue(student.totalPoints)})`)
+      .join(', ')
+    : 'No recorded recitations',
+  absentStudentsLabel: session.recitationSummary.absentStudents.length
+    ? session.recitationSummary.absentStudents
+      .map((student) => student.name)
+      .join(', ')
+    : 'No absences recorded',
+  notRecitedStudentsLabel: session.recitationSummary.notRecitedStudents.length
+    ? session.recitationSummary.notRecitedStudents
+      .map((student) => student.name)
+      .join(', ')
+    : 'Everyone recited',
+})
+
 const formatSessionDuration = (startedAt, endedAt) => {
   const start = toEventDate(startedAt)
   const end = toEventDate(endedAt)
@@ -3717,14 +3784,15 @@ const buildSessionReportSummaryItems = (sessions, dateRangeLabel) => {
 
 const downloadSpecificSessionReport = async (session) => {
   if (!classroom.value || !session) return
+  const exportSession = buildSessionReportExportData(session)
 
   await downloadSessionRecordsPdfReport({
     fileName: `${slugifyReportValue(classroom.value.subject, 'class')}-${slugifyReportValue(classroom.value.classLabel, 'session')}-${slugifyReportValue(session.title, 'session')}-record.pdf`,
     title: `${classroom.value.subject} Session Record`,
     subtitle: `${classroom.value.gradeLevel} - ${classroom.value.classLabel}`,
     generatedFor: `${teacherName.value} - ${teacherRole.value}`,
-    summaryItems: buildSessionReportSummaryItems([session], session.date || 'Selected session'),
-    sessions: [session],
+    summaryItems: buildSessionReportSummaryItems([exportSession], exportSession.date || 'Selected session'),
+    sessions: [exportSession],
   })
 }
 
