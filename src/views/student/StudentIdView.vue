@@ -347,8 +347,8 @@
     v-if="isEditModalOpen"
     class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[rgba(0,0,0,0.35)] px-3 py-3 sm:px-4 sm:py-8 sm:items-center"
   >
-    <div class="w-full max-w-[520px] max-h-[calc(100vh-1.5rem)] overflow-y-auto rounded-[28px] bg-white px-4 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.2)] sm:max-h-[calc(100vh-4rem)] sm:px-6 sm:py-6">
-      <div class="sticky top-0 z-10 flex items-start justify-between gap-4 bg-white pb-4">
+    <div class="flex h-[min(720px,calc(100vh-1.5rem))] w-full max-w-[520px] flex-col overflow-hidden rounded-[28px] bg-white px-4 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.2)] sm:h-[min(760px,calc(100vh-4rem))] sm:px-6 sm:py-6">
+      <div class="flex shrink-0 items-start justify-between gap-4 bg-white pb-4">
         <div>
           <h2 class="text-[30px] leading-none font-bold sm:text-[34px]">Settings</h2>
           <p class="mt-3 text-[15px] leading-[1.35] text-[#444] sm:text-[16px]">
@@ -366,12 +366,13 @@
         </button>
       </div>
 
-      <div class="mt-5 flex flex-wrap gap-2 rounded-[22px] bg-[#f6f6f6] p-2">
-        <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'profile' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'profile'">Profile</button>
-        <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'security' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'security'">Security</button>
-        <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'legal' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'legal'">Legal</button>
-        <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'danger' ? 'bg-white text-[#b81717] shadow-[0_8px_18px_rgba(184,23,23,0.12)]' : 'text-[#7a4a4a]'" @click="activeSettingsSection = 'danger'">Delete Account</button>
-      </div>
+      <div class="min-h-0 flex-1 overflow-y-auto pr-1">
+        <div class="mt-5 flex flex-wrap gap-2 rounded-[22px] bg-[#f6f6f6] p-2">
+          <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'profile' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'profile'">Profile</button>
+          <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'security' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'security'">Security</button>
+          <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'legal' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'legal'">Legal</button>
+          <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'danger' ? 'bg-white text-[#b81717] shadow-[0_8px_18px_rgba(184,23,23,0.12)]' : 'text-[#7a4a4a]'" @click="activeSettingsSection = 'danger'">Delete Account</button>
+        </div>
 
       <div v-if="activeSettingsSection === 'profile'" class="mt-6">
         <label class="text-[16px] font-medium" for="student-id-name">Full Name</label>
@@ -480,8 +481,9 @@
       <p v-if="editError" class="mt-4 text-[15px] font-medium text-red-600">
         {{ editError }}
       </p>
+      </div>
 
-      <div class="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <div class="mt-4 flex shrink-0 flex-col-reverse gap-3 border-t border-[#e5e7eb] pt-4 sm:flex-row sm:justify-end">
         <button
           type="button"
           class="h-[52px] w-full rounded-[22px] bg-[#d9d9d9] px-6 text-[18px] font-semibold sm:min-w-[130px] sm:w-auto"

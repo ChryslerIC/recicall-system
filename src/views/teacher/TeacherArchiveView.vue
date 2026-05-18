@@ -261,8 +261,8 @@
           class="fixed inset-0 z-20 flex items-start justify-center overflow-y-auto bg-[rgba(224,224,224,0.44)] px-3 py-3 backdrop-blur-[1px] sm:px-4 sm:py-8 sm:items-center"
           @click.self="closeProfileModal"
         >
-          <div class="w-full max-w-[560px] max-h-[calc(100vh-1.5rem)] overflow-y-auto rounded-[22px] bg-white px-4 py-4 shadow-[0_4px_39.3px_2px_rgba(0,0,0,0.2)] sm:max-h-[calc(100vh-4rem)] sm:px-6 sm:py-5">
-            <div class="sticky top-0 z-10 flex items-start justify-between border-b border-[#d7d7d7] bg-white pb-4">
+          <div class="flex h-[min(720px,calc(100vh-1.5rem))] w-full max-w-[560px] flex-col overflow-hidden rounded-[22px] bg-white px-4 py-4 shadow-[0_4px_39.3px_2px_rgba(0,0,0,0.2)] sm:h-[min(760px,calc(100vh-4rem))] sm:px-6 sm:py-5">
+            <div class="flex shrink-0 items-start justify-between border-b border-[#d7d7d7] bg-white pb-4">
               <div>
                 <h2 class="text-[30px] leading-none font-semibold sm:text-[40px]">Settings</h2>
                 <p class="mt-2 text-[15px] font-medium sm:text-[20px]">Manage your teacher profile, password access, and privacy options.</p>
@@ -272,7 +272,8 @@
               </button>
             </div>
 
-            <form class="space-y-4 pt-5" @submit.prevent="saveProfileChanges">
+            <form class="flex min-h-0 flex-1 flex-col pt-5" @submit.prevent="saveProfileChanges">
+              <div class="min-h-0 flex-1 overflow-y-auto pr-1">
               <div class="flex flex-wrap gap-2 rounded-[22px] bg-[#f6f6f6] p-2">
                 <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'profile' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'profile'">Profile</button>
                 <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'security' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'security'">Security</button>
@@ -280,7 +281,7 @@
                 <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'danger' ? 'bg-white text-[#b81717] shadow-[0_8px_18px_rgba(184,23,23,0.12)]' : 'text-[#7a4a4a]'" @click="activeSettingsSection = 'danger'">Delete Account</button>
               </div>
 
-              <div v-if="activeSettingsSection === 'profile'" class="space-y-4">
+              <div v-if="activeSettingsSection === 'profile'" class="mt-4 space-y-4">
                 <div class="flex items-center gap-4">
                   <img :src="profilePreviewSrc" alt="" class="h-[72px] w-[72px] rounded-full border border-[#d7d7d7] object-cover sm:h-[88px] sm:w-[88px]" />
                 </div>
@@ -317,7 +318,7 @@
                 </div>
               </div>
 
-              <div v-else-if="activeSettingsSection === 'security'" class="rounded-[20px] border border-[#d9e8fb] bg-[#f8fbff] px-4 py-4">
+              <div v-else-if="activeSettingsSection === 'security'" class="mt-4 rounded-[20px] border border-[#d9e8fb] bg-[#f8fbff] px-4 py-4">
                 <p class="text-[18px] font-bold text-black">Password & Sign-In</p>
                 <p class="mt-2 text-[14px] leading-[1.5] text-[#5b5b5b]">Use your account email to receive a secure password reset link.</p>
                 <div class="mt-4 rounded-[16px] border border-[#d9e8fb] bg-white px-4 py-3">
@@ -334,7 +335,7 @@
                 </button>
               </div>
 
-              <div v-else-if="activeSettingsSection === 'legal'" class="rounded-[20px] border border-[#d9e8fb] bg-[#f8fbff] px-4 py-4">
+              <div v-else-if="activeSettingsSection === 'legal'" class="mt-4 rounded-[20px] border border-[#d9e8fb] bg-[#f8fbff] px-4 py-4">
                 <p class="text-[18px] font-bold text-black">Terms & Privacy</p>
                 <p class="mt-2 text-[14px] leading-[1.5] text-[#5b5b5b]">Open the app policies in their own page with a simple back button.</p>
                 <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -355,7 +356,7 @@
                 </div>
               </div>
 
-              <div v-else class="rounded-[20px] border border-[#ffd6d6] bg-[#fff7f7] px-4 py-4">
+              <div v-else class="mt-4 rounded-[20px] border border-[#ffd6d6] bg-[#fff7f7] px-4 py-4">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p class="text-[16px] font-bold text-[#b81717]">Delete Account</p>
@@ -374,11 +375,12 @@
                 </div>
               </div>
 
-              <p v-if="profileError" class="text-sm font-medium text-red-600">{{ profileError }}</p>
-              <p v-if="profileSuccess" class="text-sm font-medium text-green-600">{{ profileSuccess }}</p>
-              <p v-if="deleteAccountError" class="text-sm font-medium text-red-600">{{ deleteAccountError }}</p>
+              <p v-if="profileError" class="mt-4 text-sm font-medium text-red-600">{{ profileError }}</p>
+              <p v-if="profileSuccess" class="mt-4 text-sm font-medium text-green-600">{{ profileSuccess }}</p>
+              <p v-if="deleteAccountError" class="mt-4 text-sm font-medium text-red-600">{{ deleteAccountError }}</p>
+              </div>
 
-              <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+              <div class="mt-4 flex shrink-0 flex-col-reverse gap-3 border-t border-[#e5e7eb] pt-4 sm:flex-row sm:justify-end">
                 <button type="button" class="h-[52px] w-full rounded-[24px] bg-[#c5c5c5] text-[18px] font-bold sm:h-[57px] sm:w-[151px] sm:rounded-[33.5px] sm:text-[20px]" @click="closeProfileModal">
                   Cancel
                 </button>
