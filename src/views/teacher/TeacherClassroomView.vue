@@ -1521,45 +1521,45 @@
       <transition name="fade">
         <div
           v-if="isScanModalOpen"
-          class="fixed inset-0 z-30 flex items-center justify-center bg-[rgba(224,224,224,0.44)] px-4 py-6 backdrop-blur-[1px]"
+          class="fixed inset-0 z-30 flex items-start justify-center bg-[rgba(224,224,224,0.44)] px-3 py-3 backdrop-blur-[1px] sm:items-center sm:px-4 sm:py-6"
           @click.self="closeScanModal"
         >
-          <div class="relative w-full max-w-[640px] rounded-[28px] border border-[#d9e8fb] bg-white px-5 pb-6 pt-5 text-black shadow-[0_24px_64px_rgba(17,136,248,0.16)]">
+          <div class="relative flex max-h-[calc(100dvh-0.75rem)] w-full max-w-[640px] flex-col overflow-y-auto rounded-[24px] border border-[#d9e8fb] bg-white px-4 pb-4 pt-4 text-black shadow-[0_24px_64px_rgba(17,136,248,0.16)] sm:max-h-[calc(100dvh-3rem)] sm:rounded-[28px] sm:px-5 sm:pb-6 sm:pt-5">
             <button
               type="button"
-              class="absolute right-[16px] top-[14px] grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8]"
+              class="absolute right-[10px] top-[10px] grid h-9 w-9 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef4ff] hover:text-[#1188f8] sm:right-[16px] sm:top-[14px] sm:h-10 sm:w-10"
               aria-label="Close scan modal"
               @click="closeScanModal"
             >
               <AppIcon name="x" :size="22" />
             </button>
 
-            <div class="pr-10">
+            <div class="pr-8 sm:pr-10">
               <p class="text-[13px] font-semibold uppercase tracking-[0.16em] text-[#8cc5ff]">
                 {{ isQueueScanMode ? 'Queue Confirmation' : 'QR Scan' }}
               </p>
-              <h2 class="mt-2 text-[30px] leading-none font-bold">
+              <h2 class="mt-2 text-[24px] leading-none font-bold sm:text-[30px]">
                 {{ isQueueScanMode ? 'Scan the selected student' : 'Ready to scan' }}
               </h2>
-              <p class="mt-3 max-w-[440px] text-[15px] font-medium leading-[1.45] text-[#5f5f5f]">
+              <p class="mt-2 max-w-[440px] text-[14px] font-medium leading-[1.4] text-[#5f5f5f] sm:mt-3 sm:text-[15px] sm:leading-[1.45]">
                 {{ isQueueScanMode
                   ? `Scan ${scanExpectedStudent?.name || 'the selected student'}'s QR code to confirm the queue recommendation before saving the score.`
                   : 'Pick the score first, then point the camera at the student ID. The camera now scans across the full frame so it can locate the QR code automatically.' }}
               </p>
             </div>
 
-            <div class="mt-5 flex flex-wrap items-center gap-3">
-              <div class="inline-flex items-center rounded-full bg-[#e7f2ff] px-4 py-2 text-[14px] font-semibold text-[#1188f8]">
+            <div class="mt-4 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3">
+              <div class="inline-flex items-center rounded-full bg-[#e7f2ff] px-3 py-[9px] text-[13px] font-semibold text-[#1188f8] sm:px-4 sm:py-2 sm:text-[14px]">
                 {{ selectedScanScoreLabel }}
               </div>
-              <div v-if="isQueueScanMode && scanExpectedStudent" class="inline-flex items-center rounded-full bg-[#eef6ff] px-4 py-2 text-[14px] font-semibold text-[#1188f8]">
+              <div v-if="isQueueScanMode && scanExpectedStudent" class="inline-flex items-center rounded-full bg-[#eef6ff] px-3 py-[9px] text-[13px] font-semibold text-[#1188f8] sm:px-4 sm:py-2 sm:text-[14px]">
                 Expected: {{ scanExpectedStudent.name }}
               </div>
             </div>
 
-            <div class="mt-5 rounded-[26px] border border-[#d9e8fb] bg-[#f8fbff] p-4">
+            <div class="mt-4 rounded-[24px] border border-[#d9e8fb] bg-[#f8fbff] p-3 sm:mt-5 sm:rounded-[26px] sm:p-4">
               <div class="w-full overflow-hidden rounded-[22px] bg-black">
-                <div class="relative aspect-[4/5] w-full overflow-hidden bg-[#0b1220] sm:aspect-[16/10]">
+                <div class="relative aspect-[4/3] w-full overflow-hidden bg-[#0b1220] sm:aspect-[16/10]">
                   <div
                     v-show="!scannedStudentName"
                     :id="scannerElementId"
@@ -1585,10 +1585,10 @@
                     v-else-if="scanError && !scannedStudentName"
                     class="absolute inset-0 flex flex-col items-center justify-center bg-[#0b1220] px-6 text-center"
                   >
-                    <p class="text-[18px] font-semibold text-[#ff8f8f]">{{ scanError }}</p>
+                    <p class="text-[16px] font-semibold leading-[1.45] text-[#ff8f8f] sm:text-[18px]">{{ scanError }}</p>
                     <button
                       type="button"
-                      class="mt-5 rounded-[18px] bg-[#1188f8] px-5 py-2 text-[16px] font-semibold text-white"
+                      class="mt-4 rounded-[18px] bg-[#1188f8] px-5 py-2 text-[15px] font-semibold text-white sm:mt-5 sm:text-[16px]"
                       @click="restartScanner"
                     >
                       Retry camera
@@ -1600,14 +1600,14 @@
                     class="absolute inset-0 flex flex-col items-center justify-center bg-[#0b1220] px-6 text-center"
                   >
                     <p class="text-[18px] font-medium text-white/70">Scanned student</p>
-                    <p class="mt-3 text-[28px] font-bold text-white">{{ scannedStudentName }}</p>
-                    <p class="mt-3 text-[15px] font-medium text-white/70">
+                    <p class="mt-3 text-[24px] font-bold text-white sm:text-[28px]">{{ scannedStudentName }}</p>
+                    <p class="mt-3 text-[14px] font-medium text-white/70 sm:text-[15px]">
                       Student ID: {{ scannedPayload?.studentNumber || 'Unknown' }}
                     </p>
-                    <div class="mt-6 flex flex-col items-center gap-3 sm:flex-row">
+                    <div class="mt-5 flex flex-col items-center gap-3 sm:mt-6 sm:flex-row">
                       <button
                         type="button"
-                        class="rounded-[18px] bg-[#1188f8] px-5 py-2 text-[16px] font-semibold text-white disabled:opacity-60"
+                        class="rounded-[18px] bg-[#1188f8] px-5 py-2 text-[15px] font-semibold text-white disabled:opacity-60 sm:text-[16px]"
                         :disabled="isSavingScanAward || selectedScanScore === null || selectedScanScore === undefined"
                         @click="confirmScannedAward"
                       >
@@ -1615,7 +1615,7 @@
                       </button>
                       <button
                         type="button"
-                        class="rounded-[18px] border border-white/20 bg-white/5 px-5 py-2 text-[16px] font-semibold text-white"
+                        class="rounded-[18px] border border-white/20 bg-white/5 px-5 py-2 text-[15px] font-semibold text-white sm:text-[16px]"
                         :disabled="isSavingScanAward"
                         @click="restartScanner"
                       >
@@ -1627,12 +1627,12 @@
               </div>
             </div>
 
-            <div class="mt-5 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+            <div class="mt-4 grid grid-cols-3 gap-3 sm:mt-5 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
               <button
                 v-for="points in quickScoreOptions"
                 :key="points"
                 type="button"
-                class="flex h-[58px] min-w-[108px] items-center justify-center rounded-[26px] px-6 text-[28px] font-bold transition-transform"
+                class="flex h-[54px] w-full items-center justify-center rounded-[22px] px-4 text-[24px] font-bold transition-transform sm:h-[58px] sm:min-w-[108px] sm:rounded-[26px] sm:px-6 sm:text-[28px]"
                 :class="selectedScanScore === points ? 'bg-[#1188f8] text-white shadow-[0_12px_22px_rgba(17,136,248,0.24)]' : 'bg-white text-[#1188f8]'"
                 :disabled="isSavingScanAward"
                 @click="selectQuickScore(points)"
@@ -1641,18 +1641,18 @@
               </button>
             </div>
 
-            <div class="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <div class="mt-3 flex flex-col items-center gap-3 sm:mt-4 sm:flex-row sm:justify-center">
               <input
                 v-model="scanCustomScore"
                 type="number"
                 min="0.1"
                 step="0.1"
                 placeholder="Custom score"
-                class="h-[50px] w-full max-w-[220px] rounded-[18px] border border-[#d9e8fb] bg-white px-4 text-[16px] font-medium text-black outline-none transition focus:border-[#1188f8]"
+                class="h-[46px] w-full max-w-[220px] rounded-[18px] border border-[#d9e8fb] bg-white px-4 text-[15px] font-medium text-black outline-none transition focus:border-[#1188f8] sm:h-[50px] sm:text-[16px]"
               />
               <button
                 type="button"
-                class="flex h-[50px] min-w-[180px] items-center justify-center rounded-[22px] border border-[#1188f8] bg-white px-5 text-[16px] font-semibold text-[#1188f8] disabled:opacity-50"
+                class="flex h-[46px] w-full max-w-[220px] items-center justify-center rounded-[20px] border border-[#1188f8] bg-white px-5 text-[15px] font-semibold text-[#1188f8] disabled:opacity-50 sm:h-[50px] sm:min-w-[180px] sm:max-w-none sm:rounded-[22px] sm:text-[16px]"
                 :disabled="isSavingScanAward"
                 @click="armScanCustomScore"
               >
@@ -1660,7 +1660,7 @@
               </button>
             </div>
 
-            <div class="mt-4 flex flex-wrap items-center justify-center gap-3 text-center text-[13px] font-medium text-[#5f5f5f]">
+            <div class="mt-3 flex flex-wrap items-center justify-center gap-3 text-center text-[12px] font-medium text-[#5f5f5f] sm:mt-4 sm:text-[13px]">
               <button
                 type="button"
                 class="rounded-[18px] border border-[#d9e8fb] bg-white px-4 py-2 text-[#1188f8] transition hover:bg-[#eef6ff]"
@@ -3688,12 +3688,31 @@ const rerollQueuedStudent = () => {
   pickNextStudentError.value = ''
 }
 
+const getCameraPermissionTarget = () => {
+  if (typeof window === 'undefined') return 'this site'
+
+  const host = window.location.host || window.location.hostname
+  return host || 'this site'
+}
+
+const detectInAppBrowser = () => {
+  if (typeof navigator === 'undefined') return false
+
+  const agent = navigator.userAgent || ''
+  return /FBAN|FBAV|Messenger|Instagram|Line|wv\)|WebView/i.test(agent)
+}
+
 const formatCameraError = (error) => {
   const errorName = error?.name || ''
   const errorMessage = error?.message || ''
+  const cameraTarget = getCameraPermissionTarget()
+  const inAppBrowserMessage = `Camera access may be blocked inside this in-app browser. Open ReciCall in Safari or Chrome, allow camera access for ${cameraTarget}, and try again.`
+  const deniedMessage = detectInAppBrowser()
+    ? inAppBrowserMessage
+    : `Camera permission was denied. Allow camera access for ${cameraTarget} in your browser settings and reload the page.`
 
   if (errorName === 'NotAllowedError' || errorName === 'PermissionDeniedError') {
-    return 'Camera permission was denied. Allow camera access for localhost in your browser settings and reload the page.'
+    return deniedMessage
   }
 
   if (errorName === 'NotFoundError' || errorName === 'DevicesNotFoundError') {
@@ -3709,7 +3728,7 @@ const formatCameraError = (error) => {
   }
 
   if (/Permission|denied/i.test(errorMessage)) {
-    return 'Camera permission was denied. Allow camera access for localhost in your browser settings and reload the page.'
+    return deniedMessage
   }
 
   if (/Requested device not found|not found/i.test(errorMessage)) {
