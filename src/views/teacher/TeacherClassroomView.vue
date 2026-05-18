@@ -582,59 +582,63 @@
               <template v-else-if="currentTab === 'class-list'">
                 <div class="mt-[18px] space-y-[22px]">
                   <div class="rounded-[31px] bg-[#f6f6f6] px-[22px] pb-[22px] pt-[18px]">
-                    <div class="mx-auto flex h-[53px] w-fit items-center justify-center bg-[#d9d9d9] px-[32px]">
-                      <p class="text-[24px] font-semibold text-black">Blackboard / Whiteboard</p>
-                    </div>
-
-                    <div class="mt-[22px] grid gap-[20px] xl:grid-cols-2">
-                      <div class="space-y-[14px]">
-                        <div
-                          v-for="(row, rowIndex) in deskRowsLeft"
-                          :key="`left-${rowIndex}`"
-                          class="grid gap-[10px] rounded-[24px] bg-[#eef1f2] px-[16px] py-[9px]"
-                          :style="{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }"
-                        >
-                          <div
-                            v-for="seat in row"
-                            :key="seat.id"
-                            class="flex h-[69px] min-w-0 flex-col items-center justify-start rounded-[12px] border border-[#cccdce] bg-[#f8f8f8] pt-[2px] transition"
-                            :class="isSeatEditMode && !isLayoutLocked ? 'cursor-move hover:border-[#1188f8] hover:bg-[#eef6ff]' : ''"
-                            :draggable="isSeatEditMode && !isLayoutLocked && !!seat.studentId"
-                            @dragstart="handleSeatDragStart(seat, 'left', rowIndex, row.indexOf(seat))"
-                            @dragend="clearDraggedSeat"
-                            @dragover.prevent
-                            @drop="handleSeatDrop('left', rowIndex, row.indexOf(seat))"
-                          >
-                            <template v-if="seat.studentId">
-                              <img :src="getSeatStudent(seat)?.avatarSrc || resolveStudentAvatar()" alt="" class="h-[41px] w-[43px] rounded-full object-cover" />
-                              <p class="mt-[2px] max-w-[56px] truncate text-[10px] font-medium leading-none text-black">{{ getSeatLabel(seat) }}</p>
-                            </template>
-                          </div>
+                    <div class="overflow-x-auto pb-2">
+                      <div class="mx-auto min-w-[720px]">
+                        <div class="mx-auto flex h-[53px] w-fit items-center justify-center bg-[#d9d9d9] px-[32px]">
+                          <p class="text-[24px] font-semibold text-black">Blackboard / Whiteboard</p>
                         </div>
-                      </div>
 
-                      <div class="space-y-[14px]">
-                        <div
-                          v-for="(row, rowIndex) in deskRowsRight"
-                          :key="`right-${rowIndex}`"
-                          class="grid gap-[10px] rounded-[24px] bg-[#eef1f2] px-[16px] py-[9px]"
-                          :style="{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }"
-                        >
-                          <div
-                            v-for="seat in row"
-                            :key="seat.id"
-                            class="flex h-[69px] min-w-0 flex-col items-center justify-start rounded-[12px] border border-[#cccdce] bg-[#f8f8f8] pt-[2px] transition"
-                            :class="isSeatEditMode && !isLayoutLocked ? 'cursor-move hover:border-[#1188f8] hover:bg-[#eef6ff]' : ''"
-                            :draggable="isSeatEditMode && !isLayoutLocked && !!seat.studentId"
-                            @dragstart="handleSeatDragStart(seat, 'right', rowIndex, row.indexOf(seat))"
-                            @dragend="clearDraggedSeat"
-                            @dragover.prevent
-                            @drop="handleSeatDrop('right', rowIndex, row.indexOf(seat))"
-                          >
-                            <template v-if="seat.studentId">
-                              <img :src="getSeatStudent(seat)?.avatarSrc || resolveStudentAvatar()" alt="" class="h-[41px] w-[43px] rounded-full object-cover" />
-                              <p class="mt-[2px] max-w-[56px] truncate text-[10px] font-medium leading-none text-black">{{ getSeatLabel(seat) }}</p>
-                            </template>
+                        <div class="mt-[22px] grid grid-cols-2 gap-[20px]">
+                          <div class="space-y-[14px]">
+                            <div
+                              v-for="(row, rowIndex) in deskRowsLeft"
+                              :key="`left-${rowIndex}`"
+                              class="grid gap-[10px] rounded-[24px] bg-[#eef1f2] px-[16px] py-[9px]"
+                              :style="{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }"
+                            >
+                              <div
+                                v-for="seat in row"
+                                :key="seat.id"
+                                class="flex h-[69px] min-w-0 flex-col items-center justify-start rounded-[12px] border border-[#cccdce] bg-[#f8f8f8] pt-[2px] transition"
+                                :class="isSeatEditMode && !isLayoutLocked ? 'cursor-move hover:border-[#1188f8] hover:bg-[#eef6ff]' : ''"
+                                :draggable="isSeatEditMode && !isLayoutLocked && !!seat.studentId"
+                                @dragstart="handleSeatDragStart(seat, 'left', rowIndex, row.indexOf(seat))"
+                                @dragend="clearDraggedSeat"
+                                @dragover.prevent
+                                @drop="handleSeatDrop('left', rowIndex, row.indexOf(seat))"
+                              >
+                                <template v-if="seat.studentId">
+                                  <img :src="getSeatStudent(seat)?.avatarSrc || resolveStudentAvatar()" alt="" class="h-[41px] w-[43px] rounded-full object-cover" />
+                                  <p class="mt-[2px] max-w-[56px] truncate text-[10px] font-medium leading-none text-black">{{ getSeatLabel(seat) }}</p>
+                                </template>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="space-y-[14px]">
+                            <div
+                              v-for="(row, rowIndex) in deskRowsRight"
+                              :key="`right-${rowIndex}`"
+                              class="grid gap-[10px] rounded-[24px] bg-[#eef1f2] px-[16px] py-[9px]"
+                              :style="{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }"
+                            >
+                              <div
+                                v-for="seat in row"
+                                :key="seat.id"
+                                class="flex h-[69px] min-w-0 flex-col items-center justify-start rounded-[12px] border border-[#cccdce] bg-[#f8f8f8] pt-[2px] transition"
+                                :class="isSeatEditMode && !isLayoutLocked ? 'cursor-move hover:border-[#1188f8] hover:bg-[#eef6ff]' : ''"
+                                :draggable="isSeatEditMode && !isLayoutLocked && !!seat.studentId"
+                                @dragstart="handleSeatDragStart(seat, 'right', rowIndex, row.indexOf(seat))"
+                                @dragend="clearDraggedSeat"
+                                @dragover.prevent
+                                @drop="handleSeatDrop('right', rowIndex, row.indexOf(seat))"
+                              >
+                                <template v-if="seat.studentId">
+                                  <img :src="getSeatStudent(seat)?.avatarSrc || resolveStudentAvatar()" alt="" class="h-[41px] w-[43px] rounded-full object-cover" />
+                                  <p class="mt-[2px] max-w-[56px] truncate text-[10px] font-medium leading-none text-black">{{ getSeatLabel(seat) }}</p>
+                                </template>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>

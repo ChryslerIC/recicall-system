@@ -355,63 +355,67 @@
 
               <div v-else-if="activeTab === 'class-list'" class="mt-[22px] space-y-[22px]">
                 <div class="rounded-[31px] bg-[#f6f6f6] px-4 pb-4 pt-4 sm:px-[22px] sm:pb-[22px] sm:pt-[18px]">
-                  <div class="mx-auto flex h-[46px] w-fit items-center justify-center bg-[#d9d9d9] px-5 sm:h-[53px] sm:px-[32px]">
-                    <p class="text-[18px] font-semibold text-black sm:text-[24px]">Blackboard / Whiteboard</p>
-                  </div>
-
-                  <div class="mt-[22px] grid gap-[20px] xl:grid-cols-2">
-                    <div class="space-y-[14px]">
-                      <div
-                        v-for="(row, rowIndex) in deskRowsLeft"
-                        :key="`left-${rowIndex}`"
-                        class="grid gap-[10px] rounded-[24px] bg-[#eef1f2] px-[16px] py-[9px]"
-                        :style="{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }"
-                      >
-                        <div
-                          v-for="seat in row"
-                          :key="seat.id"
-                          class="flex h-[69px] min-w-0 flex-col items-center justify-start rounded-[12px] border border-[#cccdce] bg-[#f8f8f8] pt-[4px]"
-                          :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8] bg-[#eaf3ff] shadow-[0_0_0_2px_rgba(17,136,248,0.15)]' : ''"
-                        >
-                          <template v-if="seat.studentId">
-                            <img
-                              :src="getSeatAvatar(seat)"
-                              alt=""
-                              class="h-[41px] w-[43px] rounded-full border-2 object-cover"
-                              :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8]' : 'border-[#8d8d8d]'"
-                            />
-                            <p class="mt-[3px] max-w-[56px] truncate text-center text-[10px] font-medium leading-none" :class="isCurrentStudentSeat(seat) ? 'text-[#1188f8]' : 'text-black'">
-                              {{ isCurrentStudentSeat(seat) ? 'YOU' : getSeatLabel(seat) }}
-                            </p>
-                          </template>
-                        </div>
+                  <div class="overflow-x-auto pb-2">
+                    <div class="mx-auto min-w-[720px]">
+                      <div class="mx-auto flex h-[46px] w-fit items-center justify-center bg-[#d9d9d9] px-5 sm:h-[53px] sm:px-[32px]">
+                        <p class="text-[18px] font-semibold text-black sm:text-[24px]">Blackboard / Whiteboard</p>
                       </div>
-                    </div>
 
-                    <div class="space-y-[14px]">
-                      <div
-                        v-for="(row, rowIndex) in deskRowsRight"
-                        :key="`right-${rowIndex}`"
-                        class="grid gap-[10px] rounded-[24px] bg-[#eef1f2] px-[16px] py-[9px]"
-                        :style="{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }"
-                      >
-                        <div
-                          v-for="seat in row"
-                          :key="seat.id"
-                          class="flex h-[69px] min-w-0 flex-col items-center justify-start rounded-[12px] border border-[#cccdce] bg-[#f8f8f8] pt-[4px]"
-                          :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8] bg-[#eaf3ff] shadow-[0_0_0_2px_rgba(17,136,248,0.15)]' : ''"
-                        >
-                          <template v-if="seat.studentId">
-                            <img
-                              :src="getSeatAvatar(seat)"
-                              alt=""
-                              class="h-[41px] w-[43px] rounded-full border-2 object-cover"
-                              :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8]' : 'border-[#8d8d8d]'"
-                            />
-                            <p class="mt-[3px] max-w-[56px] truncate text-center text-[10px] font-medium leading-none" :class="isCurrentStudentSeat(seat) ? 'text-[#1188f8]' : 'text-black'">
-                              {{ isCurrentStudentSeat(seat) ? 'YOU' : getSeatLabel(seat) }}
-                            </p>
-                          </template>
+                      <div class="mt-[22px] grid grid-cols-2 gap-[20px]">
+                        <div class="space-y-[14px]">
+                          <div
+                            v-for="(row, rowIndex) in deskRowsLeft"
+                            :key="`left-${rowIndex}`"
+                            class="grid gap-[10px] rounded-[24px] bg-[#eef1f2] px-[16px] py-[9px]"
+                            :style="{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }"
+                          >
+                            <div
+                              v-for="seat in row"
+                              :key="seat.id"
+                              class="flex h-[69px] min-w-0 flex-col items-center justify-start rounded-[12px] border border-[#cccdce] bg-[#f8f8f8] pt-[4px]"
+                              :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8] bg-[#eaf3ff] shadow-[0_0_0_2px_rgba(17,136,248,0.15)]' : ''"
+                            >
+                              <template v-if="seat.studentId">
+                                <img
+                                  :src="getSeatAvatar(seat)"
+                                  alt=""
+                                  class="h-[41px] w-[43px] rounded-full border-2 object-cover"
+                                  :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8]' : 'border-[#8d8d8d]'"
+                                />
+                                <p class="mt-[3px] max-w-[56px] truncate text-center text-[10px] font-medium leading-none" :class="isCurrentStudentSeat(seat) ? 'text-[#1188f8]' : 'text-black'">
+                                  {{ isCurrentStudentSeat(seat) ? 'YOU' : getSeatLabel(seat) }}
+                                </p>
+                              </template>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="space-y-[14px]">
+                          <div
+                            v-for="(row, rowIndex) in deskRowsRight"
+                            :key="`right-${rowIndex}`"
+                            class="grid gap-[10px] rounded-[24px] bg-[#eef1f2] px-[16px] py-[9px]"
+                            :style="{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }"
+                          >
+                            <div
+                              v-for="seat in row"
+                              :key="seat.id"
+                              class="flex h-[69px] min-w-0 flex-col items-center justify-start rounded-[12px] border border-[#cccdce] bg-[#f8f8f8] pt-[4px]"
+                              :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8] bg-[#eaf3ff] shadow-[0_0_0_2px_rgba(17,136,248,0.15)]' : ''"
+                            >
+                              <template v-if="seat.studentId">
+                                <img
+                                  :src="getSeatAvatar(seat)"
+                                  alt=""
+                                  class="h-[41px] w-[43px] rounded-full border-2 object-cover"
+                                  :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8]' : 'border-[#8d8d8d]'"
+                                />
+                                <p class="mt-[3px] max-w-[56px] truncate text-center text-[10px] font-medium leading-none" :class="isCurrentStudentSeat(seat) ? 'text-[#1188f8]' : 'text-black'">
+                                  {{ isCurrentStudentSeat(seat) ? 'YOU' : getSeatLabel(seat) }}
+                                </p>
+                              </template>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>

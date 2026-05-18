@@ -208,14 +208,14 @@
                   </p>
                 </div>
 
-                <div class="mt-[10px] flex gap-[13px] px-[10px]">
-                  <div class="h-[58px] rounded-[11px] bg-[#f6f6f6] px-[11px] py-[5px]" :style="{ width: `${classItem.statsWidth}px` }">
+                <div class="mt-[10px] flex items-stretch gap-[13px] px-[10px]">
+                  <div class="min-h-[64px] rounded-[11px] bg-[#f6f6f6] px-[11px] py-[7px]" :style="{ width: `${classItem.statsWidth}px` }">
                     <p class="text-[20px] leading-none font-medium text-[#161616]">Students</p>
                     <p class="mt-[8px] text-[20px] leading-none font-semibold text-[#1188f8]">{{ classItem.students }}</p>
                   </div>
-                  <div class="h-[58px] rounded-[11px] bg-[#f6f6f6] px-[11px] py-[5px]" :style="{ width: `${classItem.engagementWidth}px` }">
+                  <div class="min-h-[64px] rounded-[11px] bg-[#f6f6f6] px-[11px] py-[7px]" :style="{ width: `${classItem.engagementWidth}px` }">
                     <p class="text-[18px] leading-none font-medium text-[#161616]">Engagement</p>
-                    <p class="mt-[8px] text-[20px] leading-none font-semibold" :class="engagementClass(classItem.engagement)">{{ classItem.engagement }}</p>
+                    <p class="mt-[6px] text-[17px] leading-[1.05] font-semibold" :class="engagementClass(classItem.engagement)">{{ classItem.engagement }}</p>
                   </div>
                 </div>
               </article>
@@ -415,7 +415,7 @@ import {
 import { getUserById, upsertUserProfile } from '../../services/userService'
 import imgProfile from '../../assets/icons/recicall-profile.svg'
 import imgStar from '../../assets/icons/recicall-logo.png'
-import { decorateClassWithTheme, getClassTheme } from '../../utils/classThemes'
+import { decorateClassWithTheme } from '../../utils/classThemes'
 import { defaultTeacherAvatarKey, resolveTeacherAvatar, sanitizeTeacherAvatarKey, teacherAvatarOptions } from '../../utils/teacherAvatarOptions'
 
 const router = useRouter()
@@ -518,7 +518,8 @@ const ensureProfileFallback = (event) => {
 const engagementClass = (engagement) => {
   if (engagement === 'High') return 'text-[#1188f8]'
   if (engagement === 'Moderate') return 'text-[#4fb817]'
-  return 'text-[#b81717]'
+  if (engagement === 'Low') return 'text-[#b81717]'
+  return 'text-[#6b7280]'
 }
 
 const classCardWidth = (classItem) => {
@@ -529,12 +530,11 @@ const classCardWidth = (classItem) => {
 
 const mapClassToCard = (classItem) => {
   const themedClass = decorateClassWithTheme(classItem)
-  const theme = getClassTheme(themedClass)
 
   return {
     ...themedClass,
     students: themedClass.students ?? 0,
-    engagement: themedClass.engagement || theme.engagementFallback,
+    engagement: themedClass.engagement || 'No activity yet',
     width: 400,
     statsWidth: 142.391,
     engagementWidth: 141.304,

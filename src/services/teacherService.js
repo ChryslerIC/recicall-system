@@ -82,6 +82,39 @@ const getParticipationEventsForTeacherClass = async (teacherId, classId) => {
     })
 }
 
+const getClassEngagementLabel = ({ studentsCount = 0, participationEvents = [] } = {}) => {
+  const participationOnlyEvents = (Array.isArray(participationEvents) ? participationEvents : []).filter(
+    (event) => event?.eventType !== 'absence',
+  )
+
+  if (!participationOnlyEvents.length) {
+    return 'No activity yet'
+  }
+
+  const safeStudentCount = Math.max(Number(studentsCount) || 0, 1)
+  const activeStudents = new Set(
+    participationOnlyEvents.map((event) => event?.studentId).filter(Boolean),
+  ).size
+  const sessionKeys = new Set(
+    participationOnlyEvents
+      .map((event, index) => event?.sessionId || event?.sessionLabel || event?.createdAt?.seconds || `event-${index}`)
+      .filter(Boolean),
+  ).size
+
+  const activeStudentRatio = activeStudents / safeStudentCount
+  const participationDensity = participationOnlyEvents.length / safeStudentCount
+
+  if (activeStudentRatio >= 0.75 || participationDensity >= 1 || sessionKeys >= 4) {
+    return 'High'
+  }
+
+  if (activeStudentRatio >= 0.35 || participationDensity >= 0.4 || sessionKeys >= 2) {
+    return 'Moderate'
+  }
+
+  return 'Low'
+}
+
 const sortClasses = (classes) =>
   [...classes].sort((left, right) => {
     if (left.sortOrder !== right.sortOrder) {
@@ -98,11 +131,16 @@ export const getTeacherClasses = async (teacherId, { archived = false } = {}) =>
   const classes = await Promise.all(
     snapshot.docs.map(async (classDoc) => {
       const enrolledStudents = await getEnrolledStudentsForTeacherClass(teacherId, classDoc.id)
+      const participationEvents = await getParticipationEventsForTeacherClass(teacherId, classDoc.id)
 
       return {
         id: classDoc.id,
         ...classDoc.data(),
         students: enrolledStudents.length,
+        engagement: getClassEngagementLabel({
+          studentsCount: enrolledStudents.length,
+          participationEvents,
+        }),
       }
     }),
   )
@@ -129,6 +167,10 @@ export const getTeacherClassById = async (teacherId, classId) => {
     enrolledStudents,
     participationEvents,
     students: enrolledStudents.length,
+    engagement: getClassEngagementLabel({
+      studentsCount: enrolledStudents.length,
+      participationEvents,
+    }),
   }
 }
 
