@@ -228,12 +228,15 @@ export const downloadElementAsPdf = async ({
   format = 'a4',
   margin = 10,
   backgroundColor = '#ffffff',
+  scale = 2,
+  targetWidth,
+  targetHeight,
 }) => {
   if (!element || typeof window === 'undefined') return
   const [html2canvas, jsPDF] = await Promise.all([loadHtml2Canvas(), loadJsPdf()])
 
   const canvas = await html2canvas(element, {
-    scale: 2,
+    scale,
     useCORS: true,
     backgroundColor,
   })
@@ -247,8 +250,8 @@ export const downloadElementAsPdf = async ({
 
   const pageWidth = doc.internal.pageSize.getWidth()
   const pageHeight = doc.internal.pageSize.getHeight()
-  const maxWidth = pageWidth - margin * 2
-  const maxHeight = pageHeight - margin * 2
+  const maxWidth = Number.isFinite(targetWidth) ? Math.min(targetWidth, pageWidth - margin * 2) : pageWidth - margin * 2
+  const maxHeight = Number.isFinite(targetHeight) ? Math.min(targetHeight, pageHeight - margin * 2) : pageHeight - margin * 2
   const imageRatio = canvas.width / canvas.height
 
   let renderWidth = maxWidth

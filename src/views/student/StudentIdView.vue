@@ -677,6 +677,11 @@ const getVisibleIdCardElement = () => {
   }) || desktopIdCardRef.value || mobileIdCardRef.value
 }
 
+const studentIdPrintAreaMm = {
+  width: 76.2,
+  height: 50.8,
+}
+
 const saveStudentIdAsPdf = async () => {
   const target = getVisibleIdCardElement()
   if (!target || isSavingIdPdf.value) return
@@ -686,10 +691,13 @@ const saveStudentIdAsPdf = async () => {
     await downloadElementAsPdf({
       element: target,
       fileName: `${displayName.value.trim().replace(/\s+/g, '-').toLowerCase() || 'student-id'}-recicall-id.pdf`,
-      orientation: 'landscape',
+      orientation: 'portrait',
       format: 'a4',
-      margin: 12,
+      margin: 16,
       backgroundColor: '#ffffff',
+      scale: 3,
+      targetWidth: studentIdPrintAreaMm.width,
+      targetHeight: studentIdPrintAreaMm.height,
     })
   } catch (error) {
     console.error('Unable to save student ID PDF:', error)
