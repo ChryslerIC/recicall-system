@@ -9,22 +9,22 @@
       <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,20,43,0.76)_0%,rgba(8,20,43,0.58)_45%,rgba(8,20,43,0.42)_100%)]" />
 
       <header class="relative z-10 px-4 pt-4 sm:px-6 lg:px-10 lg:pt-6">
-        <div class="mx-auto flex w-full max-w-[1240px] items-center justify-between">
-          <RouterLink to="/" class="flex items-center gap-3">
+        <div class="mx-auto flex w-full max-w-[1240px] flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <RouterLink to="/" class="flex items-center gap-3 self-start">
             <img :src="imgLogo" alt="" class="h-[48px] w-[48px] object-contain sm:h-[56px] sm:w-[56px]" />
             <span class="text-[28px] font-black leading-none text-white sm:text-[34px]">ReciCall</span>
           </RouterLink>
 
-          <div class="flex items-center gap-3">
+          <div class="grid w-full grid-cols-2 gap-3 sm:flex sm:w-auto sm:items-center">
             <RouterLink
               to="/login"
-              class="flex h-[44px] items-center justify-center rounded-full border border-white/60 px-5 text-[15px] font-semibold text-white transition hover:border-white hover:bg-white/10"
+              class="flex h-[44px] items-center justify-center rounded-full border border-white/60 px-4 text-[15px] font-semibold text-white transition hover:border-white hover:bg-white/10 sm:px-5"
             >
               Log In
             </RouterLink>
             <RouterLink
               to="/signup"
-              class="flex h-[44px] items-center justify-center rounded-full bg-[#1188f8] px-5 text-[15px] font-semibold text-white transition hover:bg-[#0c78dd]"
+              class="flex h-[44px] items-center justify-center rounded-full bg-[#1188f8] px-4 text-[15px] font-semibold text-white transition hover:bg-[#0c78dd] sm:px-5"
             >
               Create Account
             </RouterLink>
@@ -42,7 +42,7 @@
               ReciCall
             </h1>
             <p class="mt-5 max-w-[560px] text-[18px] leading-[1.5] text-white/92 sm:text-[20px]">
-              Streamline classroom participation with QR-based attendance, fair student selection,
+              Streamline classroom participation with QR-based recitation tracking, fair student selection,
               and analytics that help teachers see engagement patterns in real time.
             </p>
 
@@ -218,7 +218,7 @@ const headlineMetrics = [
   {
     title: 'Session Tracking',
     value: 'QR-Based Check-In',
-    description: 'Move attendance and participation capture into one structured classroom routine.',
+    description: 'Move recitation and participation tracking into one structured classroom routine.',
   },
   {
     title: 'Student Selection',

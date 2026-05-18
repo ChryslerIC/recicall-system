@@ -11,29 +11,29 @@
     :student-illustration-src="studentIllustration"
     @google="handleGoogleAuth"
   >
-    <form class="space-y-4" @submit.prevent="handleLogin">
+    <form class="space-y-3 sm:space-y-4" @submit.prevent="handleLogin">
       <label class="block">
         <span class="sr-only">Email or Username</span>
-        <div class="flex h-14 items-center rounded-[15px] border border-black px-4">
+        <div class="flex h-12 items-center rounded-[15px] border border-black px-4 sm:h-14">
           <AppIcon name="mail" :size="20" class="mr-3 text-[#777]" />
           <input
             v-model.trim="email"
             type="email"
             placeholder="Email or Username"
-            class="w-full bg-transparent text-[16px] font-medium text-black outline-none placeholder:text-[#777]"
+            class="w-full bg-transparent text-[15px] font-medium text-black outline-none placeholder:text-[#777] sm:text-[16px]"
           />
         </div>
       </label>
 
       <label class="block">
         <span class="sr-only">Password</span>
-        <div class="flex h-14 items-center rounded-[15px] border border-black px-4">
+        <div class="flex h-12 items-center rounded-[15px] border border-black px-4 sm:h-14">
           <AppIcon name="lock" :size="20" class="mr-3 text-[#777]" />
           <input
             v-model="password"
             :type="showPassword ? 'text' : 'password'"
             placeholder="Password"
-            class="w-full bg-transparent text-[16px] font-medium text-black outline-none placeholder:text-[#777]"
+            class="w-full bg-transparent text-[15px] font-medium text-black outline-none placeholder:text-[#777] sm:text-[16px]"
           />
           <button type="button" class="ml-3 text-[#777]" @click="showPassword = !showPassword">
             <AppIcon :name="showPassword ? 'eye-off' : 'eye'" :size="20" />
@@ -41,7 +41,7 @@
         </div>
       </label>
 
-      <div class="flex items-center justify-between gap-4 pt-1">
+      <div class="flex items-center justify-between gap-3 pt-1">
         <label class="flex items-center gap-2 text-[14px] font-medium text-black">
           <input v-model="rememberMe" type="checkbox" class="h-4 w-4 rounded-full border-black text-[#1188f8]" />
           <span>Remember me</span>
@@ -67,7 +67,7 @@
 
       <button
         type="submit"
-        class="mt-2 flex h-[61px] w-full items-center justify-center rounded-full bg-[#1188f8] text-[20px] font-extrabold text-white shadow-[0_9px_8.8px_0_rgba(17,136,248,0.3)] transition hover:bg-[#0c78dd] disabled:cursor-not-allowed disabled:opacity-70"
+        class="mt-1 flex h-[54px] w-full items-center justify-center rounded-full bg-[#1188f8] text-[18px] font-extrabold text-white shadow-[0_9px_8.8px_0_rgba(17,136,248,0.3)] transition hover:bg-[#0c78dd] disabled:cursor-not-allowed disabled:opacity-70 sm:mt-2 sm:h-[61px] sm:text-[20px]"
         :disabled="isSubmitting"
       >
         {{ isSubmitting ? 'Logging in...' : 'Log In' }}

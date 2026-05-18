@@ -31,7 +31,7 @@
           class="fixed inset-0 z-30 bg-[rgba(12,18,28,0.45)] backdrop-blur-[2px] lg:hidden"
           @click.self="isSidebarExpanded = false"
         >
-          <aside class="flex h-full w-[272px] max-w-[86vw] flex-col justify-between bg-white px-4 pb-6 pt-5 shadow-[0_18px_44px_rgba(0,0,0,0.18)]">
+          <aside class="flex h-full w-[272px] max-w-[86vw] flex-col justify-between overflow-y-auto bg-white px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-5 shadow-[0_18px_44px_rgba(0,0,0,0.18)]">
             <div>
               <div class="flex items-center justify-between">
                 <p class="text-[26px] font-black leading-none tracking-[-0.03em]">ReciCall</p>
@@ -70,13 +70,13 @@
 
       <div class="flex gap-4 px-4 pb-4 pt-2 sm:px-6 lg:gap-0 lg:px-0">
         <aside
-          class="hidden shrink-0 self-start flex-col justify-between pb-[40px] pt-[77px] transition-[width,padding] duration-200 lg:sticky lg:top-[118px] lg:ml-[7px] lg:flex lg:h-[650px]"
-          :class="isSidebarExpanded ? 'w-[220px] px-[12px]' : 'w-[72px]'"
+          class="hidden shrink-0 self-start flex-col justify-between pb-[44px] pt-[84px] transition-[width,padding] duration-200 lg:sticky lg:top-[118px] lg:flex lg:h-[650px]"
+          :class="isSidebarExpanded ? 'w-[220px] px-[12px]' : 'w-[88px] px-[10px]'"
         >
-          <div class="flex flex-col gap-[18px]">
+          <div class="flex flex-col gap-5">
             <div
               class="flex h-[63px] w-full items-center rounded-[17px] bg-[rgba(46,130,239,0.25)]"
-              :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center'"
+              :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center pl-[4px]'"
             >
               <AppIcon name="classes" :size="26" class="shrink-0 text-[#174ca0]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-semibold text-[#174ca0]">Classes</span>
@@ -84,7 +84,7 @@
             <button
               type="button"
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
-              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
+              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center pl-[4px]'"
               aria-label="Predictive analytics"
               @click="openPredictiveAnalytics"
             >
@@ -94,7 +94,7 @@
             <button
               type="button"
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
-              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
+              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center pl-[4px]'"
               aria-label="Archive"
               @click="router.push('/teacher/archive')"
             >
@@ -103,11 +103,11 @@
             </button>
           </div>
 
-          <div class="flex flex-col gap-[18px]">
+          <div class="flex flex-col gap-5">
             <button
               type="button"
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
-              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
+              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center pl-[4px]'"
               aria-label="Settings"
               @click="openProfileModal"
             >
@@ -117,7 +117,7 @@
             <button
               type="button"
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(255,84,84,0.08)]"
-              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
+              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center pl-[4px]'"
               aria-label="Logout"
               @click="openLogoutConfirm"
             >
@@ -167,11 +167,11 @@
               <article
                 v-for="classItem in classes"
                 :key="classItem.id"
-                class="relative h-[260px] w-full cursor-pointer rounded-[20px] border-2 border-[#bdbdbd] bg-white transition-transform hover:-translate-y-0.5"
+                class="relative min-h-[292px] w-full cursor-pointer rounded-[20px] border-2 border-[#bdbdbd] bg-white transition-transform hover:-translate-y-0.5"
                 :style="{ width: classCardWidth(classItem) }"
                 @click="openClassroom(classItem.id)"
               >
-                <div class="relative mx-[5px] mt-[6px] h-[173px] overflow-visible rounded-[17px]" :style="{ backgroundImage: classItem.gradient }">
+                <div class="relative mx-[5px] mt-[6px] min-h-[205px] overflow-visible rounded-[17px]" :style="{ backgroundImage: classItem.gradient }">
                   <div class="absolute inset-x-0 bottom-0 h-[20px]" :style="{ backgroundImage: classItem.gradient }" />
                   <ClassThemeArt :theme-id="classItem.gradientId" variant="card" />
 
@@ -222,7 +222,9 @@
                   <p class="relative z-10 mt-[12px] ml-[15px] inline-flex w-fit rounded-full bg-white/18 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-white backdrop-blur-[1px]">
                     {{ classItem.themeLabel }}
                   </p>
-                  <p class="relative z-10 mt-[24px] pl-[15px] text-[18px] leading-none font-medium text-white">{{ classItem.scheduleLabel }} &bull; {{ classItem.time }}</p>
+                  <p class="relative z-10 mt-[20px] max-w-[calc(100%-30px)] pr-[74px] pl-[15px] text-[18px] leading-tight font-medium text-white sm:mt-[24px]">
+                    {{ classItem.scheduleLabel }} &bull; {{ classItem.time }}
+                  </p>
                 </div>
 
                 <div class="mt-[10px] flex gap-[13px] px-[10px]">
@@ -313,7 +315,7 @@
                 <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'profile' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'profile'">Profile</button>
                 <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'security' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'security'">Security</button>
                 <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'legal' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'legal'">Legal</button>
-                <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'danger' ? 'bg-white text-[#b81717] shadow-[0_8px_18px_rgba(184,23,23,0.12)]' : 'text-[#7a4a4a]'" @click="activeSettingsSection = 'danger'">Danger Zone</button>
+                <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'danger' ? 'bg-white text-[#b81717] shadow-[0_8px_18px_rgba(184,23,23,0.12)]' : 'text-[#7a4a4a]'" @click="activeSettingsSection = 'danger'">Delete Account</button>
               </div>
 
               <div v-if="activeSettingsSection === 'profile'" class="space-y-4">

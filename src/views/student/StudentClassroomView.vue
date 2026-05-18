@@ -31,7 +31,7 @@
           class="fixed inset-0 z-30 bg-[rgba(12,18,28,0.45)] backdrop-blur-[2px] lg:hidden"
           @click.self="isSidebarExpanded = false"
         >
-          <aside class="flex h-full w-[272px] max-w-[86vw] flex-col justify-between bg-white px-4 pb-6 pt-5 shadow-[0_18px_44px_rgba(0,0,0,0.18)]">
+          <aside class="flex h-full w-[272px] max-w-[86vw] flex-col justify-between overflow-y-auto bg-white px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-5 shadow-[0_18px_44px_rgba(0,0,0,0.18)]">
             <div>
               <div class="flex items-center justify-between">
                 <p class="text-[26px] font-black leading-none tracking-[-0.03em]">ReciCall</p>
@@ -66,13 +66,13 @@
 
       <div class="flex gap-4 px-4 pb-4 pt-2 sm:px-6 lg:gap-0 lg:px-0">
         <aside
-          class="hidden shrink-0 self-start flex-col justify-between pb-[40px] pt-[77px] transition-[width,padding] duration-200 lg:sticky lg:top-[118px] lg:ml-[7px] lg:flex lg:h-[650px]"
-          :class="isSidebarExpanded ? 'w-[220px] px-[12px]' : 'w-[72px]'"
+          class="hidden shrink-0 self-start flex-col justify-between pb-[44px] pt-[84px] transition-[width,padding] duration-200 lg:sticky lg:top-[118px] lg:flex lg:h-[650px]"
+          :class="isSidebarExpanded ? 'w-[220px] px-[12px]' : 'w-[88px] px-[10px]'"
         >
-          <div class="flex flex-col gap-[18px]">
+          <div class="flex flex-col gap-5">
             <div
               class="flex h-[63px] w-full items-center rounded-[17px] bg-[rgba(46,130,239,0.25)]"
-              :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center'"
+              :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center pl-[4px]'"
             >
               <AppIcon name="classes" :size="26" class="shrink-0 text-[#174ca0]" />
               <span v-if="isSidebarExpanded" class="ml-4 text-[16px] font-semibold text-[#174ca0]">Classes</span>
@@ -81,7 +81,7 @@
             <button
               type="button"
               class="flex h-[63px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
-              :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center'"
+              :class="isSidebarExpanded ? 'justify-start px-[18px]' : 'justify-center pl-[4px]'"
               aria-label="Student ID"
               @click="router.push('/student/id')"
             >
@@ -90,11 +90,11 @@
             </button>
           </div>
 
-          <div class="flex flex-col gap-[18px]">
+          <div class="flex flex-col gap-5">
             <button
               type="button"
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(46,130,239,0.12)]"
-              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
+              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center pl-[4px]'"
               aria-label="Settings"
               @click="openStudentSettings"
             >
@@ -105,7 +105,7 @@
             <button
               type="button"
               class="flex h-[52px] w-full items-center rounded-[17px] transition-colors hover:bg-[rgba(255,84,84,0.08)]"
-              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center'"
+              :class="isSidebarExpanded ? 'justify-start px-[21px]' : 'justify-center pl-[4px]'"
               aria-label="Logout"
               @click="openLogoutConfirm"
             >
@@ -132,7 +132,7 @@
             </div>
 
             <template v-else>
-              <div class="sticky top-[96px] z-10 -mx-4 bg-white/92 px-4 pb-3 pt-1 backdrop-blur-[10px] sm:-mx-7 sm:px-7 lg:-mx-[39px] lg:px-[39px] lg:top-[112px]">
+              <div class="sticky top-[96px] z-10 w-fit max-w-full pb-3 pt-1 lg:top-[112px]">
                 <div class="rounded-[30.5px] bg-[#f6f6f6] px-[10px] py-[8px] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)] sm:w-fit">
                   <div class="flex flex-wrap gap-2 sm:flex-nowrap">
                     <button

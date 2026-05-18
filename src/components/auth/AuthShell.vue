@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative min-h-screen overflow-hidden px-4 py-8 sm:px-6 lg:flex lg:items-center lg:justify-center"
+    class="relative min-h-dvh overflow-hidden px-3 py-3 sm:px-6 sm:py-8 lg:flex lg:min-h-screen lg:items-center lg:justify-center"
     :class="frameBackgroundSrc ? 'bg-[#fbfbfb]' : 'bg-[#515151]'"
   >
     <img
@@ -17,7 +17,7 @@
     />
 
     <div
-      class="relative z-10 mx-auto flex w-full max-w-[1087px] overflow-hidden rounded-[40px] bg-[#f6f6f6] shadow-[0_4px_98.4px_-24px_rgba(0,0,0,0.25)] lg:min-h-[746px] lg:rounded-[60px]"
+      class="relative z-10 mx-auto flex w-full max-w-[1087px] overflow-hidden rounded-[28px] bg-[#f6f6f6] shadow-[0_4px_98.4px_-24px_rgba(0,0,0,0.25)] sm:rounded-[40px] lg:min-h-[746px] lg:rounded-[60px]"
     >
       <section class="relative z-10 hidden flex-1 items-center justify-center px-12 py-16 lg:flex">
         <img
@@ -28,7 +28,7 @@
       </section>
 
       <section
-        class="relative z-10 flex w-full flex-col justify-center border-2 border-[#2e82ef] bg-white/95 px-6 py-10 backdrop-blur-[1px] sm:px-10 lg:w-[512px] lg:rounded-[61px] lg:px-8 lg:py-12"
+        class="relative z-10 flex w-full flex-col justify-center border-2 border-[#2e82ef] bg-white/95 px-5 py-5 backdrop-blur-[1px] sm:px-10 sm:py-10 lg:w-[512px] lg:rounded-[61px] lg:px-8 lg:py-12"
       >
         <div class="mx-auto flex w-full max-w-[439px] flex-col items-center">
           <div class="flex w-full justify-start">
@@ -37,23 +37,23 @@
             </RouterLink>
           </div>
 
-          <div class="mb-6">
-            <img :src="imgLogo" alt="" class="h-[68px] w-[68px] object-contain sm:h-[80px] sm:w-[80px]" />
+          <div class="mb-3 sm:mb-6">
+            <img :src="imgLogo" alt="" class="h-[56px] w-[56px] object-contain sm:h-[80px] sm:w-[80px]" />
           </div>
 
-          <h1 class="text-center text-[36px] leading-none font-black text-black">
+          <h1 class="text-center text-[30px] leading-none font-black text-black sm:text-[36px]">
             {{ title }}
           </h1>
-          <p class="mt-3 text-center text-[14px] font-semibold text-black">
+          <p class="mt-2 text-center text-[13px] font-semibold text-black sm:mt-3 sm:text-[14px]">
             {{ subtitle }}
           </p>
 
-          <div class="mt-5 flex h-[61px] w-[350px] max-w-full rounded-full bg-[#f6f6f6] p-[7px]">
+          <div class="mt-4 flex h-[54px] w-full max-w-[350px] rounded-full bg-[#f6f6f6] p-[6px] sm:mt-5 sm:h-[61px] sm:p-[7px]">
             <button
               v-for="option in roleOptions"
               :key="option.value"
               type="button"
-              class="flex-1 rounded-full text-[16px] font-semibold transition"
+              class="flex-1 rounded-full text-[15px] font-semibold transition sm:text-[16px]"
               :class="
                 modelValue === option.value
                   ? 'bg-white text-[#1188f8] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)]'
@@ -65,19 +65,19 @@
             </button>
           </div>
 
-          <div class="mt-5 w-full">
+          <div class="mt-4 w-full sm:mt-5">
             <slot />
           </div>
 
-          <div class="mt-9 flex w-full items-center gap-[9px]">
+          <div class="mt-6 flex w-full items-center gap-[9px] sm:mt-9">
             <span class="h-px flex-1 bg-[#d5d5d5]" />
-            <span class="text-[13px] font-semibold text-[#777]">OR CONTINUE WITH</span>
+            <span class="text-[11px] font-semibold text-[#777] sm:text-[13px]">OR CONTINUE WITH</span>
             <span class="h-px flex-1 bg-[#d5d5d5]" />
           </div>
 
           <button
             type="button"
-            class="mt-6 flex h-[45px] w-[281px] max-w-full items-center justify-center gap-2 rounded-full bg-[#f6f6f6] px-6 text-[20px] font-bold text-black"
+            class="mt-4 flex h-[44px] w-full max-w-[281px] items-center justify-center gap-2 rounded-full bg-[#f6f6f6] px-6 text-[18px] font-bold text-black sm:mt-6 sm:h-[45px] sm:text-[20px]"
             :disabled="googleDisabled"
             :class="{ 'cursor-not-allowed opacity-70': googleDisabled }"
             @click="$emit('google')"
@@ -103,7 +103,7 @@
             <span>Google</span>
           </button>
 
-          <p class="mt-12 text-center text-[15px] font-medium text-[#575757]">
+          <p class="mt-6 text-center text-[14px] font-medium text-[#575757] sm:mt-12 sm:text-[15px]">
             {{ promptText }}
             <RouterLink :to="promptLink" class="ml-1 font-bold text-[#3abef6]">
               {{ promptAction }}
