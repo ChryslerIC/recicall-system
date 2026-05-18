@@ -1765,14 +1765,23 @@
                   <p v-if="selectedSessionRecord.topic" class="mt-2 text-[15px] font-semibold sm:mt-3 sm:text-[18px]">{{ selectedSessionRecord.topic }}</p>
                   <p class="mt-2 text-[14px] font-medium sm:text-[15px]">{{ formatFullDate(selectedSessionRecord.startedAt) }}</p>
                 </div>
-                <button
-                  type="button"
-                  class="grid h-9 w-9 place-items-center rounded-full bg-white/15 text-white transition hover:bg-white/25 sm:h-10 sm:w-10"
-                  aria-label="Close recitation record modal"
-                  @click="closeSessionRecordModal"
-                >
-                  <AppIcon name="x" :size="20" />
-                </button>
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    class="rounded-full bg-white/15 px-3 py-2 text-[12px] font-semibold text-white transition hover:bg-white/25 sm:px-4 sm:text-[13px]"
+                    @click="downloadSelectedSessionReport"
+                  >
+                    Download Session
+                  </button>
+                  <button
+                    type="button"
+                    class="grid h-9 w-9 place-items-center rounded-full bg-white/15 text-white transition hover:bg-white/25 sm:h-10 sm:w-10"
+                    aria-label="Close recitation record modal"
+                    @click="closeSessionRecordModal"
+                  >
+                    <AppIcon name="x" :size="20" />
+                  </button>
+                </div>
               </div>
 
               <div class="mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:gap-3 xl:grid-cols-5">
@@ -2153,7 +2162,7 @@ import imgStar1 from '../../assets/icons/recicall-logo.png'
 import { decorateClassWithTheme } from '../../utils/classThemes'
 import {
   buildParticipationDateRangeLabel,
-  downloadParticipationPdfReport,
+  downloadSessionRecordsPdfReport,
   filterParticipationEventsByDate,
 } from '../../utils/participationReports'
 import { resolveStudentAvatar } from '../../utils/studentAvatarOptions'
@@ -2576,6 +2585,11 @@ const currentSessionAbsentStudentIds = computed(() =>
 const queueExcludedStudentIds = computed(() =>
   [...new Set([...excludedRecommendationIds.value, ...currentSessionAbsentStudentIds.value])],
 )
+const queueEligibleStudentIds = computed(() =>
+  classAnalytics.value.students
+    .map((student) => student.id)
+    .filter((id) => id && !currentSessionAbsentStudentIds.value.includes(id)),
+)
 const completedSessionRecords = computed(() =>
   sessionHistory.value
     .map((session, index) => {
@@ -2624,6 +2638,20 @@ const filteredSessionReportSessions = computed(() =>
       started: formatDateTime(session.startedAt),
       ended: formatDateTime(session.endedAt),
       duration: formatSessionDuration(session.startedAt, session.endedAt),
+      averageScoreLabel: formatScoreValue(session.recitationSummary.averageScore),
+      pointsLabel: formatScoreValue(session.recitationSummary.totalPoints),
+      recitedStudentEntries: session.recitationSummary.recitedStudents.length
+        ? session.recitationSummary.recitedStudents.map(
+          (student) =>
+            `- ${student.name} — ${formatScoreValue(student.totalPoints)} pts${student.turnCount > 1 ? ` across ${student.turnCount} turns` : ' in 1 turn'}`,
+        )
+        : ['No recorded recitations'],
+      absentStudentEntries: session.recitationSummary.absentStudents.length
+        ? session.recitationSummary.absentStudents.map((student) => `- ${student.name}`)
+        : ['No absences recorded'],
+      notRecitedStudentEntries: session.recitationSummary.notRecitedStudents.length
+        ? session.recitationSummary.notRecitedStudents.map((student) => `- ${student.name}`)
+        : ['Everyone recited'],
       recitedStudentsLabel: session.recitationSummary.recitedStudents.length
         ? session.recitationSummary.recitedStudents
           .map((student) => `${student.name} (${formatScoreValue(student.totalPoints)})`)
@@ -3638,37 +3666,56 @@ const clearSessionReportFilters = () => {
   sessionReportEndDate.value = ''
 }
 
+const buildSessionReportSummaryItems = (sessions, dateRangeLabel) => {
+  const totalPoints = sessions.reduce((sum, session) => sum + (Number(session.recitationSummary?.totalPoints) || 0), 0)
+  const uniqueStudents = new Set(
+    sessions.flatMap((session) =>
+      session.recitationSummary?.recitedStudents.map((student) => student.id).filter(Boolean) || [],
+    ),
+  ).size
+
+  return [
+    { label: 'Date Range', value: dateRangeLabel },
+    { label: 'Sessions', value: sessions.length },
+    {
+      label: 'Students With Points',
+      value: uniqueStudents,
+    },
+    { label: 'Total Points', value: formatScoreValue(totalPoints) },
+  ]
+}
+
+const downloadSpecificSessionReport = async (session) => {
+  if (!classroom.value || !session) return
+
+  await downloadSessionRecordsPdfReport({
+    fileName: `${slugifyReportValue(classroom.value.subject, 'class')}-${slugifyReportValue(classroom.value.classLabel, 'session')}-${slugifyReportValue(session.title, 'session')}-record.pdf`,
+    title: `${classroom.value.subject} Session Record`,
+    subtitle: `${classroom.value.gradeLevel} - ${classroom.value.classLabel}`,
+    generatedFor: `${teacherName.value} - ${teacherRole.value}`,
+    summaryItems: buildSessionReportSummaryItems([session], session.date || 'Selected session'),
+    sessions: [session],
+  })
+}
+
+const downloadSelectedSessionReport = async () => {
+  if (!selectedSessionRecord.value) return
+  await downloadSpecificSessionReport(selectedSessionRecord.value)
+}
+
 const downloadSessionReport = async () => {
   if (!classroom.value || !filteredSessionReportSessions.value.length) return
 
-  await downloadParticipationPdfReport({
+  await downloadSessionRecordsPdfReport({
     fileName: `${slugifyReportValue(classroom.value.subject, 'class')}-${slugifyReportValue(classroom.value.classLabel, 'session')}-session-report.pdf`,
     title: `${classroom.value.subject} Session Report`,
     subtitle: `${classroom.value.gradeLevel} - ${classroom.value.classLabel}`,
     generatedFor: `${teacherName.value} - ${teacherRole.value}`,
-    summaryItems: [
-      { label: 'Date Range', value: filteredSessionReportDateRangeLabel.value },
-      { label: 'Sessions', value: filteredSessionReportSummary.value.sessions },
-      { label: 'Events', value: filteredSessionReportSummary.value.events },
-      { label: 'Unique Students', value: filteredSessionReportSummary.value.students },
-      { label: 'Total Points', value: filteredSessionReportSummary.value.points },
-    ],
-    columns: [
-      { key: 'date', label: 'Date' },
-      { key: 'sessionLabel', label: 'Session' },
-      { key: 'recitedStudentsLabel', label: 'Recited Students' },
-      { key: 'absentStudentsLabel', label: 'Picked but Absent' },
-      { key: 'notRecitedStudentsLabel', label: 'Did Not Recite' },
-      { key: 'pointsLabel', label: 'Points' },
-    ],
-    rows: filteredSessionReportSessions.value.map((session) => ({
-      date: session.date,
-      sessionLabel: session.title,
-      recitedStudentsLabel: session.recitedStudentsLabel,
-      absentStudentsLabel: session.absentStudentsLabel,
-      notRecitedStudentsLabel: session.notRecitedStudentsLabel,
-      pointsLabel: `${session.points}`,
-    })),
+    summaryItems: buildSessionReportSummaryItems(
+      filteredSessionReportSessions.value,
+      filteredSessionReportDateRangeLabel.value,
+    ),
+    sessions: filteredSessionReportSessions.value,
   })
 }
 
@@ -3709,9 +3756,14 @@ const armQueueCustomScore = () => {
 const rerollQueuedStudent = () => {
   const currentStudentId = selectedQueuedStudent.value?.id
   if (!currentStudentId) return
-  if (!excludedRecommendationIds.value.includes(currentStudentId)) {
-    excludedRecommendationIds.value = [...excludedRecommendationIds.value, currentStudentId]
-  }
+  const nextExcludedIds = excludedRecommendationIds.value.includes(currentStudentId)
+    ? excludedRecommendationIds.value
+    : [...excludedRecommendationIds.value, currentStudentId]
+  const exhaustedEligibleStudents =
+    queueEligibleStudentIds.value.length > 0 &&
+    queueEligibleStudentIds.value.every((studentId) => nextExcludedIds.includes(studentId))
+
+  excludedRecommendationIds.value = exhaustedEligibleStudents ? [] : nextExcludedIds
   pickNextStudentError.value = ''
 }
 

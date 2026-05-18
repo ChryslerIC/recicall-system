@@ -556,14 +556,12 @@ export const buildPriorityQueueRecommendation = (classroom = {}, excludedStudent
     const zeroParticipationBoost = student.sessions === 0 ? 28 : 0
     const seatEnvironmentBoost = seatEnvironment?.priorityBoost || 0
     const absenceBoost = clamp(absenceCount * 10, 0, 24)
-    const exclusionPenalty = excludedSet.has(student.id) ? 85 : 0
     const priorityScore = clamp(
       normalizedNeed * 0.52 +
         inactivityBoost +
         zeroParticipationBoost +
         absenceBoost +
-        seatEnvironmentBoost -
-        exclusionPenalty,
+        seatEnvironmentBoost,
       0,
       100,
     )
@@ -578,7 +576,6 @@ export const buildPriorityQueueRecommendation = (classroom = {}, excludedStudent
     if (seatEnvironment && seatEnvironmentBoost >= 8) {
       reasons.push(`Seat environment: ${seatEnvironment.zoneLabel}`)
     }
-    if (excludedSet.has(student.id)) reasons.push('Recently recommended')
     if (!reasons.length) reasons.push('Balanced queue rotation candidate')
 
     return {
@@ -595,9 +592,11 @@ export const buildPriorityQueueRecommendation = (classroom = {}, excludedStudent
   })
 
   const priorityQueue = []
-  candidates.forEach((candidate) => {
+  candidates
+    .filter((candidate) => !excludedSet.has(candidate.id))
+    .forEach((candidate) => {
     enqueuePriorityCandidate(priorityQueue, candidate)
-  })
+    })
 
   const rankedCandidates = priorityQueue.map((candidate, index) => ({
     ...candidate,

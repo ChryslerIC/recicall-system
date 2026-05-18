@@ -74,6 +74,21 @@ const addWrappedText = (doc, text, x, y, maxWidth, lineHeight = 6.5) => {
   return y + Math.max(lines.length, 1) * lineHeight
 }
 
+const addWrappedList = (doc, entries, x, y, maxWidth, lineHeight = 5.2) => {
+  const safeEntries = Array.isArray(entries) && entries.length ? entries : ['None recorded']
+  let cursorY = y
+
+  safeEntries.forEach((entry) => {
+    const lines = doc.splitTextToSize(String(entry ?? ''), maxWidth)
+    lines.forEach((line, index) => {
+      doc.text(line, x, cursorY + index * lineHeight)
+    })
+    cursorY += Math.max(lines.length, 1) * lineHeight
+  })
+
+  return cursorY
+}
+
 const loadJsPdf = async () => {
   const { jsPDF } = await import('jspdf')
   return jsPDF
@@ -216,6 +231,153 @@ export const downloadParticipationPdfReport = async ({
       addWrappedText(doc, row[column.key], x + 2, cursorY + 5, colWidth - 4, 4.5)
     })
     cursorY += rowHeight
+  })
+
+  doc.save(fileName)
+}
+
+export const downloadSessionRecordsPdfReport = async ({
+  fileName = 'session-records-report.pdf',
+  title = 'Session Records Report',
+  subtitle = '',
+  generatedFor = '',
+  summaryItems = [],
+  sessions = [],
+}) => {
+  if (typeof window === 'undefined') return
+  const jsPDF = await loadJsPdf()
+
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+  })
+
+  const pageWidth = doc.internal.pageSize.getWidth()
+  const pageHeight = doc.internal.pageSize.getHeight()
+  const margin = 16
+  const contentWidth = pageWidth - margin * 2
+  const labelWidth = 38
+  const listWidth = contentWidth - labelWidth - 8
+  let cursorY = 18
+
+  const drawHeader = () => {
+    doc.setFillColor(17, 136, 248)
+    doc.roundedRect(margin, 12, pageWidth - margin * 2, 30, 8, 8, 'F')
+    doc.setTextColor(255, 255, 255)
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(20)
+    doc.text(title, margin + 8, 24)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(10)
+    if (subtitle) doc.text(subtitle, margin + 8, 31)
+    doc.text(`Generated ${new Date().toLocaleString('en-US')}${generatedFor ? ` - ${generatedFor}` : ''}`, margin + 8, 37)
+    doc.setTextColor(24, 24, 27)
+    cursorY = 52
+  }
+
+  const ensureSpace = (neededHeight = 12) => {
+    if (cursorY + neededHeight <= pageHeight - margin) return
+    doc.addPage()
+    drawHeader()
+  }
+
+  const drawMetaLine = (label, value) => {
+    if (!value) return
+    ensureSpace(8)
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.setTextColor(95, 95, 103)
+    doc.text(`${label}:`, margin, cursorY)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(24, 24, 27)
+    addWrappedText(doc, value, margin + 22, cursorY, contentWidth - 22, 4.8)
+    cursorY += 6
+  }
+
+  const drawSectionList = (label, entries, accent = [17, 136, 248]) => {
+    const safeEntries = Array.isArray(entries) && entries.length ? entries : ['None recorded']
+    const estimatedHeight = Math.max(safeEntries.length, 1) * 5.2 + 8
+    ensureSpace(Math.max(estimatedHeight, 14))
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.setTextColor(...accent)
+    doc.text(label.toUpperCase(), margin, cursorY)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.setTextColor(24, 24, 27)
+    cursorY = addWrappedList(doc, safeEntries, margin + labelWidth, cursorY, listWidth, 4.8) + 1.5
+  }
+
+  drawHeader()
+
+  if (summaryItems.length) {
+    const cardWidth = (pageWidth - margin * 2 - 8) / 2
+    summaryItems.forEach((item, index) => {
+      if (index % 2 === 0) ensureSpace(22)
+
+      const x = margin + (index % 2) * (cardWidth + 8)
+      const y = cursorY
+      doc.setFillColor(246, 250, 255)
+      doc.setDrawColor(217, 221, 227)
+      doc.roundedRect(x, y, cardWidth, 18, 5, 5, 'FD')
+      doc.setTextColor(95, 95, 103)
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(8)
+      doc.text(String(item.label || '').toUpperCase(), x + 5, y + 6)
+      doc.setTextColor(24, 24, 27)
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(12)
+      addWrappedText(doc, item.value, x + 5, y + 12, cardWidth - 10, 5)
+
+      if (index % 2 === 1 || index === summaryItems.length - 1) {
+        cursorY += 22
+      }
+    })
+    cursorY += 2
+  }
+
+  if (!sessions.length) {
+    ensureSpace(12)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(11)
+    doc.text('No session records matched the selected filter.', margin, cursorY)
+    doc.save(fileName)
+    return
+  }
+
+  sessions.forEach((session, index) => {
+    ensureSpace(26)
+
+    if (index > 0) {
+      doc.setDrawColor(224, 229, 235)
+      doc.line(margin, cursorY, pageWidth - margin, cursorY)
+      cursorY += 8
+    }
+
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(16)
+    doc.setTextColor(17, 136, 248)
+    doc.text(session.title || `Session ${index + 1}`, margin, cursorY)
+    cursorY += 7
+
+    drawMetaLine('Date', session.date)
+    drawMetaLine('Topic', session.topic || 'No topic recorded')
+    drawMetaLine('Time', `${session.started || 'No start time'}${session.ended ? ` to ${session.ended}` : ''}`)
+    drawMetaLine(
+      'Summary',
+      `Recited: ${session.recitationSummary?.recitedCount ?? 0} | Picked but absent: ${session.recitationSummary?.absentCount ?? 0} | Did not recite: ${session.recitationSummary?.notRecitedCount ?? 0}`,
+    )
+    drawMetaLine(
+      'Points',
+      `${session.pointsLabel || session.points || 0} total points | Average score: ${session.averageScoreLabel || 0}`,
+    )
+    cursorY += 1
+
+    drawSectionList('Recited', session.recitedStudentEntries, [17, 136, 248])
+    drawSectionList('Picked But Absent', session.absentStudentEntries, [182, 106, 0])
+    drawSectionList('Did Not Recite', session.notRecitedStudentEntries, [209, 17, 17])
+    cursorY += 4
   })
 
   doc.save(fileName)
