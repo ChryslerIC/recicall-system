@@ -208,14 +208,14 @@
                   </p>
                 </div>
 
-                <div class="mt-[10px] flex gap-[13px] px-[10px]">
-                  <div class="h-[58px] rounded-[11px] bg-[#f6f6f6] px-[11px] py-[5px]" :style="{ width: `${classItem.statsWidth}px` }">
+                <div class="mt-[10px] flex items-stretch gap-[13px] px-[10px]">
+                  <div class="min-h-[64px] rounded-[11px] bg-[#f6f6f6] px-[11px] py-[7px]" :style="{ width: `${classItem.statsWidth}px` }">
                     <p class="text-[20px] leading-none font-medium text-[#161616]">Students</p>
                     <p class="mt-[8px] text-[20px] leading-none font-semibold text-[#1188f8]">{{ classItem.students }}</p>
                   </div>
-                  <div class="h-[58px] rounded-[11px] bg-[#f6f6f6] px-[11px] py-[5px]" :style="{ width: `${classItem.engagementWidth}px` }">
+                  <div class="min-h-[64px] rounded-[11px] bg-[#f6f6f6] px-[11px] py-[7px]" :style="{ width: `${classItem.engagementWidth}px` }">
                     <p class="text-[18px] leading-none font-medium text-[#161616]">Engagement</p>
-                    <p class="mt-[8px] text-[20px] leading-none font-semibold" :class="engagementClass(classItem.engagement)">{{ classItem.engagement }}</p>
+                    <p class="mt-[6px] text-[17px] leading-[1.05] font-semibold" :class="engagementClass(classItem.engagement)">{{ classItem.engagement }}</p>
                   </div>
                 </div>
               </article>
@@ -261,8 +261,8 @@
           class="fixed inset-0 z-20 flex items-start justify-center overflow-y-auto bg-[rgba(224,224,224,0.44)] px-3 py-3 backdrop-blur-[1px] sm:px-4 sm:py-8 sm:items-center"
           @click.self="closeProfileModal"
         >
-          <div class="w-full max-w-[560px] max-h-[calc(100vh-1.5rem)] overflow-y-auto rounded-[22px] bg-white px-4 py-4 shadow-[0_4px_39.3px_2px_rgba(0,0,0,0.2)] sm:max-h-[calc(100vh-4rem)] sm:px-6 sm:py-5">
-            <div class="sticky top-0 z-10 flex items-start justify-between border-b border-[#d7d7d7] bg-white pb-4">
+          <div class="flex h-[min(720px,calc(100vh-1.5rem))] w-full max-w-[560px] flex-col overflow-hidden rounded-[22px] bg-white px-4 py-4 shadow-[0_4px_39.3px_2px_rgba(0,0,0,0.2)] sm:h-[min(760px,calc(100vh-4rem))] sm:px-6 sm:py-5">
+            <div class="flex shrink-0 items-start justify-between border-b border-[#d7d7d7] bg-white pb-4">
               <div>
                 <h2 class="text-[30px] leading-none font-semibold sm:text-[40px]">Settings</h2>
                 <p class="mt-2 text-[15px] font-medium sm:text-[20px]">Manage your teacher profile, password access, and privacy options.</p>
@@ -272,7 +272,8 @@
               </button>
             </div>
 
-            <form class="space-y-4 pt-5" @submit.prevent="saveProfileChanges">
+            <form class="flex min-h-0 flex-1 flex-col pt-5" @submit.prevent="saveProfileChanges">
+              <div class="min-h-0 flex-1 overflow-y-auto pr-1">
               <div class="flex flex-wrap gap-2 rounded-[22px] bg-[#f6f6f6] p-2">
                 <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'profile' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'profile'">Profile</button>
                 <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'security' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'security'">Security</button>
@@ -280,9 +281,31 @@
                 <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'danger' ? 'bg-white text-[#b81717] shadow-[0_8px_18px_rgba(184,23,23,0.12)]' : 'text-[#7a4a4a]'" @click="activeSettingsSection = 'danger'">Delete Account</button>
               </div>
 
-              <div v-if="activeSettingsSection === 'profile'" class="space-y-4">
+              <div v-if="activeSettingsSection === 'profile'" class="mt-4 space-y-4">
                 <div class="flex items-center gap-4">
                   <img :src="profilePreviewSrc" alt="" class="h-[72px] w-[72px] rounded-full border border-[#d7d7d7] object-cover sm:h-[88px] sm:w-[88px]" />
+                  <div class="flex flex-col gap-2">
+                    <label class="inline-flex cursor-pointer items-center justify-center rounded-[18px] border border-[#1188f8] bg-white px-4 py-2 text-[14px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff]">
+                      Upload Photo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        class="hidden"
+                        :disabled="isSavingProfile"
+                        @change="handleProfilePhotoSelected"
+                      />
+                    </label>
+                    <button
+                      v-if="profilePhotoPreviewUrl"
+                      type="button"
+                      class="rounded-[18px] border border-[#d7d7d7] bg-[#fafafa] px-4 py-2 text-[13px] font-semibold text-[#555] transition hover:border-[#1188f8] hover:text-[#1188f8]"
+                      :disabled="isSavingProfile"
+                      @click="clearProfilePhotoSelection"
+                    >
+                      Use avatar instead
+                    </button>
+                    <p class="text-[12px] font-medium text-[#666]">JPG or PNG, up to 5 MB.</p>
+                  </div>
                 </div>
 
                 <label class="block">
@@ -317,7 +340,7 @@
                 </div>
               </div>
 
-              <div v-else-if="activeSettingsSection === 'security'" class="rounded-[20px] border border-[#d9e8fb] bg-[#f8fbff] px-4 py-4">
+              <div v-else-if="activeSettingsSection === 'security'" class="mt-4 rounded-[20px] border border-[#d9e8fb] bg-[#f8fbff] px-4 py-4">
                 <p class="text-[18px] font-bold text-black">Password & Sign-In</p>
                 <p class="mt-2 text-[14px] leading-[1.5] text-[#5b5b5b]">Use your account email to receive a secure password reset link.</p>
                 <div class="mt-4 rounded-[16px] border border-[#d9e8fb] bg-white px-4 py-3">
@@ -334,7 +357,7 @@
                 </button>
               </div>
 
-              <div v-else-if="activeSettingsSection === 'legal'" class="rounded-[20px] border border-[#d9e8fb] bg-[#f8fbff] px-4 py-4">
+              <div v-else-if="activeSettingsSection === 'legal'" class="mt-4 rounded-[20px] border border-[#d9e8fb] bg-[#f8fbff] px-4 py-4">
                 <p class="text-[18px] font-bold text-black">Terms & Privacy</p>
                 <p class="mt-2 text-[14px] leading-[1.5] text-[#5b5b5b]">Open the app policies in their own page with a simple back button.</p>
                 <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -355,7 +378,7 @@
                 </div>
               </div>
 
-              <div v-else class="rounded-[20px] border border-[#ffd6d6] bg-[#fff7f7] px-4 py-4">
+              <div v-else class="mt-4 rounded-[20px] border border-[#ffd6d6] bg-[#fff7f7] px-4 py-4">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p class="text-[16px] font-bold text-[#b81717]">Delete Account</p>
@@ -374,11 +397,12 @@
                 </div>
               </div>
 
-              <p v-if="profileError" class="text-sm font-medium text-red-600">{{ profileError }}</p>
-              <p v-if="profileSuccess" class="text-sm font-medium text-green-600">{{ profileSuccess }}</p>
-              <p v-if="deleteAccountError" class="text-sm font-medium text-red-600">{{ deleteAccountError }}</p>
+              <p v-if="profileError" class="mt-4 text-sm font-medium text-red-600">{{ profileError }}</p>
+              <p v-if="profileSuccess" class="mt-4 text-sm font-medium text-green-600">{{ profileSuccess }}</p>
+              <p v-if="deleteAccountError" class="mt-4 text-sm font-medium text-red-600">{{ deleteAccountError }}</p>
+              </div>
 
-              <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+              <div class="mt-4 flex shrink-0 flex-col-reverse gap-3 border-t border-[#e5e7eb] pt-4 sm:flex-row sm:justify-end">
                 <button type="button" class="h-[52px] w-full rounded-[24px] bg-[#c5c5c5] text-[18px] font-bold sm:h-[57px] sm:w-[151px] sm:rounded-[33.5px] sm:text-[20px]" @click="closeProfileModal">
                   Cancel
                 </button>
@@ -415,7 +439,7 @@ import {
 import { getUserById, upsertUserProfile } from '../../services/userService'
 import imgProfile from '../../assets/icons/recicall-profile.svg'
 import imgStar from '../../assets/icons/recicall-logo.png'
-import { decorateClassWithTheme, getClassTheme } from '../../utils/classThemes'
+import { decorateClassWithTheme } from '../../utils/classThemes'
 import { defaultTeacherAvatarKey, resolveTeacherAvatar, sanitizeTeacherAvatarKey, teacherAvatarOptions } from '../../utils/teacherAvatarOptions'
 
 const router = useRouter()
@@ -441,17 +465,20 @@ const profileSuccess = ref('')
 const deleteAccountError = ref('')
 const profileName = ref('')
 const profileAvatarKey = ref(defaultTeacherAvatarKey)
+const profilePhotoFile = ref(null)
+const profilePhotoPreviewUrl = ref('')
 const openOptionsId = ref(null)
 const teacherId = ref('')
 const classes = ref([])
 const analyticsClasses = ref([])
 const loadError = ref('')
+const teacherPhotoURL = ref('')
 const teacherPhoto = computed(() =>
-  resolveTeacherAvatar(teacherAvatarKey.value, ''),
+  resolveTeacherAvatar(teacherAvatarKey.value, teacherPhotoURL.value || ''),
 )
 const signedInEmail = computed(() => auth.currentUser?.email || 'No email available')
 const profilePreviewSrc = computed(() =>
-  resolveTeacherAvatar(profileAvatarKey.value || defaultTeacherAvatarKey, ''),
+  profilePhotoPreviewUrl.value || resolveTeacherAvatar(profileAvatarKey.value || defaultTeacherAvatarKey, teacherPhotoURL.value || ''),
 )
 
 const normalizeSettingsSection = (value) =>
@@ -493,7 +520,9 @@ const buildSettingsReturnTo = (section = activeSettingsSection.value) =>
 
 const prefillProfileSettings = () => {
   profileName.value = teacherName.value
-  profileAvatarKey.value = teacherAvatarKey.value || defaultTeacherAvatarKey
+  profileAvatarKey.value = sanitizeTeacherAvatarKey(teacherAvatarKey.value, { allowEmpty: true })
+  profilePhotoFile.value = null
+  profilePhotoPreviewUrl.value = teacherPhotoURL.value || ''
 }
 
 const recoverTeacherAccessFailure = async (error) => {
@@ -518,7 +547,8 @@ const ensureProfileFallback = (event) => {
 const engagementClass = (engagement) => {
   if (engagement === 'High') return 'text-[#1188f8]'
   if (engagement === 'Moderate') return 'text-[#4fb817]'
-  return 'text-[#b81717]'
+  if (engagement === 'Low') return 'text-[#b81717]'
+  return 'text-[#6b7280]'
 }
 
 const classCardWidth = (classItem) => {
@@ -529,12 +559,11 @@ const classCardWidth = (classItem) => {
 
 const mapClassToCard = (classItem) => {
   const themedClass = decorateClassWithTheme(classItem)
-  const theme = getClassTheme(themedClass)
 
   return {
     ...themedClass,
     students: themedClass.students ?? 0,
-    engagement: themedClass.engagement || theme.engagementFallback,
+    engagement: themedClass.engagement || 'No activity yet',
     width: 400,
     statsWidth: 142.391,
     engagementWidth: 141.304,
@@ -666,6 +695,26 @@ const handleAnalyticsClassSelect = (classItem) => {
 
 const selectTeacherAvatarPreset = (avatarKey) => {
   profileAvatarKey.value = avatarKey
+  profilePhotoFile.value = null
+  profilePhotoPreviewUrl.value = ''
+}
+
+const clearProfilePhotoSelection = () => {
+  profilePhotoFile.value = null
+  profilePhotoPreviewUrl.value = ''
+  profileAvatarKey.value = defaultTeacherAvatarKey
+}
+
+const handleProfilePhotoSelected = (event) => {
+  const input = event.target
+  const nextFile = input?.files?.[0] || null
+
+  if (!nextFile) return
+
+  profilePhotoFile.value = nextFile
+  profilePhotoPreviewUrl.value = URL.createObjectURL(nextFile)
+  profileAvatarKey.value = ''
+  input.value = ''
 }
 
 const saveProfileChanges = async () => {
@@ -680,21 +729,30 @@ const saveProfileChanges = async () => {
   isSavingProfile.value = true
 
   try {
+    const shouldUsePresetAvatar = Boolean(profileAvatarKey.value)
+    const hasCustomPhoto = Boolean(profilePhotoFile.value)
     const updatedProfile = await updateCurrentUserAccount({
       displayName: profileName.value.trim(),
-      photoURL: '',
+      photoFile: profilePhotoFile.value || undefined,
+      photoURL: hasCustomPhoto ? '' : shouldUsePresetAvatar ? '' : teacherPhotoURL.value || '',
     })
 
-    const nextAvatarKey = sanitizeTeacherAvatarKey(profileAvatarKey.value)
+    const nextAvatarKey = sanitizeTeacherAvatarKey(profileAvatarKey.value, { allowEmpty: true })
     await upsertUserProfile(teacherId.value, {
       displayName: updatedProfile.displayName,
       avatarKey: nextAvatarKey,
-      photoURL: '',
+      photoURL: updatedProfile.photoURL || '',
+      cloudinaryPublicId: updatedProfile.cloudinaryPublicId || '',
+      cloudinaryAssetId: updatedProfile.cloudinaryAssetId || '',
+      cloudinaryFormat: updatedProfile.cloudinaryFormat || '',
       avatarPromptSeen: true,
     })
 
     teacherName.value = updatedProfile.displayName || teacherName.value
     teacherAvatarKey.value = nextAvatarKey
+    teacherPhotoURL.value = updatedProfile.photoURL || ''
+    profilePhotoFile.value = null
+    profilePhotoPreviewUrl.value = updatedProfile.photoURL || ''
     profileSuccess.value = updatedProfile.photoUploadError
       ? 'Display name updated. Photo upload did not complete.'
       : 'Profile updated successfully.'
@@ -777,7 +835,8 @@ onMounted(async () => {
     }
     if (profile?.displayName) teacherName.value = profile.displayName
     else if (user.displayName) teacherName.value = user.displayName
-    teacherAvatarKey.value = sanitizeTeacherAvatarKey(profile?.avatarKey)
+    teacherAvatarKey.value = sanitizeTeacherAvatarKey(profile?.avatarKey, { allowEmpty: true })
+    teacherPhotoURL.value = profile?.photoURL || user.photoURL || ''
     profileName.value = teacherName.value
     if (route.query.settings === 'open') {
       prefillProfileSettings()

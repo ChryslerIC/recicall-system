@@ -14,6 +14,7 @@ import {
 import { db } from '../config/firebase'
 
 const teacherClassesCollection = (teacherId) => collection(db, 'users', teacherId, 'classes')
+const teacherClassRef = (teacherId, classId) => doc(db, 'users', teacherId, 'classes', classId)
 const teacherClassStudentsCollection = (teacherId, classId) => collection(db, 'users', teacherId, 'classes', classId, 'students')
 const teacherClassStudentRef = (teacherId, classId, studentId) =>
   doc(db, 'users', teacherId, 'classes', classId, 'students', studentId)
@@ -24,6 +25,13 @@ const teacherClassParticipationCollection = (teacherId, classId) =>
 const createJoinCode = () => Math.random().toString(36).slice(2, 8).toUpperCase()
 const removeUndefinedValues = (value) =>
   Object.fromEntries(Object.entries(value).filter(([, entryValue]) => entryValue !== undefined))
+const toFirestoreDate = (value) => {
+  if (!value) return null
+  if (typeof value.toDate === 'function') return value.toDate()
+  if (typeof value.seconds === 'number') return new Date(value.seconds * 1000)
+  const parsedDate = new Date(value)
+  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate
+}
 const sanitizeSessionRosterSnapshot = (rosterSnapshot = []) =>
   Array.isArray(rosterSnapshot)
     ? rosterSnapshot.map((student, index) =>
@@ -82,6 +90,99 @@ const getParticipationEventsForTeacherClass = async (teacherId, classId) => {
     })
 }
 
+const syncTeacherClassStudentStatsFromEvents = async (teacherId, classId, participationDocs = null) => {
+  const [studentsSnapshot, loadedParticipationDocs] = await Promise.all([
+    getDocs(teacherClassStudentsCollection(teacherId, classId)),
+    participationDocs ? Promise.resolve(participationDocs) : getDocs(teacherClassParticipationCollection(teacherId, classId)),
+  ])
+
+  const participationEntries = loadedParticipationDocs.docs
+    .map((eventDoc) => ({
+      id: eventDoc.id,
+      ...eventDoc.data(),
+    }))
+    .filter((event) => event?.eventType !== 'absence' && event?.studentId)
+    .sort((left, right) => {
+      const leftTime = toFirestoreDate(left.createdAt)?.getTime() || 0
+      const rightTime = toFirestoreDate(right.createdAt)?.getTime() || 0
+      return leftTime - rightTime
+    })
+
+  const statsByStudentId = new Map()
+
+  participationEntries.forEach((event) => {
+    const studentId = event.studentId
+    const existingStats = statsByStudentId.get(studentId) || {
+      totalPoints: 0,
+      participatedSessions: 0,
+      latestPoints: 0,
+      lastParticipationAt: null,
+    }
+
+    existingStats.totalPoints += Number(event.points) || 0
+    existingStats.participatedSessions += 1
+    existingStats.latestPoints = Number(event.points) || 0
+    existingStats.lastParticipationAt = event.createdAt || existingStats.lastParticipationAt
+    statsByStudentId.set(studentId, existingStats)
+  })
+
+  await Promise.all(
+    studentsSnapshot.docs.map((studentDoc) => {
+      const stats = statsByStudentId.get(studentDoc.id) || {
+        totalPoints: 0,
+        participatedSessions: 0,
+        latestPoints: 0,
+        lastParticipationAt: null,
+      }
+
+      return setDoc(
+        studentDoc.ref,
+        {
+          totalPoints: stats.totalPoints,
+          participatedSessions: stats.participatedSessions,
+          latestPoints: stats.latestPoints,
+          lastParticipationAt: stats.lastParticipationAt,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      )
+    }),
+  )
+}
+
+const getClassEngagementLabel = ({ studentsCount = 0, participationEvents = [] } = {}) => {
+  const participationOnlyEvents = (Array.isArray(participationEvents) ? participationEvents : []).filter(
+    (event) => event?.eventType !== 'absence',
+  )
+
+  if (!participationOnlyEvents.length) {
+    return 'No activity yet'
+  }
+
+  const safeStudentCount = Math.max(Number(studentsCount) || 0, 1)
+  const activeStudents = new Set(
+    participationOnlyEvents.map((event) => event?.studentId).filter(Boolean),
+  ).size
+  const sessionKeys = new Set(
+    participationOnlyEvents
+      .map((event, index) => event?.sessionId || event?.sessionLabel || event?.createdAt?.seconds || `event-${index}`)
+      .filter(Boolean),
+  ).size
+
+  const activeStudentRatio = activeStudents / safeStudentCount
+  const participationDensity = participationOnlyEvents.length / safeStudentCount
+
+  if (activeStudentRatio >= 0.75 || participationDensity >= 1 || sessionKeys >= 4) {
+    return 'High'
+  }
+
+  if (activeStudentRatio >= 0.35 || participationDensity >= 0.4 || sessionKeys >= 2) {
+    return 'Moderate'
+  }
+
+  return 'Low'
+}
+
 const sortClasses = (classes) =>
   [...classes].sort((left, right) => {
     if (left.sortOrder !== right.sortOrder) {
@@ -98,11 +199,16 @@ export const getTeacherClasses = async (teacherId, { archived = false } = {}) =>
   const classes = await Promise.all(
     snapshot.docs.map(async (classDoc) => {
       const enrolledStudents = await getEnrolledStudentsForTeacherClass(teacherId, classDoc.id)
+      const participationEvents = await getParticipationEventsForTeacherClass(teacherId, classDoc.id)
 
       return {
         id: classDoc.id,
         ...classDoc.data(),
         students: enrolledStudents.length,
+        engagement: getClassEngagementLabel({
+          studentsCount: enrolledStudents.length,
+          participationEvents,
+        }),
       }
     }),
   )
@@ -111,8 +217,7 @@ export const getTeacherClasses = async (teacherId, { archived = false } = {}) =>
 }
 
 export const getTeacherClassById = async (teacherId, classId) => {
-  const classRef = doc(db, 'users', teacherId, 'classes', classId)
-  const snapshot = await getDoc(classRef)
+  const snapshot = await getDoc(teacherClassRef(teacherId, classId))
 
   if (!snapshot.exists()) {
     return null
@@ -129,6 +234,10 @@ export const getTeacherClassById = async (teacherId, classId) => {
     enrolledStudents,
     participationEvents,
     students: enrolledStudents.length,
+    engagement: getClassEngagementLabel({
+      studentsCount: enrolledStudents.length,
+      participationEvents,
+    }),
   }
 }
 
@@ -148,8 +257,7 @@ export const createTeacherClass = async (teacherId, classData) => {
 
 export const updateTeacherClass = async (teacherId, classId, classData) => {
   const { students: _ignoredStudents, ...restClassData } = classData
-  const classRef = doc(db, 'users', teacherId, 'classes', classId)
-  await updateDoc(classRef, {
+  await updateDoc(teacherClassRef(teacherId, classId), {
     ...restClassData,
     updatedAt: serverTimestamp(),
   })
@@ -180,8 +288,7 @@ export const updateTeacherClassStudentFeedback = async (
 }
 
 export const archiveTeacherClass = async (teacherId, classId) => {
-  const classRef = doc(db, 'users', teacherId, 'classes', classId)
-  await updateDoc(classRef, {
+  await updateDoc(teacherClassRef(teacherId, classId), {
     archived: true,
     archivedAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -189,8 +296,7 @@ export const archiveTeacherClass = async (teacherId, classId) => {
 }
 
 export const restoreTeacherClass = async (teacherId, classId) => {
-  const classRef = doc(db, 'users', teacherId, 'classes', classId)
-  await updateDoc(classRef, {
+  await updateDoc(teacherClassRef(teacherId, classId), {
     archived: false,
     archivedAt: null,
     updatedAt: serverTimestamp(),
@@ -198,8 +304,99 @@ export const restoreTeacherClass = async (teacherId, classId) => {
 }
 
 export const permanentlyDeleteTeacherClass = async (teacherId, classId) => {
-  const classRef = doc(db, 'users', teacherId, 'classes', classId)
-  await deleteDoc(classRef)
+  await deleteDoc(teacherClassRef(teacherId, classId))
+}
+
+export const deleteTeacherClassSession = async (teacherId, classId, sessionId) => {
+  if (!teacherId || !classId || !sessionId) {
+    throw new Error('Missing teacher, class, or session information.')
+  }
+
+  const classRef = teacherClassRef(teacherId, classId)
+  const classSnapshot = await getDoc(classRef)
+
+  if (!classSnapshot.exists()) {
+    throw new Error('This class could not be found.')
+  }
+
+  const classData = classSnapshot.data()
+  const nextSessionHistory = (Array.isArray(classData.sessionHistory) ? classData.sessionHistory : [])
+    .filter((session) => session?.id !== sessionId)
+
+  const participationSnapshot = await getDocs(teacherClassParticipationCollection(teacherId, classId))
+  const sessionEventDocs = participationSnapshot.docs.filter((eventDoc) => eventDoc.data()?.sessionId === sessionId)
+  const remainingParticipationDocs = participationSnapshot.docs.filter((eventDoc) => eventDoc.data()?.sessionId !== sessionId)
+
+  await Promise.all(sessionEventDocs.map((eventDoc) => deleteDoc(eventDoc.ref)))
+  await syncTeacherClassStudentStatsFromEvents(teacherId, classId, { docs: remainingParticipationDocs })
+
+  await updateDoc(classRef, {
+    sessionHistory: nextSessionHistory,
+    updatedAt: serverTimestamp(),
+  })
+}
+
+export const deleteAllTeacherClassSessions = async (teacherId, classId) => {
+  if (!teacherId || !classId) {
+    throw new Error('Missing teacher or class information.')
+  }
+
+  const classRef = teacherClassRef(teacherId, classId)
+  const classSnapshot = await getDoc(classRef)
+
+  if (!classSnapshot.exists()) {
+    throw new Error('This class could not be found.')
+  }
+
+  if (classSnapshot.data()?.activeSession) {
+    throw new Error('End the active session before deleting the session history.')
+  }
+
+  const participationSnapshot = await getDocs(teacherClassParticipationCollection(teacherId, classId))
+
+  await Promise.all(participationSnapshot.docs.map((eventDoc) => deleteDoc(eventDoc.ref)))
+  await syncTeacherClassStudentStatsFromEvents(teacherId, classId, { docs: [] })
+
+  await updateDoc(classRef, {
+    sessionHistory: [],
+    updatedAt: serverTimestamp(),
+  })
+}
+
+export const removeStudentFromTeacherClass = async (teacherId, classId, studentId) => {
+  if (!teacherId || !classId || !studentId) {
+    throw new Error('Missing teacher, class, or student information.')
+  }
+
+  const classRef = teacherClassRef(teacherId, classId)
+  const classSnapshot = await getDoc(classRef)
+
+  if (!classSnapshot.exists()) {
+    throw new Error('This class could not be found.')
+  }
+
+  const classData = classSnapshot.data()
+  const activeSession = classData?.activeSession
+  const nextActiveSession = activeSession
+    ? {
+        ...activeSession,
+        rosterSnapshot: sanitizeSessionRosterSnapshot(activeSession.rosterSnapshot || []).filter(
+          (student) => (student.studentId || student.id) !== studentId,
+        ),
+      }
+    : null
+
+  await Promise.all([
+    deleteDoc(studentEnrolledClassRef(studentId, classId)),
+    deleteDoc(teacherClassStudentRef(teacherId, classId, studentId)),
+  ])
+
+  if (activeSession) {
+    await updateDoc(classRef, {
+      activeSession: nextActiveSession,
+      updatedAt: serverTimestamp(),
+    })
+  }
 }
 
 export const deleteTeacherAccountData = async (teacherId) => {
@@ -303,7 +500,6 @@ export const recordTeacherClassAbsence = async (teacherId, classId, studentPaylo
 }
 
 export const startTeacherClassSession = async (teacherId, classId, sessionData = {}) => {
-  const classRef = doc(db, 'users', teacherId, 'classes', classId)
   const startedAt = Timestamp.now()
 
   const activeSession = removeUndefinedValues({
@@ -314,7 +510,7 @@ export const startTeacherClassSession = async (teacherId, classId, sessionData =
     rosterSnapshot: sanitizeSessionRosterSnapshot(sessionData.rosterSnapshot),
   })
 
-  await updateDoc(classRef, {
+  await updateDoc(teacherClassRef(teacherId, classId), {
     activeSession,
     updatedAt: serverTimestamp(),
   })
@@ -331,14 +527,13 @@ export const endTeacherClassSession = async (
 ) => {
   if (!activeSession) return null
 
-  const classRef = doc(db, 'users', teacherId, 'classes', classId)
   const endedAt = Timestamp.now()
   const completedSession = removeUndefinedValues({
     ...activeSession,
     endedAt,
   })
 
-  await updateDoc(classRef, {
+  await updateDoc(teacherClassRef(teacherId, classId), {
     activeSession: null,
     sessionHistory: [...(Array.isArray(sessionHistory) ? sessionHistory : []), completedSession],
     updatedAt: serverTimestamp(),

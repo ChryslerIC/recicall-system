@@ -355,63 +355,67 @@
 
               <div v-else-if="activeTab === 'class-list'" class="mt-[22px] space-y-[22px]">
                 <div class="rounded-[31px] bg-[#f6f6f6] px-4 pb-4 pt-4 sm:px-[22px] sm:pb-[22px] sm:pt-[18px]">
-                  <div class="mx-auto flex h-[46px] w-fit items-center justify-center bg-[#d9d9d9] px-5 sm:h-[53px] sm:px-[32px]">
-                    <p class="text-[18px] font-semibold text-black sm:text-[24px]">Blackboard / Whiteboard</p>
-                  </div>
-
-                  <div class="mt-[22px] grid gap-[20px] xl:grid-cols-2">
-                    <div class="space-y-[14px]">
-                      <div
-                        v-for="(row, rowIndex) in deskRowsLeft"
-                        :key="`left-${rowIndex}`"
-                        class="grid gap-[10px] rounded-[24px] bg-[#eef1f2] px-[16px] py-[9px]"
-                        :style="{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }"
-                      >
-                        <div
-                          v-for="seat in row"
-                          :key="seat.id"
-                          class="flex h-[69px] min-w-0 flex-col items-center justify-start rounded-[12px] border border-[#cccdce] bg-[#f8f8f8] pt-[4px]"
-                          :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8] bg-[#eaf3ff] shadow-[0_0_0_2px_rgba(17,136,248,0.15)]' : ''"
-                        >
-                          <template v-if="seat.studentId">
-                            <img
-                              :src="getSeatAvatar(seat)"
-                              alt=""
-                              class="h-[41px] w-[43px] rounded-full border-2 object-cover"
-                              :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8]' : 'border-[#8d8d8d]'"
-                            />
-                            <p class="mt-[3px] max-w-[56px] truncate text-center text-[10px] font-medium leading-none" :class="isCurrentStudentSeat(seat) ? 'text-[#1188f8]' : 'text-black'">
-                              {{ isCurrentStudentSeat(seat) ? 'YOU' : getSeatLabel(seat) }}
-                            </p>
-                          </template>
-                        </div>
+                  <div class="overflow-x-auto pb-2">
+                    <div class="mx-auto min-w-[720px]">
+                      <div class="mx-auto flex h-[46px] w-fit items-center justify-center bg-[#d9d9d9] px-5 sm:h-[53px] sm:px-[32px]">
+                        <p class="text-[18px] font-semibold text-black sm:text-[24px]">Blackboard / Whiteboard</p>
                       </div>
-                    </div>
 
-                    <div class="space-y-[14px]">
-                      <div
-                        v-for="(row, rowIndex) in deskRowsRight"
-                        :key="`right-${rowIndex}`"
-                        class="grid gap-[10px] rounded-[24px] bg-[#eef1f2] px-[16px] py-[9px]"
-                        :style="{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }"
-                      >
-                        <div
-                          v-for="seat in row"
-                          :key="seat.id"
-                          class="flex h-[69px] min-w-0 flex-col items-center justify-start rounded-[12px] border border-[#cccdce] bg-[#f8f8f8] pt-[4px]"
-                          :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8] bg-[#eaf3ff] shadow-[0_0_0_2px_rgba(17,136,248,0.15)]' : ''"
-                        >
-                          <template v-if="seat.studentId">
-                            <img
-                              :src="getSeatAvatar(seat)"
-                              alt=""
-                              class="h-[41px] w-[43px] rounded-full border-2 object-cover"
-                              :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8]' : 'border-[#8d8d8d]'"
-                            />
-                            <p class="mt-[3px] max-w-[56px] truncate text-center text-[10px] font-medium leading-none" :class="isCurrentStudentSeat(seat) ? 'text-[#1188f8]' : 'text-black'">
-                              {{ isCurrentStudentSeat(seat) ? 'YOU' : getSeatLabel(seat) }}
-                            </p>
-                          </template>
+                      <div class="mt-[22px] grid grid-cols-2 gap-[20px]">
+                        <div class="space-y-[14px]">
+                          <div
+                            v-for="(row, rowIndex) in deskRowsLeft"
+                            :key="`left-${rowIndex}`"
+                            class="grid gap-[10px] rounded-[24px] bg-[#eef1f2] px-[16px] py-[9px]"
+                            :style="{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }"
+                          >
+                            <div
+                              v-for="seat in row"
+                              :key="seat.id"
+                              class="flex h-[69px] min-w-0 flex-col items-center justify-start rounded-[12px] border border-[#cccdce] bg-[#f8f8f8] pt-[4px]"
+                              :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8] bg-[#eaf3ff] shadow-[0_0_0_2px_rgba(17,136,248,0.15)]' : ''"
+                            >
+                              <template v-if="seat.studentId">
+                                <img
+                                  :src="getSeatAvatar(seat)"
+                                  alt=""
+                                  class="h-[41px] w-[43px] rounded-full border-2 object-cover"
+                                  :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8]' : 'border-[#8d8d8d]'"
+                                />
+                                <p class="mt-[3px] max-w-[56px] truncate text-center text-[10px] font-medium leading-none" :class="isCurrentStudentSeat(seat) ? 'text-[#1188f8]' : 'text-black'">
+                                  {{ isCurrentStudentSeat(seat) ? 'YOU' : getSeatLabel(seat) }}
+                                </p>
+                              </template>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="space-y-[14px]">
+                          <div
+                            v-for="(row, rowIndex) in deskRowsRight"
+                            :key="`right-${rowIndex}`"
+                            class="grid gap-[10px] rounded-[24px] bg-[#eef1f2] px-[16px] py-[9px]"
+                            :style="{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }"
+                          >
+                            <div
+                              v-for="seat in row"
+                              :key="seat.id"
+                              class="flex h-[69px] min-w-0 flex-col items-center justify-start rounded-[12px] border border-[#cccdce] bg-[#f8f8f8] pt-[4px]"
+                              :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8] bg-[#eaf3ff] shadow-[0_0_0_2px_rgba(17,136,248,0.15)]' : ''"
+                            >
+                              <template v-if="seat.studentId">
+                                <img
+                                  :src="getSeatAvatar(seat)"
+                                  alt=""
+                                  class="h-[41px] w-[43px] rounded-full border-2 object-cover"
+                                  :class="isCurrentStudentSeat(seat) ? 'border-[#1188f8]' : 'border-[#8d8d8d]'"
+                                />
+                                <p class="mt-[3px] max-w-[56px] truncate text-center text-[10px] font-medium leading-none" :class="isCurrentStudentSeat(seat) ? 'text-[#1188f8]' : 'text-black'">
+                                  {{ isCurrentStudentSeat(seat) ? 'YOU' : getSeatLabel(seat) }}
+                                </p>
+                              </template>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -519,6 +523,7 @@
                     <p class="text-[14px] font-bold uppercase tracking-[0.08em] text-[#777]">Participation Score</p>
                     <p class="mt-3 text-[42px] font-bold leading-none text-[#1188f8]">{{ studentAnalytics.score }}%</p>
                     <p class="mt-3 text-[15px] font-semibold text-[#4a4a4a]">{{ studentStatusLabel }}</p>
+                    <p class="mt-2 text-[13px] font-medium leading-[1.4] text-[#6a7280]">{{ PARTICIPATION_SCORE_EXPLANATION }}</p>
                   </article>
                   <article class="rounded-[22px] border border-[#cccdce] bg-white px-5 py-4">
                     <p class="text-[14px] font-bold uppercase tracking-[0.08em] text-[#777]">Times You Joined</p>
@@ -693,6 +698,7 @@
                             <div>
                               <h2 class="text-[28px] font-bold leading-none text-black">How You Compare</h2>
                               <p class="mt-2 text-[16px] font-medium text-[#4a4a4a]">See your participation score beside the class average and top score.</p>
+                              <p class="mt-2 text-[13px] font-medium leading-[1.4] text-[#6a7280]">{{ PARTICIPATION_SCORE_EXPLANATION }}</p>
                             </div>
                             <div class="rounded-[18px] bg-white px-4 py-3 text-center">
                               <p class="text-[28px] font-bold leading-none text-[#1188f8]">{{ studentAnalytics.classAverageScore }}%</p>
@@ -724,6 +730,57 @@
                                 <p class="mt-2 text-[14px] font-medium text-[#4a4a4a]">{{ topScoreGapLabel }}</p>
                               </div>
                             </div>
+                          </section>
+
+                          <section class="rounded-[28px] border border-[#cccdce] bg-white px-5 py-5">
+                            <div class="flex items-start justify-between gap-4">
+                              <div>
+                                <h2 class="text-[24px] font-bold leading-none text-black">Turn Priority</h2>
+                                <p class="mt-2 text-[14px] font-medium leading-[1.4] text-[#5b5b5b]">
+                                  This shows how ReciCall decides who should get a turn sooner.
+                                </p>
+                              </div>
+                              <div class="rounded-[20px] border border-[#d8e7fb] bg-[linear-gradient(180deg,#f7fbff_0%,#eaf4ff_100%)] px-4 py-3 text-center shadow-[0_10px_24px_rgba(17,136,248,0.08)]">
+                                <p class="text-[12px] font-bold uppercase tracking-[0.12em] text-[#6d7f97]">Score range</p>
+                                <p class="mt-1 text-[32px] font-black leading-none tracking-[-0.03em] text-[#1188f8]">0-100</p>
+                              </div>
+                            </div>
+                            <div class="mt-4 rounded-[22px] border border-[#dce9fb] bg-[linear-gradient(180deg,#fbfdff_0%,#f3f7fc_100%)] px-4 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.04)] sm:px-5">
+                              <p class="text-[12px] font-bold uppercase tracking-[0.12em] text-[#6d7f97]">Simple rule</p>
+                              <div class="mt-3 flex flex-wrap gap-2">
+                                <span class="rounded-full bg-white px-3 py-2 text-[13px] font-semibold text-[#17406f] shadow-[0_4px_10px_rgba(15,23,42,0.05)]">Low participation score</span>
+                                <span class="rounded-full bg-white px-3 py-2 text-[13px] font-semibold text-[#17406f] shadow-[0_4px_10px_rgba(15,23,42,0.05)]">Longer time since last participation</span>
+                                <span class="rounded-full bg-white px-3 py-2 text-[13px] font-semibold text-[#17406f] shadow-[0_4px_10px_rgba(15,23,42,0.05)]">No first participation yet</span>
+                                <span class="rounded-full bg-white px-3 py-2 text-[13px] font-semibold text-[#17406f] shadow-[0_4px_10px_rgba(15,23,42,0.05)]">Missed participation</span>
+                                <span class="rounded-full bg-white px-3 py-2 text-[13px] font-semibold text-[#17406f] shadow-[0_4px_10px_rgba(15,23,42,0.05)]">Seat assignment</span>
+                              </div>
+                              <div class="mt-4 rounded-[18px] bg-[#1188f8] px-4 py-3 text-white shadow-[0_14px_28px_rgba(17,136,248,0.16)]">
+                                <p class="text-[12px] font-bold uppercase tracking-[0.12em] text-white/80">What it means</p>
+                                <p class="mt-2 text-[17px] font-bold leading-[1.35] sm:text-[18px]">
+                                  More points across these factors move a student higher in the queue.
+                                </p>
+                              </div>
+                            </div>
+                            <div class="mt-4 grid gap-3 md:grid-cols-2">
+                              <div
+                                v-for="factor in studentAnalytics.priorityBreakdown"
+                                :key="factor.key"
+                                class="rounded-[20px] border border-[#d8e7fb] bg-[linear-gradient(180deg,#fbfdff_0%,#f5f9ff_100%)] px-4 py-4 shadow-[0_8px_18px_rgba(15,23,42,0.04)]"
+                              >
+                                <div class="flex items-start justify-between gap-3">
+                                  <span class="max-w-[70%] text-[12px] font-bold uppercase tracking-[0.1em] text-[#6f84a3]">{{ factor.label }}</span>
+                                  <span class="rounded-full bg-[#e8f2ff] px-2.5 py-1 text-[11px] font-bold text-[#1188f8]">factor</span>
+                                </div>
+                                <p class="mt-3 text-[28px] font-black leading-none tracking-[-0.03em] text-[#1188f8]">+{{ factor.value }}</p>
+                                <div class="mt-4 rounded-[14px] bg-white px-3 py-3">
+                                  <p class="text-[12px] font-medium leading-[1.4] text-[#42556f]">{{ factor.source }}</p>
+                                </div>
+                                <p class="mt-3 text-[12px] font-semibold leading-[1.4] text-[#7b8aa0]">{{ factor.basis }}</p>
+                              </div>
+                            </div>
+                            <p class="mt-4 text-[13px] font-medium leading-[1.4] text-[#6a7280]">
+                              Higher priority means you are more likely to be called next, but the teacher still confirms the final scan.
+                            </p>
                           </section>
                         </aside>
                       </div>
@@ -887,6 +944,7 @@ import {
   defaultStudentAvatarKey,
   resolveStudentAvatar,
 } from '../../utils/studentAvatarOptions'
+import { PARTICIPATION_SCORE_EXPLANATION } from '../../utils/scoring'
 import { defaultTeacherAvatarKey, resolveTeacherAvatar, sanitizeTeacherAvatarKey } from '../../utils/teacherAvatarOptions'
 
 const router = useRouter()

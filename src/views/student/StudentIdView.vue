@@ -347,8 +347,8 @@
     v-if="isEditModalOpen"
     class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[rgba(0,0,0,0.35)] px-3 py-3 sm:px-4 sm:py-8 sm:items-center"
   >
-    <div class="w-full max-w-[520px] max-h-[calc(100vh-1.5rem)] overflow-y-auto rounded-[28px] bg-white px-4 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.2)] sm:max-h-[calc(100vh-4rem)] sm:px-6 sm:py-6">
-      <div class="sticky top-0 z-10 flex items-start justify-between gap-4 bg-white pb-4">
+    <div class="flex h-[min(720px,calc(100vh-1.5rem))] w-full max-w-[520px] flex-col overflow-hidden rounded-[28px] bg-white px-4 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.2)] sm:h-[min(760px,calc(100vh-4rem))] sm:px-6 sm:py-6">
+      <div class="flex shrink-0 items-start justify-between gap-4 bg-white pb-4">
         <div>
           <h2 class="text-[30px] leading-none font-bold sm:text-[34px]">Settings</h2>
           <p class="mt-3 text-[15px] leading-[1.35] text-[#444] sm:text-[16px]">
@@ -366,12 +366,13 @@
         </button>
       </div>
 
-      <div class="mt-5 flex flex-wrap gap-2 rounded-[22px] bg-[#f6f6f6] p-2">
-        <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'profile' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'profile'">Profile</button>
-        <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'security' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'security'">Security</button>
-        <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'legal' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'legal'">Legal</button>
-        <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'danger' ? 'bg-white text-[#b81717] shadow-[0_8px_18px_rgba(184,23,23,0.12)]' : 'text-[#7a4a4a]'" @click="activeSettingsSection = 'danger'">Delete Account</button>
-      </div>
+      <div class="min-h-0 flex-1 overflow-y-auto pr-1">
+        <div class="mt-5 flex flex-wrap gap-2 rounded-[22px] bg-[#f6f6f6] p-2">
+          <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'profile' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'profile'">Profile</button>
+          <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'security' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'security'">Security</button>
+          <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'legal' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.12)]' : 'text-[#4b4b4b]'" @click="activeSettingsSection = 'legal'">Legal</button>
+          <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'danger' ? 'bg-white text-[#b81717] shadow-[0_8px_18px_rgba(184,23,23,0.12)]' : 'text-[#7a4a4a]'" @click="activeSettingsSection = 'danger'">Delete Account</button>
+        </div>
 
       <div v-if="activeSettingsSection === 'profile'" class="mt-6">
         <label class="text-[16px] font-medium" for="student-id-name">Full Name</label>
@@ -390,7 +391,30 @@
         <div class="mt-6">
           <div class="flex items-center justify-between gap-4">
             <p class="text-[16px] font-medium">Student Avatar</p>
-            <img :src="editAvatarPreview" alt="" class="h-[56px] w-[56px] rounded-full border border-[#d7d7d7] object-cover" />
+            <div class="flex items-center gap-3">
+              <img :src="editAvatarPreview" alt="" class="h-[56px] w-[56px] rounded-full border border-[#d7d7d7] object-cover" />
+              <div class="flex flex-col items-end gap-2">
+                <label class="inline-flex cursor-pointer items-center justify-center rounded-[16px] border border-[#1188f8] bg-white px-3 py-2 text-[13px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff]">
+                  Upload Photo
+                  <input
+                    type="file"
+                    accept="image/*"
+                    class="hidden"
+                    :disabled="isSavingName"
+                    @change="handleStudentPhotoSelected"
+                  />
+                </label>
+                <button
+                  v-if="editPhotoPreviewUrl"
+                  type="button"
+                  class="rounded-[16px] border border-[#d7d7d7] bg-[#fafafa] px-3 py-2 text-[12px] font-semibold text-[#555] transition hover:border-[#1188f8] hover:text-[#1188f8]"
+                  :disabled="isSavingName"
+                  @click="clearStudentPhotoSelection"
+                >
+                  Use avatar instead
+                </button>
+              </div>
+            </div>
           </div>
           <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
             <button
@@ -400,7 +424,7 @@
               class="rounded-[18px] border px-3 py-3 text-center transition"
               :class="editAvatarKey === avatar.key ? 'border-[#1188f8] bg-[#eef6ff] shadow-[0_0_0_2px_rgba(17,136,248,0.12)]' : 'border-[#d7d7d7] bg-[#fafafa] hover:border-[#1188f8]'"
               :disabled="isSavingName"
-              @click="editAvatarKey = avatar.key"
+              @click="selectStudentAvatarPreset(avatar.key)"
             >
               <img :src="avatar.src" :alt="avatar.label" class="mx-auto h-[70px] w-[70px] rounded-full object-cover" />
               <p class="mt-3 text-[13px] font-semibold text-black">{{ avatar.label }}</p>
@@ -409,6 +433,9 @@
           <p class="mt-3 text-[14px] text-[#666]">
             Your selected avatar will appear on your ID, your class list, and your teacher's class
             list.
+          </p>
+          <p class="mt-2 text-[13px] text-[#777]">
+            You can also upload a JPG or PNG profile photo up to 5 MB.
           </p>
         </div>
       </div>
@@ -480,8 +507,9 @@
       <p v-if="editError" class="mt-4 text-[15px] font-medium text-red-600">
         {{ editError }}
       </p>
+      </div>
 
-      <div class="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <div class="mt-4 flex shrink-0 flex-col-reverse gap-3 border-t border-[#e5e7eb] pt-4 sm:flex-row sm:justify-end">
         <button
           type="button"
           class="h-[52px] w-full rounded-[22px] bg-[#d9d9d9] px-6 text-[18px] font-semibold sm:min-w-[130px] sm:w-auto"
@@ -539,6 +567,8 @@ const isEditModalOpen = ref(false)
 const activeSettingsSection = ref('profile')
 const editNameValue = ref('')
 const editAvatarKey = ref(defaultStudentAvatarKey)
+const editPhotoFile = ref(null)
+const editPhotoPreviewUrl = ref('')
 const editError = ref('')
 const settingsSuccess = ref('')
 const deleteAccountError = ref('')
@@ -569,11 +599,14 @@ const studentAvatarSrc = computed(() =>
   resolveStudentAvatar(avatarKey.value, fallbackStudentPhotoURL.value),
 )
 const editAvatarPreview = computed(() =>
-  resolveStudentAvatar(editAvatarKey.value, fallbackStudentPhotoURL.value),
+  editPhotoPreviewUrl.value || resolveStudentAvatar(editAvatarKey.value, fallbackStudentPhotoURL.value),
 )
 const signedInEmail = computed(() => auth.currentUser?.email || 'No email available')
 const hasProfileChanges = computed(
-  () => normalizedEditName.value !== displayName.value || editAvatarKey.value !== avatarKey.value,
+  () =>
+    normalizedEditName.value !== displayName.value ||
+    editAvatarKey.value !== avatarKey.value ||
+    Boolean(editPhotoFile.value),
 )
 
 const normalizeSettingsSection = (value) =>
@@ -616,6 +649,32 @@ const buildSettingsReturnTo = (section = activeSettingsSection.value) =>
 const prefillStudentSettings = () => {
   editNameValue.value = displayName.value
   editAvatarKey.value = avatarKey.value
+  editPhotoFile.value = null
+  editPhotoPreviewUrl.value = fallbackStudentPhotoURL.value || ''
+}
+
+const selectStudentAvatarPreset = (avatarKey) => {
+  editAvatarKey.value = avatarKey
+  editPhotoFile.value = null
+  editPhotoPreviewUrl.value = ''
+}
+
+const clearStudentPhotoSelection = () => {
+  editPhotoFile.value = null
+  editPhotoPreviewUrl.value = ''
+  editAvatarKey.value = defaultStudentAvatarKey
+}
+
+const handleStudentPhotoSelected = (event) => {
+  const input = event.target
+  const nextFile = input?.files?.[0] || null
+
+  if (!nextFile) return
+
+  editPhotoFile.value = nextFile
+  editPhotoPreviewUrl.value = URL.createObjectURL(nextFile)
+  editAvatarKey.value = ''
+  input.value = ''
 }
 
 const qrPayload = computed(() =>
@@ -675,6 +734,11 @@ const getVisibleIdCardElement = () => {
   }) || desktopIdCardRef.value || mobileIdCardRef.value
 }
 
+const studentIdPrintAreaMm = {
+  width: 76.2,
+  height: 50.8,
+}
+
 const saveStudentIdAsPdf = async () => {
   const target = getVisibleIdCardElement()
   if (!target || isSavingIdPdf.value) return
@@ -684,10 +748,13 @@ const saveStudentIdAsPdf = async () => {
     await downloadElementAsPdf({
       element: target,
       fileName: `${displayName.value.trim().replace(/\s+/g, '-').toLowerCase() || 'student-id'}-recicall-id.pdf`,
-      orientation: 'landscape',
+      orientation: 'portrait',
       format: 'a4',
-      margin: 12,
+      margin: 16,
       backgroundColor: '#ffffff',
+      scale: 3,
+      targetWidth: studentIdPrintAreaMm.width,
+      targetHeight: studentIdPrintAreaMm.height,
     })
   } catch (error) {
     console.error('Unable to save student ID PDF:', error)
@@ -809,6 +876,7 @@ const saveProfileChanges = async () => {
   const trimmedName = normalizedEditName.value
   const nameWasChanged = trimmedName !== displayName.value
   const avatarWasChanged = editAvatarKey.value !== avatarKey.value
+  const photoWasChanged = Boolean(editPhotoFile.value)
 
   if (!trimmedName) {
     editError.value = 'Please enter your full name.'
@@ -820,7 +888,7 @@ const saveProfileChanges = async () => {
     return
   }
 
-  if (!nameWasChanged && !avatarWasChanged) {
+  if (!nameWasChanged && !avatarWasChanged && !photoWasChanged) {
     closeEditModal(true)
     return
   }
@@ -829,20 +897,30 @@ const saveProfileChanges = async () => {
   editError.value = ''
 
   try {
-    const nextAvatarKey = editAvatarKey.value || (fallbackStudentPhotoURL.value ? '' : defaultStudentAvatarKey)
+    const hasCustomPhoto = Boolean(editPhotoFile.value)
+    const nextAvatarKey = editAvatarKey.value || (hasCustomPhoto || fallbackStudentPhotoURL.value ? '' : defaultStudentAvatarKey)
+    const shouldKeepExistingPhoto = !hasCustomPhoto && !nextAvatarKey
     let updatedCount = nameChangeCount.value
 
-    if (nameWasChanged) {
-      updatedCount += 1
-      await updateCurrentUserAccount({
-        displayName: trimmedName,
-        photoURL: fallbackStudentPhotoURL.value,
-      })
-    }
+    const updatedAccount = (nameWasChanged || photoWasChanged || !shouldKeepExistingPhoto)
+      ? await updateCurrentUserAccount({
+          displayName: trimmedName,
+          photoFile: editPhotoFile.value || undefined,
+          photoURL: hasCustomPhoto ? '' : shouldKeepExistingPhoto ? fallbackStudentPhotoURL.value : '',
+        })
+      : null
+
+    if (nameWasChanged) updatedCount += 1
+
+    const nextPhotoURL = updatedAccount?.photoURL ?? (shouldKeepExistingPhoto ? fallbackStudentPhotoURL.value : '')
 
     await upsertUserProfile(studentUid.value, {
       avatarKey: nextAvatarKey,
       avatarPromptSeen: true,
+      photoURL: nextPhotoURL,
+      cloudinaryPublicId: updatedAccount?.cloudinaryPublicId || '',
+      cloudinaryAssetId: updatedAccount?.cloudinaryAssetId || '',
+      cloudinaryFormat: updatedAccount?.cloudinaryFormat || '',
       ...(nameWasChanged
         ? {
             displayName: trimmedName,
@@ -854,7 +932,7 @@ const saveProfileChanges = async () => {
     await syncStudentProfileAcrossClasses(studentUid.value, {
       displayName: nameWasChanged ? trimmedName : displayName.value,
       avatarKey: nextAvatarKey,
-      photoURL: fallbackStudentPhotoURL.value || undefined,
+      photoURL: nextPhotoURL || undefined,
       email: studentProfileRecord.value?.email || auth.currentUser?.email || undefined,
       gradeLevel: studentProfileRecord.value?.gradeLevel,
       studentNumber: studentNumber.value,
@@ -863,12 +941,17 @@ const saveProfileChanges = async () => {
     displayName.value = nameWasChanged ? trimmedName : displayName.value
     avatarKey.value = nextAvatarKey
     nameChangeCount.value = updatedCount
+    editPhotoFile.value = null
+    editPhotoPreviewUrl.value = nextPhotoURL || ''
     studentProfileRecord.value = {
       ...(studentProfileRecord.value || {}),
       displayName: nameWasChanged ? trimmedName : displayName.value,
       avatarKey: nextAvatarKey,
       nameChangeCount: updatedCount,
-      photoURL: fallbackStudentPhotoURL.value,
+      photoURL: nextPhotoURL,
+      cloudinaryPublicId: updatedAccount?.cloudinaryPublicId || '',
+      cloudinaryAssetId: updatedAccount?.cloudinaryAssetId || '',
+      cloudinaryFormat: updatedAccount?.cloudinaryFormat || '',
     }
     closeEditModal()
   } catch (error) {

@@ -8,8 +8,8 @@ import {
   signOut,
   updateProfile,
 } from 'firebase/auth'
-import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
-import { auth, storage } from '../config/firebase'
+import { auth } from '../config/firebase'
+import { uploadProfilePhotoToCloudinary } from './cloudinaryService'
 
 const googleProvider = new GoogleAuthProvider()
 
@@ -91,21 +91,21 @@ export const updateCurrentUserAccount = async ({ displayName, photoFile, photoUR
 
   let nextPhotoURL = typeof photoURL === 'string' ? photoURL : undefined
   let photoUploadError = ''
+  let cloudinaryPublicId = ''
+  let cloudinaryAssetId = ''
+  let cloudinaryFormat = ''
 
   if (photoFile) {
     try {
-      const profilePhotoRef = storageRef(storage, `profile-photos/${user.uid}/${Date.now()}-${photoFile.name}`)
-      await withTimeout(
-        uploadBytes(profilePhotoRef, photoFile),
-        15000,
+      const uploadResult = await withTimeout(
+        uploadProfilePhotoToCloudinary(photoFile, { userId: user.uid }),
+        20000,
         'Profile photo upload timed out. Please try again.',
       )
-      const uploadedPhotoURL = await withTimeout(
-        getDownloadURL(profilePhotoRef),
-        10000,
-        'Unable to retrieve the uploaded profile photo. Please try again.',
-      )
-      nextPhotoURL = uploadedPhotoURL
+      nextPhotoURL = uploadResult.photoURL
+      cloudinaryPublicId = uploadResult.cloudinaryPublicId
+      cloudinaryAssetId = uploadResult.assetId
+      cloudinaryFormat = uploadResult.format
     } catch (error) {
       photoUploadError = error?.message || 'Unable to upload profile photo right now.'
     }
@@ -128,6 +128,9 @@ export const updateCurrentUserAccount = async ({ displayName, photoFile, photoUR
   return {
     displayName: user.displayName || displayName || '',
     photoURL: typeof nextPhotoURL === 'string' ? nextPhotoURL : '',
+    cloudinaryPublicId,
+    cloudinaryAssetId,
+    cloudinaryFormat,
     photoUploadError,
   }
 }
