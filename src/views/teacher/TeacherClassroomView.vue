@@ -267,10 +267,9 @@
                   </div>
 
                   <template v-if="isSessionActive">
-                    <div class="mt-[16px] w-full rounded-[32px] bg-[#f6f6f6] px-4 py-4 sm:px-5 xl:h-[244px] xl:px-[20px] xl:py-[16px]">
-                      <div class="grid h-full grid-cols-1 gap-y-4 xl:grid-cols-[276px_1fr] xl:gap-x-[18px] xl:gap-y-0">
-                        <div class="relative pl-[16px] pt-[2px]">
-                          <div class="absolute left-[0px] top-[0px] h-full w-[3px] rounded-full bg-[#1188f8]" />
+                    <div class="mt-[16px] w-full rounded-[32px] bg-[#f6f6f6] px-4 py-4 sm:px-5 xl:px-[20px] xl:py-[18px]">
+                      <div class="grid grid-cols-1 gap-y-5 xl:grid-cols-[276px_minmax(0,1fr)] xl:gap-x-[22px] xl:gap-y-0">
+                        <div class="rounded-[24px] border-l-[4px] border-[#1188f8] bg-white/40 pl-[18px] pr-3 py-2">
                           <div class="flex items-start gap-[12px]">
                             <div class="grid h-[52px] w-[54px] place-items-center rounded-[14px] bg-[#50d24a]">
                               <AppIcon name="sparkles" :size="26" class="text-[#072b10]" />
@@ -281,13 +280,13 @@
                             </div>
                           </div>
 
-                          <div class="mt-[18px] flex min-h-[61px] w-full max-w-[275px] items-center rounded-[9px] bg-[#d9d9d9] px-[14px] py-3 text-[18px] font-bold text-black sm:text-[20px]">
+                          <div class="mt-[18px] flex min-h-[61px] w-full max-w-[275px] items-center rounded-[12px] bg-[#d9d9d9] px-[14px] py-3 text-[18px] font-bold text-black sm:text-[20px]">
                             <span>Student Participated:</span>
                             <span class="ml-[8px] text-[#1188f8]">{{ activeSessionParticipantCount }}</span>
                           </div>
                         </div>
 
-                        <div class="relative min-w-0 border-t border-[#8d8d8d] pt-4 xl:border-l xl:border-t-0 xl:pl-[24px] xl:pt-[4px]">
+                        <div class="min-w-0 border-t border-[#d4dbe5] pt-4 xl:border-l xl:border-t-0 xl:pl-[24px] xl:pt-[4px]">
                           <div class="flex items-center gap-[8px]">
                             <button
                               type="button"
@@ -307,19 +306,28 @@
                           </div>
 
                           <div v-if="recentStudents.length" class="mt-[14px] space-y-[10px]">
-                            <div v-for="student in recentStudents" :key="student.id" class="flex h-[47px] items-center justify-between rounded-[28px] border border-[#cccdce] bg-[#fdfdfd] px-[10px]">
+                            <div v-for="student in recentStudents" :key="student.id" class="flex min-h-[47px] items-center justify-between gap-3 rounded-[28px] border border-[#cccdce] bg-[#fdfdfd] px-[10px] py-2">
                               <div class="flex min-w-0 items-center gap-[12px]">
                                 <img :src="student.avatarSrc" alt="" class="h-[30px] w-[30px] rounded-full border-2 border-black object-cover" />
                                 <span class="truncate text-[15px] font-medium text-black">{{ student.name }}</span>
                               </div>
-                              <div class="flex h-[35px] w-[73px] items-center justify-center rounded-[14px] bg-[#cfe3fb] text-[20px] font-bold text-black">
-                                + {{ student.points }}
+                              <div class="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  class="rounded-[14px] border border-[#1188f8] bg-white px-3 py-2 text-[12px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff]"
+                                  @click="openStudentPerformanceAnalysis(student.studentId)"
+                                >
+                                  View performance
+                                </button>
+                                <div class="flex h-[35px] w-[73px] items-center justify-center rounded-[14px] bg-[#cfe3fb] text-[20px] font-bold text-black">
+                                  + {{ student.points }}
+                                </div>
                               </div>
                             </div>
                           </div>
                           <p v-else class="mt-[14px] text-[14px] font-medium text-[#666]">No students scanned in this session yet.</p>
 
-                          <div class="mt-[18px] flex justify-start xl:justify-end xl:pr-[8px]">
+                          <div class="mt-[18px] flex justify-start xl:justify-end">
                             <button
                               type="button"
                               class="interactive-secondary-button h-[42px] w-[154px] rounded-[16.5px] border border-[#535353] bg-white text-[15px] font-semibold text-[#1188f8] disabled:cursor-not-allowed disabled:opacity-60"
@@ -355,7 +363,7 @@
                   <section class="mt-[16px] rounded-[28px] border border-[#cccdce] bg-[#f8fbff] px-5 py-5">
                     <button
                       type="button"
-                      class="flex w-full flex-col gap-4 text-left sm:flex-row sm:items-center sm:justify-between"
+                      class="flex w-full flex-col gap-4 text-left xl:flex-row xl:items-start xl:justify-between"
                       @click="isClassRecordsOpen = !isClassRecordsOpen"
                     >
                       <div>
@@ -373,7 +381,7 @@
                         </p>
                       </div>
 
-                      <div class="flex flex-wrap items-center gap-3">
+                      <div class="flex flex-wrap items-start gap-3 xl:max-w-[52%] xl:justify-end">
                         <button
                           v-if="completedSessionRecords.length"
                           type="button"
@@ -412,10 +420,37 @@
                             type="button"
                             class="interactive-primary-button inline-flex h-[48px] items-center justify-center self-start rounded-[24px] bg-[#1188f8] px-6 text-[16px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
                             :disabled="!filteredSessionReportSessions.length"
-                            @click.stop="downloadSessionReport"
+                            @click.stop="downloadSessionExcelReport()"
                           >
-                            Download Report
+                            Download Excel
                           </button>
+                        </div>
+
+                        <div class="mt-4 rounded-[20px] border border-[#d8e4f3] bg-white px-4 py-4">
+                          <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                            <h4 class="text-[16px] font-bold text-black">Excel session information</h4>
+                            <span class="text-[13px] font-medium text-[#6a7280]">The teacher fills these details before exporting.</span>
+                          </div>
+                          <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                            <input v-model="sessionExportSchoolInfo.schoolName" aria-label="School name" placeholder="School name" class="h-[44px] rounded-[14px] border border-[#cccdce] px-3 text-[14px] outline-none focus:border-[#1188f8]" />
+                            <input v-model="sessionExportSchoolInfo.schoolId" aria-label="School ID" placeholder="School ID" class="h-[44px] rounded-[14px] border border-[#cccdce] px-3 text-[14px] outline-none focus:border-[#1188f8]" />
+                            <input v-model="sessionExportSchoolInfo.districtDivision" aria-label="District and division" placeholder="District and division" class="h-[44px] rounded-[14px] border border-[#cccdce] px-3 text-[14px] outline-none focus:border-[#1188f8]" />
+                            <input v-model="sessionExportSchoolInfo.gradeLevel" aria-label="Grade level" :placeholder="classroom.gradeLevel || 'Grade level'" class="h-[44px] rounded-[14px] border border-[#cccdce] px-3 text-[14px] outline-none focus:border-[#1188f8]" />
+                            <input v-model="sessionExportSchoolInfo.section" aria-label="Section" :placeholder="classroom.classLabel || 'Section'" class="h-[44px] rounded-[14px] border border-[#cccdce] px-3 text-[14px] outline-none focus:border-[#1188f8]" />
+                            <input v-model="sessionExportSchoolInfo.subject" aria-label="Subject" :placeholder="classroom.subject || 'Subject'" class="h-[44px] rounded-[14px] border border-[#cccdce] px-3 text-[14px] outline-none focus:border-[#1188f8]" />
+                            <input v-model="sessionExportSchoolInfo.teacher" aria-label="Teacher" :placeholder="teacherName || 'Teacher'" class="h-[44px] rounded-[14px] border border-[#cccdce] px-3 text-[14px] outline-none focus:border-[#1188f8]" />
+                            <input v-model="sessionExportSchoolInfo.schoolYear" aria-label="School year" placeholder="School year" class="h-[44px] rounded-[14px] border border-[#cccdce] px-3 text-[14px] outline-none focus:border-[#1188f8]" />
+                          </div>
+                          <div class="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+                            <label class="flex items-center gap-2 text-[14px] font-semibold text-[#4a4a4a]">
+                              Session number
+                              <input v-model="sessionExportNumber" type="number" min="1" class="h-[42px] w-[100px] rounded-[14px] border border-[#cccdce] px-3 outline-none focus:border-[#1188f8]" />
+                            </label>
+                            <button type="button" class="rounded-[16px] bg-[#1188f8] px-4 py-3 text-[14px] font-semibold text-white disabled:opacity-60" :disabled="!filteredSessionReportSessions.length || isSavingSessionExportInfo" @click="downloadSessionExcelReport()">
+                              {{ isSavingSessionExportInfo ? 'Saving...' : 'Download Excel Session Record' }}
+                            </button>
+                          </div>
+                          <p v-if="sessionExportError" class="mt-3 text-[13px] font-semibold text-[#b81717]">{{ sessionExportError }}</p>
                         </div>
 
                         <div class="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
@@ -751,6 +786,13 @@
                             <div class="flex shrink-0 flex-col gap-2">
                               <button
                                 type="button"
+                                class="rounded-[18px] border border-[#1188f8] bg-[#1188f8] px-3 py-2 text-[13px] font-semibold text-white transition hover:bg-[#0d79de]"
+                                @click="openStudentPerformanceAnalysis(student.id)"
+                              >
+                                View performance
+                              </button>
+                              <button
+                                type="button"
                                 class="rounded-[18px] border border-[#1188f8] bg-white px-3 py-2 text-[13px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff]"
                                 @click="openStudentFeedbackModal(student)"
                               >
@@ -818,6 +860,7 @@
                       <p class="text-[14px] font-bold uppercase tracking-[0.08em] text-[#777]">Participation Score</p>
                       <p class="mt-3 text-[42px] font-bold leading-none text-[#1188f8]">{{ classAnalytics.averageScore }}%</p>
                       <p class="mt-3 text-[15px] font-semibold text-[#4a4a4a]">{{ classAnalytics.confidenceLabel }}</p>
+                      <p class="mt-2 text-[13px] font-medium leading-[1.4] text-[#6a7280]">{{ PARTICIPATION_SCORE_EXPLANATION }}</p>
                     </article>
                     <article class="rounded-[22px] border border-[#cccdce] bg-white px-5 py-4">
                       <p class="text-[14px] font-bold uppercase tracking-[0.08em] text-[#777]">Likely Next Participants</p>
@@ -992,6 +1035,59 @@
                             <div v-else class="mt-5 rounded-[18px] border border-dashed border-[#bdbdbd] bg-white px-5 py-8 text-center text-[17px] font-semibold text-[#5d5d5d]">
                               No enrolled students yet. Once students join and participate, suggestions will appear here.
                             </div>
+
+                            <div
+                              v-if="selectedQueuedStudent"
+                                class="mt-5 rounded-[22px] border border-[#d8e7fb] bg-white px-4 py-4 sm:px-5"
+                            >
+                              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                  <h3 class="text-[22px] font-bold leading-none text-black">How ReciCall decides who goes next</h3>
+                                  <p class="mt-2 text-[14px] font-medium leading-[1.4] text-[#5b5b5b]">
+                                    The app gives a higher priority score to students who need a turn sooner.
+                                  </p>
+                                </div>
+                                <div class="rounded-[20px] border border-[#d8e7fb] bg-[linear-gradient(180deg,#f7fbff_0%,#eaf4ff_100%)] px-4 py-3 text-center shadow-[0_10px_24px_rgba(17,136,248,0.08)]">
+                                  <p class="text-[12px] font-bold uppercase tracking-[0.12em] text-[#6d7f97]">Score range</p>
+                                  <p class="mt-1 text-[32px] font-black leading-none tracking-[-0.03em] text-[#1188f8]">0-100</p>
+                                </div>
+                              </div>
+
+                              <div class="mt-4 rounded-[22px] border border-[#dce9fb] bg-[linear-gradient(180deg,#fbfdff_0%,#f3f7fc_100%)] px-4 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.04)] sm:px-5">
+                                <p class="text-[12px] font-bold uppercase tracking-[0.12em] text-[#6d7f97]">Simple rule</p>
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                  <span class="rounded-full bg-white px-3 py-2 text-[13px] font-semibold text-[#17406f] shadow-[0_4px_10px_rgba(15,23,42,0.05)]">Low participation score</span>
+                                  <span class="rounded-full bg-white px-3 py-2 text-[13px] font-semibold text-[#17406f] shadow-[0_4px_10px_rgba(15,23,42,0.05)]">Longer time since last participation</span>
+                                  <span class="rounded-full bg-white px-3 py-2 text-[13px] font-semibold text-[#17406f] shadow-[0_4px_10px_rgba(15,23,42,0.05)]">No first participation yet</span>
+                                  <span class="rounded-full bg-white px-3 py-2 text-[13px] font-semibold text-[#17406f] shadow-[0_4px_10px_rgba(15,23,42,0.05)]">Missed participation</span>
+                                  <span class="rounded-full bg-white px-3 py-2 text-[13px] font-semibold text-[#17406f] shadow-[0_4px_10px_rgba(15,23,42,0.05)]">Seat assignment</span>
+                                </div>
+                                <div class="mt-4 rounded-[18px] bg-[#1188f8] px-4 py-3 text-white shadow-[0_14px_28px_rgba(17,136,248,0.16)]">
+                                  <p class="text-[12px] font-bold uppercase tracking-[0.12em] text-white/80">What it means</p>
+                                  <p class="mt-2 text-[17px] font-bold leading-[1.35] sm:text-[18px]">
+                                    More points across these factors move a student higher in the queue.
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+                                <div
+                                  v-for="factor in selectedQueuedStudent.priorityBreakdown"
+                                  :key="factor.key"
+                                  class="rounded-[20px] border border-[#d8e7fb] bg-[linear-gradient(180deg,#fbfdff_0%,#f5f9ff_100%)] px-4 py-4 shadow-[0_8px_18px_rgba(15,23,42,0.04)]"
+                                >
+                                  <div class="flex items-start justify-between gap-3">
+                                    <p class="max-w-[70%] text-[12px] font-bold uppercase tracking-[0.1em] text-[#6f84a3]">{{ factor.label }}</p>
+                                    <span class="rounded-full bg-[#e8f2ff] px-2.5 py-1 text-[11px] font-bold text-[#1188f8]">factor</span>
+                                  </div>
+                                  <p class="mt-3 text-[28px] font-black leading-none tracking-[-0.03em] text-[#1188f8]">+{{ formatScoreValue(factor.value) }}</p>
+                                  <div class="mt-4 rounded-[14px] bg-white px-3 py-3">
+                                    <p class="text-[12px] font-medium leading-[1.4] text-[#42556f]">{{ factor.source }}</p>
+                                  </div>
+                                  <p class="mt-3 text-[12px] font-semibold leading-[1.4] text-[#7b8aa0]">{{ factor.basis }}</p>
+                                </div>
+                              </div>
+                            </div>
                           </section>
 
                           <aside class="space-y-[18px]">
@@ -1109,6 +1205,146 @@
                             </div>
                             <p v-else class="mt-3 text-[14px] font-medium text-[#5d5d5d]">No participation data yet.</p>
                           </div>
+                        </article>
+
+                        <article class="rounded-[28px] border border-[#cccdce] bg-white px-5 py-5">
+                          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <h2 class="text-[24px] font-bold leading-none text-black">Predictive Insights / Performance Analysis</h2>
+                              <p class="mt-2 text-[15px] font-medium text-[#5b5b5b]">
+                                A student-by-student view of current performance, likely next need, and the suggested teacher response.
+                              </p>
+                            </div>
+                            <div class="rounded-[18px] bg-[#f6f6f6] px-4 py-3 text-right">
+                              <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Students reviewed</p>
+                              <p class="mt-1 text-[24px] font-bold leading-none text-[#1188f8]">{{ studentPerformanceAnalysisRows.length }}</p>
+                            </div>
+                          </div>
+
+                          <div v-if="studentPerformanceAnalysisRows.length" class="mt-5 grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
+                            <aside class="rounded-[24px] border border-[#dce7f4] bg-[#f8fbff] px-3 py-3">
+                              <p class="px-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">Select a student</p>
+                              <div class="mt-3 space-y-2">
+                                <button
+                                  v-for="student in studentPerformanceAnalysisRows"
+                                  :key="`analysis-picker-${student.id}`"
+                                  type="button"
+                                  class="flex w-full items-center justify-between gap-3 rounded-[18px] border px-3 py-3 text-left transition-all"
+                                  :class="selectedPerformanceStudent?.id === student.id
+                                    ? 'border-[#1188f8] bg-white shadow-[0_10px_24px_rgba(17,136,248,0.12)]'
+                                    : 'border-transparent bg-transparent hover:border-[#d8e7fb] hover:bg-white'"
+                                  @click="selectedPerformanceStudentId = student.id"
+                                >
+                                  <div class="flex min-w-0 items-center gap-3">
+                                    <img :src="student.avatarSrc" alt="" class="h-[42px] w-[42px] rounded-full border border-[#d8e4f3] object-cover" />
+                                    <div class="min-w-0">
+                                      <p class="truncate text-[15px] font-bold text-black">{{ student.name }}</p>
+                                      <p class="mt-1 text-[12px] font-medium" :class="student.predictionTone">{{ student.predictionLabel }}</p>
+                                    </div>
+                                  </div>
+                                  <div class="shrink-0 text-right">
+                                    <p class="text-[18px] font-bold leading-none text-[#1188f8]">{{ student.score }}%</p>
+                                    <p class="mt-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">score</p>
+                                  </div>
+                                </button>
+                              </div>
+                            </aside>
+
+                            <article
+                              v-if="selectedPerformanceStudent"
+                              class="rounded-[24px] border border-[#dce7f4] bg-[linear-gradient(180deg,#fbfdff_0%,#f6f9fc_100%)] px-4 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.04)]"
+                            >
+                              <div class="flex items-start justify-between gap-3">
+                                <div class="flex min-w-0 items-center gap-3">
+                                  <img :src="selectedPerformanceStudent.avatarSrc" alt="" class="h-[52px] w-[52px] rounded-full border border-[#d8e4f3] object-cover" />
+                                  <div class="min-w-0">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                      <p class="truncate text-[20px] font-bold text-black">{{ selectedPerformanceStudent.name }}</p>
+                                      <span
+                                        v-if="selectedPerformanceStudent.queuePosition"
+                                        class="rounded-full bg-[#e8f2ff] px-2 py-1 text-[11px] font-bold text-[#1188f8]"
+                                      >
+                                        Queue #{{ selectedPerformanceStudent.queuePosition }}
+                                      </span>
+                                    </div>
+                                    <p class="mt-1 text-[13px] font-medium text-[#5d6b7f]">
+                                      {{ selectedPerformanceStudent.studentNumber || selectedPerformanceStudent.email || 'Joined student' }}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div class="rounded-[16px] bg-white px-3 py-2 text-right">
+                                  <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">Participation Score</p>
+                                  <p class="mt-1 text-[24px] font-bold leading-none text-[#1188f8]">{{ selectedPerformanceStudent.score }}%</p>
+                                </div>
+                              </div>
+
+                              <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                                <div class="rounded-[16px] bg-white px-3 py-3">
+                                  <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">Participation</p>
+                                  <p class="mt-2 text-[20px] font-bold leading-none text-black">{{ selectedPerformanceStudent.points }}</p>
+                                  <p class="mt-1 text-[12px] font-medium text-[#5d6b7f]">points earned</p>
+                                </div>
+                                <div class="rounded-[16px] bg-white px-3 py-3">
+                                  <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">Sessions Joined</p>
+                                  <p class="mt-2 text-[20px] font-bold leading-none text-black">{{ selectedPerformanceStudent.sessions }}</p>
+                                  <p class="mt-1 text-[12px] font-medium text-[#5d6b7f]">recorded turns</p>
+                                </div>
+                                <div class="rounded-[16px] bg-white px-3 py-3">
+                                  <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">Last Participation</p>
+                                  <p class="mt-2 text-[20px] font-bold leading-none text-black">{{ selectedPerformanceStudent.sessionsSinceLastParticipation }}</p>
+                                  <p class="mt-1 text-[12px] font-medium text-[#5d6b7f]">sessions ago</p>
+                                </div>
+                                <div class="rounded-[16px] bg-white px-3 py-3">
+                                  <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">Priority Score</p>
+                                  <p class="mt-2 text-[20px] font-bold leading-none text-[#1188f8]">{{ Math.round(selectedPerformanceStudent.priorityScore) }}</p>
+                                  <p class="mt-1 text-[12px] font-medium text-[#5d6b7f]">queue score</p>
+                                </div>
+                              </div>
+
+                              <div class="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                                <div class="rounded-[18px] border border-[#d8e7fb] bg-white px-4 py-4">
+                                  <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">Predictive Insight</p>
+                                  <p class="mt-2 text-[18px] font-bold leading-[1.2]" :class="selectedPerformanceStudent.predictionTone">{{ selectedPerformanceStudent.predictionLabel }}</p>
+                                  <p class="mt-2 text-[13px] font-medium leading-[1.35] text-[#4d5c70]">
+                                    {{ selectedPerformanceStudent.riskLevel }} support level based on current participation score and activity pattern.
+                                  </p>
+                                </div>
+                                <div class="rounded-[18px] border border-[#d8e7fb] bg-white px-4 py-4">
+                                  <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">Recommended Action</p>
+                                  <p class="mt-2 text-[16px] font-bold leading-[1.3] text-black">{{ selectedPerformanceStudent.recommendation }}</p>
+                                  <p class="mt-2 text-[13px] font-medium leading-[1.35] text-[#4d5c70]">
+                                    Seat: {{ selectedPerformanceStudent.seatZoneLabel || 'Seat not assigned' }}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div v-if="selectedPerformanceStudent.priorityFormulaNumbers" class="mt-4 rounded-[18px] border border-[#d8e7fb] bg-white px-4 py-4">
+                                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                  <div>
+                                    <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">Priority Score Calculation</p>
+                                    <p class="mt-2 text-[17px] font-bold leading-[1.35] text-black">{{ selectedPerformanceStudent.priorityFormulaNumbers }}</p>
+                                  </div>
+                                  <div class="rounded-[14px] bg-[#eef6ff] px-3 py-2 text-center">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.08em] text-[#6d7f97]">Final Priority</p>
+                                    <p class="mt-1 text-[24px] font-bold leading-none text-[#1188f8]">{{ Math.round(selectedPerformanceStudent.priorityScore) }}</p>
+                                  </div>
+                                </div>
+
+                                <div v-if="selectedPerformanceStudent.priorityBreakdown?.length" class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                                  <div
+                                    v-for="factor in selectedPerformanceStudent.priorityBreakdown"
+                                    :key="`selected-factor-${factor.key}`"
+                                    class="rounded-[16px] bg-[#f8fbff] px-3 py-3"
+                                  >
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">{{ factor.label }}</p>
+                                    <p class="mt-2 text-[20px] font-bold leading-none text-[#1188f8]">+{{ formatScoreValue(factor.value) }}</p>
+                                    <p class="mt-2 text-[12px] font-medium leading-[1.35] text-[#4d5c70]">{{ factor.source }}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </article>
+                          </div>
+                          <p v-else class="mt-5 text-[15px] font-medium text-[#5d5d5d]">No student performance data yet.</p>
                         </article>
                       </template>
 
@@ -1287,9 +1523,10 @@
                                   <div
                                     v-for="seat in row"
                                     :key="seat.id"
-                                    class="flex min-h-[82px] min-w-0 flex-col items-center rounded-[14px] border px-2 py-2 text-center"
+                                    class="flex min-h-[98px] min-w-0 flex-col items-center rounded-[14px] border px-2 py-2 text-center"
                                     :style="seat.student ? getHeatmapSeatStyle(seat.heatScore) : undefined"
-                                    :class="seat.student ? '' : 'border-[#d7d7d7] bg-[#fafafa]'"
+                                    :class="seat.student ? 'cursor-pointer' : 'border-[#d7d7d7] bg-[#fafafa]'"
+                                    @click="seat.student ? openStudentPerformanceAnalysis(seat.student.id) : null"
                                   >
                                     <template v-if="seat.student">
                                       <div class="flex w-full items-start justify-between gap-2">
@@ -1301,6 +1538,9 @@
                                         </span>
                                       </div>
                                       <p class="mt-2 max-w-full truncate text-[10px] font-semibold leading-none text-black">{{ getSeatLabel(seat) }}</p>
+                                      <p class="mt-2 max-w-full truncate text-[9px] font-semibold leading-none text-[#334155]">
+                                        {{ seat.student.seatZoneLabel }} | Seat +{{ seat.student.seatEnvironmentBoost }}
+                                      </p>
                                       <p class="mt-2 text-[9px] font-bold uppercase tracking-[0.08em] text-[#334155]">
                                         {{ Math.round(seat.student.priorityScore) }} priority
                                       </p>
@@ -1319,9 +1559,10 @@
                                   <div
                                     v-for="seat in row"
                                     :key="seat.id"
-                                    class="flex min-h-[82px] min-w-0 flex-col items-center rounded-[14px] border px-2 py-2 text-center"
+                                    class="flex min-h-[98px] min-w-0 flex-col items-center rounded-[14px] border px-2 py-2 text-center"
                                     :style="seat.student ? getHeatmapSeatStyle(seat.heatScore) : undefined"
-                                    :class="seat.student ? '' : 'border-[#d7d7d7] bg-[#fafafa]'"
+                                    :class="seat.student ? 'cursor-pointer' : 'border-[#d7d7d7] bg-[#fafafa]'"
+                                    @click="seat.student ? openStudentPerformanceAnalysis(seat.student.id) : null"
                                   >
                                     <template v-if="seat.student">
                                       <div class="flex w-full items-start justify-between gap-2">
@@ -1333,6 +1574,9 @@
                                         </span>
                                       </div>
                                       <p class="mt-2 max-w-full truncate text-[10px] font-semibold leading-none text-black">{{ getSeatLabel(seat) }}</p>
+                                      <p class="mt-2 max-w-full truncate text-[9px] font-semibold leading-none text-[#334155]">
+                                        {{ seat.student.seatZoneLabel }} | Seat +{{ seat.student.seatEnvironmentBoost }}
+                                      </p>
                                       <p class="mt-2 text-[9px] font-bold uppercase tracking-[0.08em] text-[#334155]">
                                         {{ Math.round(seat.student.priorityScore) }} priority
                                       </p>
@@ -1371,6 +1615,13 @@
                               <div class="shrink-0 text-right">
                                 <p class="text-[18px] font-bold text-black">{{ Math.round(student.priorityScore) }}</p>
                                 <p class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#555]">priority</p>
+                                <button
+                                  type="button"
+                                  class="mt-2 rounded-[14px] border border-[#1188f8] bg-white px-3 py-2 text-[12px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff]"
+                                  @click="openStudentPerformanceAnalysis(student.id)"
+                                >
+                                  View performance
+                                </button>
                               </div>
                             </div>
                           </section>
@@ -1470,7 +1721,7 @@
             <div class="min-h-0 flex-1 overflow-y-auto pr-1">
               <h2 class="pr-8 text-center text-[26px] leading-none font-bold text-black sm:text-[32px]">Pick Next Student</h2>
               <p class="mx-auto mt-3 max-w-[520px] text-center text-[15px] leading-[1.35] font-medium text-[#5b5b5b] sm:text-[18px] sm:leading-[1.2]">
-                ReciCall ranks who to call on next using participation balance, inactivity, attendance history, class engagement trends, and seat environment. The selected student is still confirmed through QR scanning before any score is saved.
+                ReciCall ranks who to call on next using simple added factors: participation need, waiting time, first-turn boost, absence recovery, and seat environment. The selected student is still confirmed through QR scanning before any score is saved.
               </p>
 
               <div v-if="selectedQueuedStudent" class="mt-6 rounded-[28px] border border-[#d8d8d8] bg-[#f8fbff] px-4 py-4 sm:mt-8 sm:px-6 sm:py-6">
@@ -1498,6 +1749,32 @@
                       <span>{{ reason }}</span>
                     </li>
                   </ul>
+                </div>
+              </div>
+
+              <div class="mt-5 rounded-[22px] border border-[#d8e7fb] bg-white px-4 py-4">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p class="text-[15px] font-semibold text-black">Priority breakdown</p>
+                    <p class="mt-1 text-[13px] font-medium text-[#6a7280]">
+                      {{ selectedQueuedStudent.priorityFormula }}
+                    </p>
+                  </div>
+                  <p class="text-[13px] font-semibold text-[#1188f8]">
+                    Higher total means higher turn priority
+                  </p>
+                </div>
+
+                <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                  <div
+                    v-for="factor in selectedQueuedStudent.priorityBreakdown"
+                    :key="factor.key"
+                    class="rounded-[18px] border border-[#e4eefb] bg-[#f8fbff] px-4 py-4"
+                  >
+                    <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">{{ factor.label }}</p>
+                    <p class="mt-2 text-[26px] font-bold leading-none text-[#1188f8]">+{{ formatScoreValue(factor.value) }}</p>
+                    <p class="mt-2 text-[13px] font-medium leading-[1.35] text-[#4d5c70]">{{ factor.source }}</p>
+                  </div>
                 </div>
               </div>
 
@@ -1597,10 +1874,55 @@
               <div class="inline-flex items-center rounded-full bg-[#e7f2ff] px-3 py-[9px] text-[13px] font-semibold text-[#1188f8] sm:px-4 sm:py-2 sm:text-[14px]">
                 {{ selectedScanScoreLabel }}
               </div>
+              <div class="inline-flex flex-wrap items-center gap-2 rounded-[22px] border border-[#d8e7fb] bg-[#f8fbff] px-2 py-2 text-[12px] font-semibold text-[#4f4f4f] sm:text-[13px]">
+                <span class="inline-flex items-center px-2 py-[7px] text-[11px] font-bold uppercase tracking-[0.12em] text-[#7d8ca1] sm:text-[12px]">
+                  <span class="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-[#9dbfe8]" />
+                  Scan mode
+                </span>
+                <button
+                  type="button"
+                  class="inline-flex min-w-[102px] items-center justify-center rounded-full border px-4 py-[8px] transition focus-visible:outline-none"
+                  :class="scanConfirmationMode === 'manual'
+                    ? 'border-[#1188f8] bg-[#1188f8] text-white shadow-[0_10px_22px_rgba(17,136,248,0.26)]'
+                    : 'border-[#cfe0f6] bg-white text-[#4f647d] shadow-[0_4px_10px_rgba(15,23,42,0.04)] hover:border-[#1188f8] hover:bg-[#eef6ff] hover:text-[#1188f8]'"
+                  :disabled="isSavingScanAward || isQueueScanMode"
+                  @click="scanConfirmationMode = 'manual'"
+                >
+                  <span class="mr-2 inline-block h-2 w-2 rounded-full" :class="scanConfirmationMode === 'manual' ? 'bg-white' : 'bg-[#1188f8]'" />
+                  Manual
+                </button>
+                <button
+                  type="button"
+                  class="inline-flex min-w-[116px] items-center justify-center rounded-full border px-4 py-[8px] transition focus-visible:outline-none"
+                  :class="scanConfirmationMode === 'automatic'
+                    ? 'border-[#1188f8] bg-[#1188f8] text-white shadow-[0_10px_22px_rgba(17,136,248,0.26)]'
+                    : 'border-[#cfe0f6] bg-white text-[#4f647d] shadow-[0_4px_10px_rgba(15,23,42,0.04)] hover:border-[#1188f8] hover:bg-[#eef6ff] hover:text-[#1188f8]'"
+                  :disabled="isSavingScanAward || isQueueScanMode"
+                  @click="scanConfirmationMode = 'automatic'"
+                >
+                  <span class="mr-2 inline-block h-2 w-2 rounded-full" :class="scanConfirmationMode === 'automatic' ? 'bg-white' : 'bg-[#1188f8]'" />
+                  Automatic
+                </button>
+              </div>
               <div v-if="isQueueScanMode && scanExpectedStudent" class="inline-flex items-center rounded-full bg-[#eef6ff] px-3 py-[9px] text-[13px] font-semibold text-[#1188f8] sm:px-4 sm:py-2 sm:text-[14px]">
                 Expected: {{ scanExpectedStudent.name }}
               </div>
             </div>
+
+            <p
+              class="mt-3 text-[13px] font-medium leading-[1.45] sm:text-[14px]"
+              :class="scanConfirmationMode === 'automatic' && !isQueueScanMode ? 'text-[#1188f8]' : 'text-[#5f5f5f]'"
+            >
+              {{ isQueueScanMode
+                ? 'Queue confirmation always requires a manual teacher check before saving.'
+                : scanConfirmationMode === 'automatic'
+                  ? 'Automatic mode saves the selected score immediately after a valid student QR code is detected, then reopens the camera for the next scan.'
+                  : 'Manual mode pauses after each valid scan so the teacher can confirm the student and score before saving.' }}
+            </p>
+
+            <p v-if="scanStatusMessage" class="mt-3 text-[14px] font-semibold text-[#169447]">
+              {{ scanStatusMessage }}
+            </p>
 
             <div class="mt-4 rounded-[24px] border border-[#d9e8fb] bg-[#f8fbff] p-3 sm:mt-5 sm:rounded-[26px] sm:p-4">
               <div class="w-full overflow-hidden rounded-[22px] bg-black">
@@ -1685,6 +2007,21 @@
                 +{{ points }}
               </button>
             </div>
+
+            <div class="mt-3 grid gap-2 sm:mt-4 sm:grid-cols-3">
+              <div
+                v-for="scoreGuide in SCORE_MODE_GUIDE"
+                :key="scoreGuide.points"
+                class="rounded-[18px] border border-[#d8e7fb] bg-[#f8fbff] px-4 py-3 text-center"
+              >
+                <p class="text-[18px] font-bold leading-none text-[#1188f8]">+{{ scoreGuide.points }}</p>
+                <p class="mt-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#6d7f97]">{{ scoreGuide.label }}</p>
+              </div>
+            </div>
+
+            <p class="mt-3 text-center text-[12px] font-medium leading-[1.45] text-[#6a7280] sm:mt-4 sm:text-[13px]">
+              {{ PARTICIPATION_SCORE_EXPLANATION }}
+            </p>
 
             <div class="mt-3 flex flex-col items-center gap-3 sm:mt-4 sm:flex-row sm:justify-center">
               <input
@@ -1810,7 +2147,7 @@
                     class="rounded-full bg-white/15 px-3 py-2 text-[12px] font-semibold text-white transition hover:bg-white/25 sm:px-4 sm:text-[13px]"
                     @click="downloadSelectedSessionReport"
                   >
-                    Download Session
+                    Download Excel Session
                   </button>
                   <button
                     type="button"
@@ -1970,9 +2307,33 @@
                 <button type="button" class="min-h-[42px] rounded-[18px] px-4 text-[14px] font-semibold transition sm:text-[15px]" :class="activeSettingsSection === 'danger' ? 'bg-white text-[#b81717] shadow-[0_8px_18px_rgba(184,23,23,0.12)]' : 'text-[#7a4a4a]'" @click="activeSettingsSection = 'danger'">Delete Account</button>
               </div>
 
-              <div v-if="activeSettingsSection === 'profile'" class="mt-4 space-y-4">
+                <div v-if="activeSettingsSection === 'profile'" class="mt-4 space-y-4">
                 <div class="flex items-center gap-4">
                   <img :src="profilePreviewSrc" alt="" class="h-[72px] w-[72px] rounded-full border border-[#d7d7d7] object-cover sm:h-[88px] sm:w-[88px]" />
+                  <div class="flex flex-col gap-2">
+                    <label class="inline-flex cursor-pointer items-center justify-center rounded-[18px] border border-[#1188f8] bg-white px-4 py-2 text-[14px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff]">
+                      Upload Photo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        class="hidden"
+                        :disabled="isSavingProfile"
+                        @change="handleProfilePhotoSelected"
+                      />
+                    </label>
+                    <button
+                      v-if="profilePhotoPreviewUrl"
+                      type="button"
+                      class="rounded-[18px] border border-[#d7d7d7] bg-[#fafafa] px-4 py-2 text-[13px] font-semibold text-[#555] transition hover:border-[#1188f8] hover:text-[#1188f8]"
+                      :disabled="isSavingProfile"
+                      @click="clearProfilePhotoSelection"
+                    >
+                      Use avatar instead
+                    </button>
+                    <p class="text-[12px] font-medium text-[#666]">
+                      JPG or PNG, up to 5 MB.
+                    </p>
+                  </div>
                 </div>
 
                 <label class="block">
@@ -1988,7 +2349,7 @@
                 <div>
                   <div class="flex items-center justify-between gap-4">
                     <p class="text-[16px] font-semibold">Preset Avatars</p>
-                    <p class="text-[13px] text-[#666]">Choose one avatar to use across the app.</p>
+                    <p class="text-[13px] text-[#666]">Choose one avatar or upload your own photo.</p>
                   </div>
                   <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                     <button
@@ -2182,6 +2543,8 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Html5Qrcode } from 'html5-qrcode'
+import * as XLSX from 'xlsx-js-style'
+import classRecordTemplateUrl from '../../assets/templates/recicall-class-record-template.xlsx?url'
 import { auth } from '../../config/firebase'
 import ConfirmActionModal from '../../components/common/ConfirmActionModal.vue'
 import AppIcon from '../../components/common/AppIcon.vue'
@@ -2219,6 +2582,13 @@ import {
   filterParticipationEventsByDate,
 } from '../../utils/participationReports'
 import { resolveStudentAvatar } from '../../utils/studentAvatarOptions'
+import {
+  formatScoreValue,
+  parseCustomScoreValue,
+  PARTICIPATION_SCORE_EXPLANATION,
+  QUICK_SCORE_OPTIONS,
+  SCORE_MODE_GUIDE,
+} from '../../utils/scoring'
 import { defaultTeacherAvatarKey, resolveTeacherAvatar, sanitizeTeacherAvatarKey, teacherAvatarOptions } from '../../utils/teacherAvatarOptions'
 const router = useRouter()
 const route = useRoute()
@@ -2226,6 +2596,7 @@ const route = useRoute()
 const teacherName = ref('Maam. Anderson')
 const teacherRole = ref('High School Teacher')
 const teacherAvatarKey = ref(defaultTeacherAvatarKey)
+const teacherPhotoURL = ref('')
 const teacherId = ref('')
 const isLoading = ref(true)
 const isLoggingOut = ref(false)
@@ -2266,11 +2637,25 @@ const seatLayoutSaveStatus = ref('')
 const seatLayoutSaveError = ref(false)
 const sessionReportStartDate = ref('')
 const sessionReportEndDate = ref('')
+const sessionExportSchoolInfo = ref({
+  schoolName: '',
+  schoolId: '',
+  districtDivision: '',
+  gradeLevel: '',
+  section: '',
+  subject: '',
+  teacher: '',
+  schoolYear: '',
+})
+const sessionExportNumber = ref('1')
+const isSavingSessionExportInfo = ref(false)
+const sessionExportError = ref('')
 const profileError = ref('')
 const profileSuccess = ref('')
 const deleteAccountError = ref('')
 const classActionError = ref('')
 const scanError = ref('')
+const scanStatusMessage = ref('')
 const pickNextStudentError = ref('')
 const sessionSetupError = ref('')
 const studentFeedbackError = ref('')
@@ -2280,18 +2665,22 @@ const scannedPayload = ref(null)
 const scannerInstance = ref(null)
 const profileName = ref('')
 const profileAvatarKey = ref(defaultTeacherAvatarKey)
+const profilePhotoFile = ref(null)
+const profilePhotoPreviewUrl = ref('')
 const copiedJoinCode = ref('')
 const sessionDraftName = ref('')
 const sessionDraftTopic = ref('')
 const scanCustomScore = ref('')
 const queueCustomScore = ref('')
 const selectedScanScore = ref(3)
+const scanConfirmationMode = ref('manual')
 const scanMode = ref('general')
 const scanExpectedStudent = ref(null)
 const selectedSessionRecordId = ref('')
 const pendingDeleteSessionId = ref('')
 const selectedFeedbackStudentId = ref('')
 const selectedStudentRemovalId = ref('')
+const selectedPerformanceStudentId = ref('')
 const studentFeedbackDraft = ref('')
 const rawClassroom = ref(null)
 const loadError = ref('')
@@ -2303,11 +2692,11 @@ const draggedSeatPayload = ref(null)
 const excludedRecommendationIds = ref([])
 const scannerElementId = 'teacher-qr-scanner'
 const teacherPhoto = computed(() =>
-  resolveTeacherAvatar(teacherAvatarKey.value, ''),
+  resolveTeacherAvatar(teacherAvatarKey.value, teacherPhotoURL.value || ''),
 )
 const signedInEmail = computed(() => auth.currentUser?.email || 'No email available')
 const profilePreviewSrc = computed(() =>
-  resolveTeacherAvatar(profileAvatarKey.value || defaultTeacherAvatarKey, ''),
+  profilePhotoPreviewUrl.value || resolveTeacherAvatar(profileAvatarKey.value || defaultTeacherAvatarKey, teacherPhotoURL.value || ''),
 )
 
 const normalizeSettingsSection = (value) =>
@@ -2349,7 +2738,9 @@ const buildSettingsReturnTo = (section = activeSettingsSection.value) =>
 
 const prefillProfileSettings = () => {
   profileName.value = teacherName.value
-  profileAvatarKey.value = teacherAvatarKey.value || defaultTeacherAvatarKey
+  profileAvatarKey.value = sanitizeTeacherAvatarKey(teacherAvatarKey.value, { allowEmpty: true })
+  profilePhotoFile.value = null
+  profilePhotoPreviewUrl.value = teacherPhotoURL.value || ''
 }
 
 const recoverTeacherAccessFailure = async (error) => {
@@ -2379,7 +2770,7 @@ const normalizeClassroomTab = (value) => {
 const isSessionActive = computed(() => Boolean(rawClassroom.value?.activeSession))
 const currentTab = computed(() => activeClassroomTab.value)
 const scannedStudentName = computed(() => scannedPayload.value?.name || '')
-const quickScoreOptions = [1, 3, 5]
+const quickScoreOptions = QUICK_SCORE_OPTIONS
 const isQueueScanMode = computed(() => scanMode.value === 'queue')
 const selectedScanScoreLabel = computed(() =>
   selectedScanScore.value === null || selectedScanScore.value === undefined
@@ -2410,6 +2801,13 @@ const setTab = async (tab) => {
   } catch (error) {
     console.error('Unable to switch classroom tabs:', error)
   }
+}
+
+const openStudentPerformanceAnalysis = async (studentId = '') => {
+  if (!studentId) return
+  selectedPerformanceStudentId.value = studentId
+  analyticsSubview.value = 'students'
+  await setTab('analytics')
 }
 
 const toggleClassOptions = () => {
@@ -2495,21 +2893,6 @@ const classroom = computed(() => {
     students: themedClassroom.students ?? 0,
   }
 })
-
-const formatScoreValue = (value) => {
-  const safeValue = Math.round(Number(value || 0) * 10) / 10
-  return Number.isInteger(safeValue) ? `${safeValue}` : safeValue.toFixed(1)
-}
-
-const parseCustomScoreValue = (value) => {
-  const normalized = String(value ?? '').trim()
-  if (!normalized) return null
-
-  const parsedValue = Number(normalized)
-  if (!Number.isFinite(parsedValue) || parsedValue <= 0) return null
-
-  return Math.round(parsedValue * 10) / 10
-}
 
 const buildSessionRosterStudent = (student = {}, index = 0) => ({
   id: student.studentId || student.id || `student-${index}`,
@@ -2722,6 +3105,7 @@ const completedSessionRecords = computed(() =>
 
       return {
         ...session,
+        events: sessionEvents,
         sessionNumber: index + 1,
         title: session.name || `Participation ${index + 1}`,
         topic: session.topic || '',
@@ -3113,6 +3497,7 @@ const recentStudents = computed(() => {
 
       return {
         id: event.id || `${event.studentId || 'student'}-${event._eventIndex || index}-${index}`,
+        studentId: event.studentId || matchedStudent?.studentId || matchedStudent?.id || '',
         name: event.displayName || event.email || 'Joined student',
         points: Number(event.points) || 0,
         avatarSrc: resolveStudentAvatar(
@@ -3274,6 +3659,56 @@ const queueStudentIndex = computed(
 )
 const classAnalyticsStudentIndex = computed(
   () => new Map(classAnalytics.value.students.map((student) => [student.id, student])),
+)
+
+const studentPerformanceAnalysisRows = computed(() =>
+  [...classAnalytics.value.students]
+    .map((student) => {
+      const queueStudent = queueStudentIndex.value.get(student.id) || null
+      const sessionsSinceLastParticipation = queueStudent?.sessionsSinceLastParticipation || 0
+
+      let predictionLabel = 'Building momentum'
+      let predictionTone = 'text-[#4FB817]'
+
+      if (student.sessions === 0) {
+        predictionLabel = 'Needs first participation'
+        predictionTone = 'text-[#F97316]'
+      } else if (student.riskLevel === 'High') {
+        predictionLabel = 'Needs support soon'
+        predictionTone = 'text-[#F97316]'
+      } else if (sessionsSinceLastParticipation >= 2) {
+        predictionLabel = 'Likely due for the next turn'
+        predictionTone = 'text-[#1188F8]'
+      } else if (student.riskLevel === 'Low') {
+        predictionLabel = 'Likely to stay active'
+        predictionTone = 'text-[#1188F8]'
+      }
+
+      return {
+        ...student,
+        priorityScore: queueStudent?.priorityScore || 0,
+        queuePosition: queueStudent?.queuePosition || null,
+        sessionsSinceLastParticipation,
+        priorityFormula: queueStudent?.priorityFormula || '',
+        priorityFormulaNumbers: queueStudent?.priorityFormulaNumbers || '',
+        priorityBreakdown: queueStudent?.priorityBreakdown || [],
+        predictionLabel,
+        predictionTone,
+      }
+    })
+    .sort((left, right) => {
+      if (left.score !== right.score) return left.score - right.score
+      if (right.sessionsSinceLastParticipation !== left.sessionsSinceLastParticipation) {
+        return right.sessionsSinceLastParticipation - left.sessionsSinceLastParticipation
+      }
+      return left.name.localeCompare(right.name)
+    }),
+)
+const selectedPerformanceStudent = computed(
+  () =>
+    studentPerformanceAnalysisRows.value.find((student) => student.id === selectedPerformanceStudentId.value) ||
+    studentPerformanceAnalysisRows.value[0] ||
+    null,
 )
 
 const priorityQueuePreview = computed(() => queueRecommendation.value.queue.slice(0, 4))
@@ -3849,6 +4284,40 @@ watch(
 )
 
 watch(
+  studentPerformanceAnalysisRows,
+  (rows) => {
+    if (!rows.length) {
+      selectedPerformanceStudentId.value = ''
+      return
+    }
+
+    if (!rows.some((student) => student.id === selectedPerformanceStudentId.value)) {
+      selectedPerformanceStudentId.value = rows[0].id
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  classroom,
+  (nextClassroom) => {
+    if (!nextClassroom) return
+    const saved = nextClassroom.exportSchoolInfo || {}
+    sessionExportSchoolInfo.value = {
+      schoolName: saved.schoolName || sessionExportSchoolInfo.value.schoolName,
+      schoolId: saved.schoolId || sessionExportSchoolInfo.value.schoolId,
+      districtDivision: saved.districtDivision || sessionExportSchoolInfo.value.districtDivision,
+      gradeLevel: saved.gradeLevel || nextClassroom.gradeLevel || '',
+      section: saved.section || nextClassroom.classLabel || '',
+      subject: saved.subject || nextClassroom.subject || '',
+      teacher: saved.teacher || teacherName.value || '',
+      schoolYear: saved.schoolYear || sessionExportSchoolInfo.value.schoolYear,
+    }
+  },
+  { immediate: true },
+)
+
+watch(
   () => [serializeDeskRows(deskRowsLeft.value), serializeDeskRows(deskRowsRight.value)],
   () => {
     if (isHydratingSeatLayout.value || !teacherId.value || !rawClassroom.value) return
@@ -3898,6 +4367,7 @@ const handleArchiveCurrentClass = async () => {
 
 const resetScanState = ({ keepSelectedScore = false, keepScanContext = false } = {}) => {
   scanError.value = ''
+  scanStatusMessage.value = ''
   scannedPayload.value = null
   scanCustomScore.value = ''
   if (!keepSelectedScore) {
@@ -4039,7 +4509,7 @@ const downloadSpecificSessionReport = async (session) => {
 
 const downloadSelectedSessionReport = async () => {
   if (!selectedSessionRecord.value) return
-  await downloadSpecificSessionReport(selectedSessionRecord.value)
+  await downloadSessionExcelReport([selectedSessionRecord.value])
 }
 
 const downloadSessionReport = async () => {
@@ -4056,6 +4526,230 @@ const downloadSessionReport = async () => {
     ),
     sessions: filteredSessionReportSessions.value,
   })
+}
+
+const downloadSessionExcelReport = async (sessions = null) => {
+  const requestedSessionNumber = Number(sessionExportNumber.value) || 1
+  const exportSessions = Array.isArray(sessions) && sessions.length
+    ? sessions
+    : completedSessionRecords.value.filter((candidate) => candidate.sessionNumber === requestedSessionNumber)
+  const session = exportSessions[0]
+  if (!classroom.value || !session) return
+
+  sessionExportError.value = ''
+
+  const info = sessionExportSchoolInfo.value
+  const sessionNumber = session.sessionNumber || requestedSessionNumber
+  const sessionRows = exportSessions.flatMap((sessionItem, sessionIndex) => {
+    const summary = sessionItem.recitationSummary || {}
+    const rows = [
+      ...(summary.recitedStudents || []).map((student) => ({
+        student,
+        status: 'Participated',
+        points: Number(student.totalPoints) || 0,
+      })),
+      ...(summary.absentStudents || []).map((student) => ({ student, status: 'Missed participation', points: 0 })),
+      ...(summary.notRecitedStudents || []).map((student) => ({ student, status: 'No participation recorded', points: 0 })),
+    ]
+    return rows.map((row, index) => ({
+    'No.': index + 1,
+    'Session Number': `Session ${sessionIndex + 1}`,
+    'Session Name': sessionItem.title || sessionItem.name || '',
+    'Student Name': row.student.name || 'Student',
+    'Student ID': row.student.studentNumber || row.student.studentId || '',
+    'Participation Status': row.status,
+    'Points Earned': row.points,
+    'Recorded At': toEventDate((sessionItem.events || []).find((event) => event.studentId === (row.student.studentId || row.student.id))?.createdAt || sessionItem.startedAt)
+      ? formatFullDate((sessionItem.events || []).find((event) => event.studentId === (row.student.studentId || row.student.id))?.createdAt || sessionItem.startedAt)
+      : '',
+    }))
+  })
+
+  const summaryRows = [
+    ['School Name', info.schoolName || ''],
+    ['School ID', info.schoolId || ''],
+    ['District and Division', info.districtDivision || ''],
+    ['Grade Level', info.gradeLevel || classroom.value.gradeLevel || ''],
+    ['Section', info.section || classroom.value.classLabel || ''],
+    ['Subject', info.subject || classroom.value.subject || ''],
+    ['Teacher', info.teacher || teacherName.value || ''],
+    ['School Year', info.schoolYear || ''],
+    ['Session Number', `Session ${sessionNumber}`],
+    ['Session Date', toEventDate(session.startedAt) ? formatFullDate(session.startedAt) : ''],
+    [],
+    ['Summary', 'Value'],
+    ['Participated Students', sessionRows.filter((row) => row['Participation Status'] === 'Participated').length],
+    ['Missed Participations', sessionRows.filter((row) => row['Participation Status'] === 'Missed participation').length],
+    ['Total Points', sessionRows.reduce((total, row) => total + row['Points Earned'], 0)],
+  ]
+
+  try {
+  const templateResponse = await fetch(classRecordTemplateUrl)
+  const templateBuffer = await templateResponse.arrayBuffer()
+  const workbook = XLSX.read(templateBuffer, {
+    type: 'array',
+    cellStyles: true,
+    cellFormula: true,
+    sheetRows: 80,
+  })
+  const termSheet = workbook.Sheets['TERM 1']
+  const inputSheet = workbook.Sheets['INPUT DATA']
+  if (workbook.Workbook?.Views?.[0]) workbook.Workbook.Views[0].activeTab = workbook.SheetNames.indexOf('TERM 1')
+  const setCell = (sheet, address, value) => {
+    if (!sheet[address]) sheet[address] = { t: typeof value === 'number' ? 'n' : 's', v: value }
+    else {
+      delete sheet[address].f
+      sheet[address].t = typeof value === 'number' ? 'n' : 's'
+      sheet[address].v = value
+    }
+  }
+  const setFormula = (sheet, address, formula) => {
+    sheet[address] = { t: 'n', f: formula, v: 0 }
+  }
+  const exportColumns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB']
+  ;[10, 11].forEach((rowNumber) => exportColumns.forEach((column) => setCell(termSheet, `${column}${rowNumber}`, '')))
+  for (let rowNumber = 13; rowNumber <= 80; rowNumber += 1) {
+    exportColumns.forEach((column) => setCell(termSheet, `${column}${rowNumber}`, ''))
+  }
+
+  setCell(termSheet, 'F4', 'DISTRICT / DIVISION')
+  setCell(termSheet, 'G4', info.districtDivision || '')
+  setCell(termSheet, 'R4', '')
+  setCell(termSheet, 'G5', info.schoolName || '')
+  setCell(termSheet, 'R5', info.schoolId || '')
+  setCell(termSheet, 'Z5', info.schoolYear || '')
+  setCell(termSheet, 'K7', `${info.gradeLevel || classroom.value.gradeLevel || ''} - ${info.section || classroom.value.classLabel || ''}`)
+  setCell(termSheet, 'T7', info.subject || classroom.value.subject || '')
+  setCell(termSheet, 'T8', info.teacher || teacherName.value || '')
+  setCell(termSheet, 'A7', `SESSION ${sessionNumber}`)
+  setCell(termSheet, 'F9', 'PARTICIPATION RECORDS')
+  setCell(termSheet, 'N9', 'ENGAGEMENT ANALYTICS')
+  setCell(termSheet, 'T9', 'SESSION SUMMARY')
+  setCell(termSheet, 'Z9', 'PRIORITY SCORE')
+  setCell(termSheet, 'AA9', 'PARTICIPATION SCORE')
+  setCell(termSheet, 'AB9', 'TRANSPARENCY FORMULA')
+  ;['F', 'G', 'H', 'I', 'J'].forEach((column, index) => setCell(termSheet, `${column}10`, `Session ${index + 1}`))
+  setCell(termSheet, 'K10', 'Total Points')
+  setCell(termSheet, 'L10', 'Sessions')
+  setCell(termSheet, 'M10', 'Missed')
+  setCell(termSheet, 'N10', 'Last Participation')
+  setCell(termSheet, 'O10', 'Participation Count')
+  setCell(termSheet, 'P10', 'Missed Participation')
+  setCell(termSheet, 'Q10', 'Priority Score')
+  setCell(termSheet, 'R10', 'Priority Formula')
+  setCell(termSheet, 'S10', 'Score Basis')
+  setCell(termSheet, 'T10', 'Session Result')
+  setCell(termSheet, 'U10', 'Points Earned')
+  setCell(termSheet, 'V10', 'Recorded At')
+  setCell(termSheet, 'W10', 'Session Number')
+  setCell(termSheet, 'Z10', 'Priority')
+  setCell(termSheet, 'AA10', 'Score')
+  setCell(termSheet, 'AB10', 'Points / 5 x 100')
+  setCell(termSheet, 'F11', 5)
+  setCell(termSheet, 'C11', '')
+  const studentsByName = new Map()
+  sessionRows.forEach((row) => {
+    const key = String(row['Student Name']).toLowerCase()
+    const current = studentsByName.get(key) || []
+    current.push(row)
+    studentsByName.set(key, current)
+  })
+  const analyticsById = new Map((classAnalytics.value.students || []).map((student) => [student.id, student]))
+  const roster = rawClassroom.value?.enrolledStudents || []
+  const templateColumns = exportColumns
+  for (let rowNumber = 13; rowNumber <= 80; rowNumber += 1) {
+    templateColumns.forEach((column) => setCell(termSheet, `${column}${rowNumber}`, ''))
+  }
+  roster.forEach((student, index) => {
+    const rowNumber = 13 + index
+    const studentName = student.displayName || student.name || student.email || ''
+    const analyticsStudent = analyticsById.get(student.studentId || student.id) || null
+    const studentSessions = studentsByName.get(String(studentName).toLowerCase()) || []
+    const sessionRow = studentSessions[0]
+    setCell(termSheet, `A${rowNumber}`, index + 1)
+    setCell(termSheet, `B${rowNumber}`, studentName)
+    setCell(termSheet, `F${rowNumber}`, sessionRow?.['Participation Status'] === 'Participated' ? sessionRow['Points Earned'] : '')
+    setCell(termSheet, `K${rowNumber}`, Number(analyticsStudent?.points) || 0)
+    setCell(termSheet, `L${rowNumber}`, Number(analyticsStudent?.sessions) || 0)
+    setCell(termSheet, `M${rowNumber}`, sessionRow?.['Participation Status'] === 'Missed participation' ? 1 : 0)
+    setCell(termSheet, `O${rowNumber}`, Number(analyticsStudent?.sessions) || 0)
+    setCell(termSheet, `P${rowNumber}`, Number(analyticsStudent?.absenceCount) || 0)
+    setCell(termSheet, `Q${rowNumber}`, Number(queueStudentIndex.value.get(student.studentId || student.id)?.priorityScore) || 0)
+    setCell(termSheet, `R${rowNumber}`, queueStudentIndex.value.get(student.studentId || student.id)?.priorityFormula || '')
+    setCell(termSheet, `S${rowNumber}`, queueStudentIndex.value.get(student.studentId || student.id)?.priorityFormulaNumbers || '')
+    setCell(termSheet, `T${rowNumber}`, sessionRow?.['Participation Status'] || 'No participation recorded')
+    setCell(termSheet, `U${rowNumber}`, sessionRow?.['Points Earned'] || 0)
+    setCell(termSheet, `U${rowNumber}`, sessionRow?.['Points Earned'] || 0)
+    setCell(termSheet, `V${rowNumber}`, sessionRow?.['Recorded At'] || '')
+    setCell(termSheet, `W${rowNumber}`, `Session ${sessionNumber}`)
+    setCell(termSheet, `Z${rowNumber}`, Number(queueStudentIndex.value.get(student.studentId || student.id)?.priorityScore) || 0)
+    setFormula(termSheet, `AA${rowNumber}`, `=IFERROR(F${rowNumber}/$F$11*100,0)`)
+    setCell(termSheet, `AB${rowNumber}`, 'Points earned / 5 x 100')
+  })
+  setCell(inputSheet, 'E10', info.districtDivision || '')
+  setCell(inputSheet, 'E11', info.schoolName || '')
+  setCell(inputSheet, 'E12', info.schoolId || '')
+
+  const headerStyle = {
+    font: { name: 'Calibri', sz: 10, bold: true, color: { rgb: 'FFFFFF' } },
+    fill: { fgColor: { rgb: '1188F8' } },
+    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    border: { top: { style: 'thin', color: { rgb: 'B8C7D9' } }, bottom: { style: 'thin', color: { rgb: 'B8C7D9' } }, left: { style: 'thin', color: { rgb: 'B8C7D9' } }, right: { style: 'thin', color: { rgb: 'B8C7D9' } } },
+  }
+  const subheaderStyle = {
+    ...headerStyle,
+    fill: { fgColor: { rgb: 'E8F2FF' } },
+    font: { name: 'Calibri', sz: 9, bold: true, color: { rgb: '17324D' } },
+  }
+  const dataStyle = {
+    alignment: { vertical: 'center', wrapText: true },
+    border: { bottom: { style: 'thin', color: { rgb: 'D9E2EC' } } },
+  }
+  const applyStyle = (sheet, address, style) => {
+    if (sheet[address]) sheet[address].s = style
+  }
+  ;['A9', 'F9', 'N9', 'T9', 'Z9', 'AA9', 'AB9'].forEach((address) => applyStyle(termSheet, address, headerStyle))
+  ;['A10', 'B10', 'F10', 'G10', 'H10', 'I10', 'J10', 'K10', 'L10', 'M10', 'N10', 'O10', 'P10', 'Q10', 'R10', 'S10', 'T10', 'U10', 'V10', 'W10', 'Z10', 'AA10', 'AB10'].forEach((address) => applyStyle(termSheet, address, subheaderStyle))
+  for (let rowNumber = 13; rowNumber <= 12 + roster.length; rowNumber += 1) {
+    ;['A', 'B', 'F', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Z', 'AA', 'AB'].forEach((column) => applyStyle(termSheet, `${column}${rowNumber}`, dataStyle))
+    if (termSheet[`AA${rowNumber}`]) termSheet[`AA${rowNumber}`].z = '0.0'
+  }
+  termSheet['!cols'] = [
+    { wch: 6 }, { wch: 30 }, { wch: 11 }, { wch: 11 }, { wch: 11 },
+    { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 },
+    { wch: 13 }, { wch: 10 }, { wch: 10 }, { wch: 18 }, { wch: 12 },
+    { wch: 11 }, { wch: 11 }, { wch: 11 }, { wch: 20 }, { wch: 22 },
+    { wch: 12 }, { wch: 18 }, { wch: 14 }, { wch: 12 }, { wch: 12 },
+    { wch: 12 }, { wch: 14 }, { wch: 28 },
+  ]
+  termSheet['!rows'] = [{}, {}, {}, {}, {}, {}, {}, {}, { hpt: 30 }, { hpt: 34 }, { hpt: 24 }]
+
+  // Keep the exported workbook focused on the single ReciCall session record.
+  workbook.SheetNames.filter((sheetName) => sheetName !== 'TERM 1').forEach((sheetName) => {
+    delete workbook.Sheets[sheetName]
+  })
+  workbook.SheetNames = ['TERM 1']
+  if (workbook.Workbook?.Views?.[0]) workbook.Workbook.Views[0].activeTab = 0
+
+  XLSX.writeFile(
+    workbook,
+    `${slugifyReportValue(classroom.value.subject, 'class')}-${slugifyReportValue(classroom.value.classLabel, 'class')}-session-${sessionNumber}.xlsx`,
+  )
+
+  if (teacherId.value && route.params.classId) {
+    isSavingSessionExportInfo.value = true
+    try {
+      await updateTeacherClass(teacherId.value, route.params.classId, {
+        exportSchoolInfo: { ...info },
+      })
+    } finally {
+      isSavingSessionExportInfo.value = false
+    }
+  }
+  } catch (error) {
+    console.error('Excel export failed', error)
+    sessionExportError.value = 'The Excel file could not be generated. Please try again.'
+  }
 }
 
 const handleDeleteSelectedSession = async () => {
@@ -4252,6 +4946,10 @@ const stopScanner = async () => {
 
 const handleScanSuccess = async (decodedText) => {
   try {
+    if (isSavingScanAward.value) {
+      return
+    }
+
     const payload = JSON.parse(decodedText)
 
     if (payload?.type !== 'student-id') {
@@ -4272,6 +4970,10 @@ const handleScanSuccess = async (decodedText) => {
     scannedPayload.value = payload
     scanError.value = ''
     await stopScanner()
+
+    if (!isQueueScanMode.value && scanConfirmationMode.value === 'automatic') {
+      await confirmScannedAward({ keepModalOpen: true, restartAfterSave: true })
+    }
   } catch (error) {
     console.error(error)
     scanError.value = 'This QR code is not a valid student participation ID.'
@@ -4355,6 +5057,7 @@ const closeScanModal = async () => {
 }
 
 const restartScanner = async () => {
+  scanStatusMessage.value = ''
   await stopScanner()
   await startScanner()
 }
@@ -4487,7 +5190,7 @@ const persistStudentAbsence = async (studentPayload) => {
   return { ok: true }
 }
 
-const confirmScannedAward = async () => {
+const confirmScannedAward = async ({ keepModalOpen = false, restartAfterSave = false } = {}) => {
   if (!scannedPayload.value || selectedScanScore.value === null || selectedScanScore.value === undefined) return
 
   isSavingScanAward.value = true
@@ -4499,7 +5202,21 @@ const confirmScannedAward = async () => {
     return
   }
 
-  await closeScanModal()
+  const savedStudentName = scannedPayload.value?.name || 'Student'
+  const savedScoreLabel = formatScoreValue(selectedScanScore.value)
+
+  if (!keepModalOpen) {
+    await closeScanModal()
+    return
+  }
+
+  scanStatusMessage.value = `${savedStudentName} was recorded automatically with +${savedScoreLabel}.`
+  scanError.value = ''
+  scannedPayload.value = null
+
+  if (restartAfterSave) {
+    await restartScanner()
+  }
 }
 
 const openQueueScanModal = async () => {
@@ -4716,6 +5433,26 @@ const goToPrivacy = () => {
 
 const selectTeacherAvatarPreset = (avatarKey) => {
   profileAvatarKey.value = avatarKey
+  profilePhotoFile.value = null
+  profilePhotoPreviewUrl.value = ''
+}
+
+const clearProfilePhotoSelection = () => {
+  profilePhotoFile.value = null
+  profilePhotoPreviewUrl.value = ''
+  profileAvatarKey.value = teacherAvatarKey.value || defaultTeacherAvatarKey
+}
+
+const handleProfilePhotoSelected = (event) => {
+  const input = event.target
+  const nextFile = input?.files?.[0] || null
+
+  if (!nextFile) return
+
+  profilePhotoFile.value = nextFile
+  profilePhotoPreviewUrl.value = URL.createObjectURL(nextFile)
+  profileAvatarKey.value = ''
+  input.value = ''
 }
 
 const saveProfileChanges = async () => {
@@ -4730,21 +5467,31 @@ const saveProfileChanges = async () => {
   isSavingProfile.value = true
 
   try {
+    const hasCustomPhoto = Boolean(profilePhotoFile.value)
     const updatedProfile = await updateCurrentUserAccount({
       displayName: profileName.value.trim(),
-      photoURL: '',
+      photoFile: profilePhotoFile.value || undefined,
+      photoURL: hasCustomPhoto ? '' : teacherPhotoURL.value || '',
     })
 
-    const nextAvatarKey = sanitizeTeacherAvatarKey(profileAvatarKey.value)
+    const nextAvatarKey = hasCustomPhoto
+      ? ''
+      : sanitizeTeacherAvatarKey(profileAvatarKey.value, { allowEmpty: true })
     await upsertUserProfile(teacherId.value, {
       displayName: updatedProfile.displayName,
       avatarKey: nextAvatarKey,
-      photoURL: '',
+      photoURL: updatedProfile.photoURL || '',
+      cloudinaryPublicId: updatedProfile.cloudinaryPublicId || '',
+      cloudinaryAssetId: updatedProfile.cloudinaryAssetId || '',
+      cloudinaryFormat: updatedProfile.cloudinaryFormat || '',
       avatarPromptSeen: true,
     })
 
     teacherName.value = updatedProfile.displayName || teacherName.value
     teacherAvatarKey.value = nextAvatarKey
+    teacherPhotoURL.value = updatedProfile.photoURL || ''
+    profilePhotoFile.value = null
+    profilePhotoPreviewUrl.value = updatedProfile.photoURL || ''
     profileSuccess.value = updatedProfile.photoUploadError
       ? 'Display name updated. Photo upload did not complete.'
       : 'Profile updated successfully.'
@@ -4963,7 +5710,8 @@ onMounted(async () => {
     }
     if (profile?.displayName) teacherName.value = profile.displayName
     else if (user.displayName) teacherName.value = user.displayName
-    teacherAvatarKey.value = sanitizeTeacherAvatarKey(profile?.avatarKey)
+    teacherAvatarKey.value = sanitizeTeacherAvatarKey(profile?.avatarKey, { allowEmpty: true })
+    teacherPhotoURL.value = profile?.photoURL || user.photoURL || ''
     profileName.value = teacherName.value
     if (route.query.settings === 'open') {
       prefillProfileSettings()

@@ -322,6 +322,28 @@
                 <div v-if="activeSettingsSection === 'profile'" class="mt-4 space-y-4">
                 <div class="flex items-center gap-4">
                   <img :src="profilePreviewSrc" alt="" class="h-[72px] w-[72px] rounded-full border border-[#d7d7d7] object-cover sm:h-[88px] sm:w-[88px]" />
+                  <div class="flex flex-col gap-2">
+                    <label class="inline-flex cursor-pointer items-center justify-center rounded-[18px] border border-[#1188f8] bg-white px-4 py-2 text-[14px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff]">
+                      Upload Photo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        class="hidden"
+                        :disabled="isSavingProfile"
+                        @change="handleProfilePhotoSelected"
+                      />
+                    </label>
+                    <button
+                      v-if="profilePhotoPreviewUrl"
+                      type="button"
+                      class="rounded-[18px] border border-[#d7d7d7] bg-[#fafafa] px-4 py-2 text-[13px] font-semibold text-[#555] transition hover:border-[#1188f8] hover:text-[#1188f8]"
+                      :disabled="isSavingProfile"
+                      @click="clearProfilePhotoSelection"
+                    >
+                      Use avatar instead
+                    </button>
+                    <p class="text-[12px] font-medium text-[#666]">JPG or PNG, up to 5 MB.</p>
+                  </div>
                 </div>
 
                 <label class="block">
@@ -337,7 +359,7 @@
                 <div>
                   <div class="flex items-center justify-between gap-4">
                     <p class="text-[16px] font-semibold">Preset Avatars</p>
-                    <p class="text-[13px] text-[#666]">Choose one avatar to use across the app.</p>
+                    <p class="text-[13px] text-[#666]">Choose one avatar or upload your own photo.</p>
                   </div>
                   <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                     <button
@@ -677,6 +699,7 @@ const timeOptions = buildTimeOptions()
 const teacherName = ref('Maam. Anderson')
 const teacherRole = ref('High School Teacher')
 const teacherAvatarKey = ref(defaultTeacherAvatarKey)
+const teacherPhotoURL = ref('')
 const teacherId = ref('')
 const isLoading = ref(true)
 const isLoggingOut = ref(false)
@@ -706,6 +729,8 @@ const copiedJoinCode = ref('')
 const promptAvatarKey = ref(defaultTeacherAvatarKey)
 const profileName = ref('')
 const profileAvatarKey = ref(defaultTeacherAvatarKey)
+const profilePhotoFile = ref(null)
+const profilePhotoPreviewUrl = ref('')
 const classes = ref([])
 const loadError = ref('')
 const currentDateTime = ref(new Date())
@@ -735,14 +760,14 @@ const liveDateTimeLabel = computed(() =>
 
 const dashboardSubtitle = computed(() => `${dashboardGreeting.value} | ${liveDateTimeLabel.value}`)
 const teacherPhoto = computed(() =>
-  resolveTeacherAvatar(teacherAvatarKey.value, ''),
+  resolveTeacherAvatar(teacherAvatarKey.value, teacherPhotoURL.value || ''),
 )
 const signedInEmail = computed(() => auth.currentUser?.email || 'No email available')
 const promptAvatarPreview = computed(() =>
   resolveTeacherAvatar(promptAvatarKey.value, ''),
 )
 const profilePreviewSrc = computed(() =>
-  resolveTeacherAvatar(profileAvatarKey.value || defaultTeacherAvatarKey, ''),
+  profilePhotoPreviewUrl.value || resolveTeacherAvatar(profileAvatarKey.value || defaultTeacherAvatarKey, teacherPhotoURL.value || ''),
 )
 const isClassFormIncomplete = computed(
   () =>
@@ -801,7 +826,9 @@ const buildSettingsReturnTo = (section = activeSettingsSection.value) =>
 
 const prefillProfileSettings = () => {
   profileName.value = teacherName.value
-  profileAvatarKey.value = teacherAvatarKey.value || defaultTeacherAvatarKey
+  profileAvatarKey.value = sanitizeTeacherAvatarKey(teacherAvatarKey.value, { allowEmpty: true })
+  profilePhotoFile.value = null
+  profilePhotoPreviewUrl.value = teacherPhotoURL.value || ''
 }
 
 const recoverTeacherAccessFailure = async (error) => {
@@ -1179,6 +1206,26 @@ const saveAvatarPrompt = async () => {
 
 const selectTeacherAvatarPreset = (avatarKey) => {
   profileAvatarKey.value = avatarKey
+  profilePhotoFile.value = null
+  profilePhotoPreviewUrl.value = ''
+}
+
+const clearProfilePhotoSelection = () => {
+  profilePhotoFile.value = null
+  profilePhotoPreviewUrl.value = ''
+  profileAvatarKey.value = defaultTeacherAvatarKey
+}
+
+const handleProfilePhotoSelected = (event) => {
+  const input = event.target
+  const nextFile = input?.files?.[0] || null
+
+  if (!nextFile) return
+
+  profilePhotoFile.value = nextFile
+  profilePhotoPreviewUrl.value = URL.createObjectURL(nextFile)
+  profileAvatarKey.value = ''
+  input.value = ''
 }
 
 const saveProfileChanges = async () => {
@@ -1193,21 +1240,32 @@ const saveProfileChanges = async () => {
   isSavingProfile.value = true
 
   try {
+    const hasCustomPhoto = Boolean(profilePhotoFile.value)
+    const shouldUsePresetAvatar = Boolean(profileAvatarKey.value)
     const updatedProfile = await updateCurrentUserAccount({
       displayName: profileName.value.trim(),
-      photoURL: '',
+      photoFile: profilePhotoFile.value || undefined,
+      photoURL: hasCustomPhoto ? '' : shouldUsePresetAvatar ? '' : teacherPhotoURL.value || '',
     })
 
-    const nextAvatarKey = sanitizeTeacherAvatarKey(profileAvatarKey.value)
+    const nextAvatarKey = hasCustomPhoto
+      ? ''
+      : sanitizeTeacherAvatarKey(profileAvatarKey.value, { allowEmpty: true })
     await upsertUserProfile(teacherId.value, {
       displayName: updatedProfile.displayName,
       avatarKey: nextAvatarKey,
-      photoURL: '',
+      photoURL: updatedProfile.photoURL || '',
+      cloudinaryPublicId: updatedProfile.cloudinaryPublicId || '',
+      cloudinaryAssetId: updatedProfile.cloudinaryAssetId || '',
+      cloudinaryFormat: updatedProfile.cloudinaryFormat || '',
       avatarPromptSeen: true,
     })
 
     teacherName.value = updatedProfile.displayName || teacherName.value
     teacherAvatarKey.value = nextAvatarKey
+    teacherPhotoURL.value = updatedProfile.photoURL || ''
+    profilePhotoFile.value = null
+    profilePhotoPreviewUrl.value = updatedProfile.photoURL || ''
     profileSuccess.value = updatedProfile.photoUploadError
       ? 'Display name updated. Photo upload did not complete.'
       : 'Profile updated successfully.'
@@ -1356,7 +1414,8 @@ onMounted(async () => {
     }
     if (profile?.displayName) teacherName.value = profile.displayName
     else if (user.displayName) teacherName.value = user.displayName
-    teacherAvatarKey.value = sanitizeTeacherAvatarKey(profile?.avatarKey)
+    teacherAvatarKey.value = sanitizeTeacherAvatarKey(profile?.avatarKey, { allowEmpty: true })
+    teacherPhotoURL.value = profile?.photoURL || user.photoURL || ''
     promptAvatarKey.value = teacherAvatarKey.value || defaultTeacherAvatarKey
     profileName.value = teacherName.value
     if (profile?.avatarPromptSeen === false) {

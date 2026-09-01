@@ -1,4 +1,5 @@
 import { resolveStudentAvatar } from '../utils/studentAvatarOptions'
+import { calculateParticipationScore } from '../utils/scoring'
 
 const toNumber = (value, fallback = 0) => {
   const numericValue = Number(value)
@@ -6,6 +7,7 @@ const toNumber = (value, fallback = 0) => {
 }
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+const roundFactorValue = (value) => Math.round(Number(value || 0) * 10) / 10
 
 const getStudentName = (student, index) =>
   student?.displayName || student?.name || student?.email || `Student ${index + 1}`
@@ -353,6 +355,9 @@ const enqueuePriorityCandidate = (queue, candidate) => {
 const buildStudentPredictions = (classroom = {}) => {
   const enrolledStudents = classroom.enrolledStudents || []
   const participationEvents = getParticipationOnlyEvents(classroom.participationEvents || [])
+  const trackedSessionCount = Array.isArray(classroom.sessionHistory) && classroom.sessionHistory.length
+    ? classroom.sessionHistory.length
+    : Math.max(getGroupedParticipationEvents(participationEvents).length, 1)
   const statsByStudentId = new Map()
 
   participationEvents.forEach((event) => {
@@ -377,7 +382,11 @@ const buildStudentPredictions = (classroom = {}) => {
     const eventStats = statsByStudentId.get(studentId) || null
     const points = eventStats ? eventStats.points : 0
     const sessions = eventStats ? eventStats.sessions : 0
-    const score = clamp(points * 14 + sessions * 18, 0, 100)
+    const score = calculateParticipationScore({
+      points,
+      sessions,
+      trackedSessions: trackedSessionCount,
+    })
     const riskLevel = getRiskLevel(score)
 
     return {
@@ -577,15 +586,54 @@ export const buildPriorityQueueRecommendation = (classroom = {}, excludedStudent
     const zeroParticipationBoost = student.sessions === 0 ? 28 : 0
     const seatEnvironmentBoost = seatEnvironment?.priorityBoost || 0
     const absenceBoost = clamp(absenceCount * 10, 0, 24)
-    const priorityScore = clamp(
+    const weightedNeed = roundFactorValue(normalizedNeed * 0.52)
+    const rawPriorityScore = roundFactorValue(
       normalizedNeed * 0.52 +
         inactivityBoost +
         zeroParticipationBoost +
         absenceBoost +
         seatEnvironmentBoost,
-      0,
-      100,
     )
+    const priorityScore = clamp(rawPriorityScore, 0, 100)
+    const priorityBreakdown = [
+      {
+        key: 'need',
+        label: 'Participation score',
+        value: weightedNeed,
+        source: `${student.score}% participation score`,
+        basis: `(100 - ${student.score}) x 0.52 = ${weightedNeed}`,
+      },
+      {
+        key: 'waiting',
+        label: 'Last participation',
+        value: roundFactorValue(inactivityBoost),
+        source: `${sessionsSinceLastParticipation} sessions since last turn`,
+        basis: `${sessionsSinceLastParticipation} x 18 = ${roundFactorValue(inactivityBoost)}`,
+      },
+      {
+        key: 'firstTurn',
+        label: 'First participation',
+        value: roundFactorValue(zeroParticipationBoost),
+        source: student.sessions === 0 ? 'No participation yet' : 'Already had at least one turn',
+        basis: student.sessions === 0 ? 'No turn yet = 28' : 'Already had a turn = 0',
+      },
+      {
+        key: 'absence',
+        label: 'Missed participation',
+        value: roundFactorValue(absenceBoost),
+        source: absenceCount
+          ? `${absenceCount} missed called ${absenceCount === 1 ? 'turn' : 'turns'}`
+          : 'No missed called turns',
+        basis: `${absenceCount} x 10 = ${roundFactorValue(absenceBoost)}`,
+      },
+      {
+        key: 'seat',
+        label: 'Seat assignment',
+        value: roundFactorValue(seatEnvironmentBoost),
+        source: seatEnvironment?.zoneLabel || 'Seat not assigned',
+        basis: `${seatEnvironment?.zoneLabel || 'Seat not assigned'} = ${roundFactorValue(seatEnvironmentBoost)}`,
+      },
+    ]
 
     const reasons = []
     if (student.sessions === 0) reasons.push('No participation yet')
@@ -608,6 +656,11 @@ export const buildPriorityQueueRecommendation = (classroom = {}, excludedStudent
       seatEnvironmentScore: seatEnvironment?.environmentScore || 0,
       seatZoneLabel: seatEnvironment?.zoneLabel || 'Seat not assigned',
       sessionsSinceLastParticipation,
+      priorityBreakdown,
+      priorityFormula: 'Priority = low score + long wait + no turn yet + missed turn + seat spot',
+      priorityFormulaNumbers: `${weightedNeed} + ${roundFactorValue(inactivityBoost)} + ${roundFactorValue(zeroParticipationBoost)} + ${roundFactorValue(absenceBoost)} + ${roundFactorValue(seatEnvironmentBoost)} = ${priorityScore}`,
+      priorityRawScore: rawPriorityScore,
+      priorityCapApplied: rawPriorityScore !== priorityScore,
       reasons,
     }
   })
@@ -639,6 +692,7 @@ export const buildNextStudentRecommendation = (...args) =>
 
 export const buildStudentAnalytics = (classroom = {}, studentId = '') => {
   const classAnalytics = buildClassAnalytics(classroom)
+  const queueRecommendation = buildPriorityQueueRecommendation(classroom)
   const student =
     classAnalytics.students.find((item) => item.id === studentId) || {
       id: studentId,
@@ -651,6 +705,7 @@ export const buildStudentAnalytics = (classroom = {}, studentId = '') => {
       riskColor: getRiskColor('High'),
       recommendation: 'Join one participation round to start your engagement history.',
     }
+  const queueStudent = queueRecommendation.queue.find((item) => item.id === student.id) || null
 
   const studentRank =
     [...classAnalytics.students]
@@ -692,6 +747,15 @@ export const buildStudentAnalytics = (classroom = {}, studentId = '') => {
     studentRank,
     percentile,
     standingLabel: percentile >= 75 ? 'Top Quartile' : percentile >= 45 ? 'Middle Band' : 'Needs Visibility',
+    priorityScore: queueStudent?.priorityScore || 0,
+    queuePosition: queueStudent?.queuePosition || null,
+    sessionsSinceLastParticipation: queueStudent?.sessionsSinceLastParticipation || 0,
+    seatZoneLabel: queueStudent?.seatZoneLabel || 'Seat not assigned',
+    priorityBreakdown: queueStudent?.priorityBreakdown || [],
+    priorityFormula: queueStudent?.priorityFormula || 'Priority = low score + long wait + no turn yet + missed turn + seat spot',
+    priorityFormulaNumbers: queueStudent?.priorityFormulaNumbers || '0 + 0 + 0 + 0 + 0 = 0',
+    priorityRawScore: queueStudent?.priorityRawScore || 0,
+    priorityCapApplied: queueStudent?.priorityCapApplied || false,
     personalTrend,
     comparisonBreakdown: [
       { label: 'You', value: student.score },
