@@ -25,6 +25,7 @@ const routes = [
   { path: '/teacher/archive', name: 'teacher-archive', component: TeacherArchiveView, meta: { requiresAuth: true, role: 'teacher' } },
   { path: '/student', name: 'student', component: StudentDashboard, meta: { requiresAuth: true, role: 'student' } },
   { path: '/student/class/:classId', name: 'student-classroom', component: StudentClassroomView, meta: { requiresAuth: true, role: 'student' } },
+  { path: '/student/profile', name: 'student-profile', component: StudentIdView, meta: { requiresAuth: true, role: 'student' } },
   { path: '/student/id', name: 'student-id', component: StudentIdView, meta: { requiresAuth: true, role: 'student' } },
 ]
 

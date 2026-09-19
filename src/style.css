@@ -1,1 +1,357 @@
 @import "tailwindcss"; 
+
+:root {
+  --recicall-blue: #1188f8;
+  --recicall-blue-deep: #1558b0;
+  --recicall-blue-soft: #eaf4ff;
+  --recicall-ink: #142238;
+  --recicall-muted: #63738a;
+  --recicall-surface: #f6f8fc;
+  --recicall-border: #d8e7f5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background: var(--recicall-surface);
+  color: var(--recicall-ink);
+  font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+a {
+  transition:
+    transform 160ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+button:not(:disabled):active {
+  transform: translateY(0) scale(0.985);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(17, 136, 248, 0.22);
+  outline-offset: 3px;
+}
+
+.app-page-shell {
+  position: relative;
+  isolation: isolate;
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.42), rgba(238, 246, 255, 0.22));
+}
+
+.app-page-shell::before,
+.app-page-shell::after {
+  position: fixed;
+  z-index: 1;
+  pointer-events: none;
+  content: "";
+  border-radius: 999px;
+  opacity: 0.3;
+  filter: blur(2px);
+  will-change: transform;
+}
+
+.app-page-shell::before {
+  top: 6rem;
+  right: -5rem;
+  width: 28rem;
+  height: 28rem;
+  border: 1px solid rgba(17, 136, 248, 0.08);
+  background:
+    radial-gradient(circle at 18% 22%, rgba(17, 136, 248, 0.22) 0 3px, transparent 4px),
+    radial-gradient(circle at 68% 32%, rgba(17, 136, 248, 0.15) 0 5px, transparent 6px),
+    radial-gradient(circle at 44% 76%, rgba(17, 136, 248, 0.12) 0 3px, transparent 4px),
+    radial-gradient(circle, rgba(102, 183, 255, 0.16) 0%, rgba(102, 183, 255, 0.06) 42%, transparent 72%);
+  animation: recicall-ambient-drift 18s ease-in-out infinite alternate;
+}
+
+.app-page-shell::after {
+  bottom: -8rem;
+  left: -5rem;
+  width: 26rem;
+  height: 26rem;
+  border: 1px solid rgba(17, 136, 248, 0.06);
+  background:
+    radial-gradient(circle at 24% 68%, rgba(59, 155, 255, 0.18) 0 4px, transparent 5px),
+    radial-gradient(circle at 70% 36%, rgba(59, 155, 255, 0.12) 0 3px, transparent 4px),
+    radial-gradient(circle at 52% 18%, rgba(59, 155, 255, 0.1) 0 6px, transparent 7px),
+    radial-gradient(circle, rgba(17, 136, 248, 0.1) 0%, rgba(17, 136, 248, 0.035) 46%, transparent 72%);
+  animation: recicall-ambient-drift-reverse 23s ease-in-out infinite alternate;
+}
+
+.app-ambient-motion {
+  position: fixed !important;
+  inset: 0;
+  z-index: 4;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.app-ambient-object {
+  position: absolute;
+  display: block;
+  border-radius: 999px;
+  opacity: 0.3;
+  will-change: transform, opacity;
+}
+
+.app-ambient-orb-one {
+  top: 18%;
+  right: 5%;
+  width: 168px;
+  height: 168px;
+  border: 1px solid rgba(17, 136, 248, 0.42);
+  background: radial-gradient(circle at 38% 34%, rgba(86, 178, 255, 0.38), rgba(86, 178, 255, 0.08) 58%, transparent 72%);
+  box-shadow: 0 0 0 14px rgba(17, 136, 248, 0.055), 0 0 0 28px rgba(17, 136, 248, 0.028);
+  animation: recicall-orb-one 19s ease-in-out infinite alternate;
+}
+
+.app-ambient-orb-two {
+  bottom: 11%;
+  left: 6%;
+  width: 124px;
+  height: 124px;
+  border: 1px solid rgba(59, 155, 255, 0.36);
+  background: radial-gradient(circle at 62% 35%, rgba(126, 201, 255, 0.3), rgba(126, 201, 255, 0.06) 60%, transparent 74%);
+  box-shadow: 0 0 0 11px rgba(59, 155, 255, 0.045);
+  animation: recicall-orb-two 23s ease-in-out infinite alternate;
+}
+
+.app-ambient-dot-one,
+.app-ambient-dot-two,
+.app-ambient-dot-three {
+  width: 9px;
+  height: 9px;
+  background: rgba(17, 136, 248, 0.62);
+}
+
+.app-ambient-dot-one {
+  top: 24%;
+  right: 23%;
+  animation: recicall-dot-one 13s ease-in-out infinite;
+}
+
+.app-ambient-dot-two {
+  top: 62%;
+  left: 27%;
+  width: 7px;
+  height: 7px;
+  background: rgba(59, 155, 255, 0.54);
+  animation: recicall-dot-two 16s ease-in-out infinite;
+}
+
+.app-ambient-dot-three {
+  right: 34%;
+  bottom: 17%;
+  width: 6px;
+  height: 6px;
+  background: rgba(17, 136, 248, 0.5);
+  animation: recicall-dot-three 15s ease-in-out infinite;
+}
+
+button[class*="bg-[#1188f8]"],
+a[class*="bg-[#1188f8]"],
+.interactive-primary-button {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--recicall-blue) 0%, #3b9bff 100%) !important;
+  box-shadow: 0 10px 22px rgba(17, 136, 248, 0.18);
+}
+
+.interactive-primary-button::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.18) 50%, transparent 75%);
+  transform: translateX(-120%);
+  transition: transform 650ms ease;
+}
+
+.interactive-primary-button:hover::after {
+  transform: translateX(120%);
+}
+
+.interactive-primary-button > * {
+  position: relative;
+  z-index: 1;
+}
+
+button[class*="bg-[#1188f8]"]:hover:not(:disabled),
+a[class*="bg-[#1188f8]"]:hover,
+.interactive-primary-button:hover:not(:disabled) {
+  box-shadow: 0 15px 30px rgba(17, 136, 248, 0.28);
+  filter: saturate(1.04) brightness(1.02);
+}
+
+.interactive-secondary-button {
+  border-color: var(--recicall-blue) !important;
+  background-color: #fff !important;
+  color: var(--recicall-blue) !important;
+  box-shadow: 0 5px 14px rgba(17, 136, 248, 0.06);
+}
+
+.interactive-secondary-button:hover:not(:disabled) {
+  background-color: var(--recicall-blue-soft) !important;
+  box-shadow: 0 11px 22px rgba(17, 136, 248, 0.14);
+}
+
+.interactive-tab-button:hover:not(:disabled),
+.interactive-nav-button:hover:not(:disabled),
+.interactive-icon-button:hover:not(:disabled),
+.interactive-profile-button:hover:not(:disabled) {
+  box-shadow: 0 9px 20px rgba(15, 72, 130, 0.1);
+}
+
+.interactive-tab-button:active:not(:disabled),
+.interactive-primary-button:active:not(:disabled),
+.interactive-secondary-button:active:not(:disabled),
+.interactive-icon-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+}
+
+.interactive-primary-button:disabled,
+.interactive-secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+  box-shadow: none;
+  filter: none;
+}
+
+@keyframes recicall-ambient-drift {
+  0% {
+    opacity: 0.2;
+    transform: translate3d(0, 0, 0) scale(0.98);
+  }
+
+  100% {
+    opacity: 0.36;
+    transform: translate3d(-26px, 20px, 0) scale(1.06);
+  }
+}
+
+@keyframes recicall-ambient-drift-reverse {
+  0% {
+    opacity: 0.16;
+    transform: translate3d(0, 0, 0) scale(1.02);
+  }
+
+  100% {
+    opacity: 0.3;
+    transform: translate3d(28px, -18px, 0) scale(1.08);
+  }
+}
+
+@keyframes recicall-orb-one {
+  0% {
+    opacity: 0.22;
+    transform: translate3d(0, 0, 0) scale(0.94) rotate(0deg);
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+
+  100% {
+    opacity: 0.32;
+    transform: translate3d(-30px, 20px, 0) scale(1.04) rotate(12deg);
+  }
+}
+
+@keyframes recicall-orb-two {
+  0% {
+    opacity: 0.18;
+    transform: translate3d(0, 0, 0) scale(1.04);
+  }
+
+  50% {
+    opacity: 0.34;
+  }
+
+  100% {
+    opacity: 0.27;
+    transform: translate3d(26px, -18px, 0) scale(0.94);
+  }
+}
+
+@keyframes recicall-dot-one {
+  0%,
+  100% {
+    opacity: 0.08;
+    transform: translate3d(0, 0, 0) scale(0.7);
+  }
+
+  50% {
+    opacity: 0.36;
+    transform: translate3d(-16px, 18px, 0) scale(1.25);
+  }
+}
+
+@keyframes recicall-dot-two {
+  0%,
+  100% {
+    opacity: 0.08;
+    transform: translate3d(0, 0, 0) scale(0.75);
+  }
+
+  50% {
+    opacity: 0.3;
+    transform: translate3d(20px, -12px, 0) scale(1.3);
+  }
+}
+
+@keyframes recicall-dot-three {
+  0%,
+  100% {
+    opacity: 0.08;
+    transform: translate3d(0, 0, 0) scale(0.7);
+  }
+
+  50% {
+    opacity: 0.28;
+    transform: translate3d(-18px, -15px, 0) scale(1.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

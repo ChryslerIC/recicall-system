@@ -1,5 +1,12 @@
 <template>
-  <div class="min-h-screen bg-[#f6f6f6] font-sans text-black">
+  <div class="app-page-shell min-h-screen bg-[#f6f6f6] font-sans text-black">
+    <div class="app-ambient-motion" aria-hidden="true">
+      <span class="app-ambient-object app-ambient-orb-one" />
+      <span class="app-ambient-object app-ambient-orb-two" />
+      <span class="app-ambient-object app-ambient-dot-one" />
+      <span class="app-ambient-object app-ambient-dot-two" />
+      <span class="app-ambient-object app-ambient-dot-three" />
+    </div>
     <div class="w-full">
       <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
@@ -18,10 +25,12 @@
           </p>
         </div>
 
-        <div class="ml-4 flex items-start sm:gap-5 lg:mr-[34px]">
-          <button type="button" class="mt-0 sm:mt-1 lg:mt-[12px]" aria-label="Profile" @click="openStudentSettings">
+        <div class="ml-4 flex flex-col items-center sm:gap-1 lg:mr-[34px]">
+          <button type="button" class="mt-0 sm:mt-1 lg:mt-[4px]" aria-label="Profile" @click="openStudentSettings">
             <img :src="studentAvatarSrc" alt="" class="h-[48px] w-[49px] rounded-full object-cover sm:h-[56px] sm:w-[57px] lg:h-[63px] lg:w-[64px]" />
           </button>
+          <p class="max-w-[150px] truncate text-center text-[13px] font-bold leading-none text-black sm:text-[14px] lg:text-[15px]">{{ displayName }}</p>
+          <p class="text-[11px] font-medium leading-none text-[#5d5d5d] sm:text-[12px]">Student</p>
         </div>
       </header>
 
@@ -116,7 +125,7 @@
         </aside>
 
         <main class="min-w-0 flex-1 lg:pl-[28px] lg:pr-[27px] lg:pt-[13px]">
-          <section class="min-h-[653px] rounded-[28px] border-2 border-[#2e82ef] bg-white px-4 pb-8 pt-6 sm:px-7 sm:pt-8 lg:rounded-[52px] lg:px-[34px] lg:pb-[36px] lg:pt-[30px]">
+          <section class="w-full rounded-[28px] border-2 border-[#2e82ef] bg-white px-4 pb-8 pt-6 sm:px-7 sm:pt-8 lg:rounded-[52px] lg:px-[34px] lg:pb-[36px] lg:pt-[30px]">
             <div v-if="isLoading" class="text-[18px] font-medium text-[#5d5d5d]">Loading class...</div>
             <div
               v-else-if="loadError"
@@ -132,29 +141,29 @@
             </div>
 
             <template v-else>
-              <div class="sticky top-[96px] z-10 w-fit max-w-full pb-3 pt-1 lg:top-[112px]">
-                <div class="rounded-[30.5px] bg-[#f6f6f6] px-[10px] py-[8px] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)] sm:w-fit">
+              <div class="sticky top-[96px] z-30 isolate w-fit max-w-full bg-transparent pb-3 pt-1 lg:top-[112px]">
+                <div class="overflow-hidden rounded-[30.5px] border border-[#e3e9f1] bg-white px-[10px] py-[8px] shadow-[0_4px_10px_-4px_rgba(0,0,0,0.18)] sm:w-fit">
                   <div class="flex flex-wrap gap-2 sm:flex-nowrap">
                     <button
                       type="button"
-                      class="h-[47px] min-w-[141px] rounded-[30.5px] text-[16px] font-semibold"
-                      :class="activeTab === 'class' ? 'bg-white text-[#1188f8]' : 'text-[#373737]'"
+                      class="h-[47px] min-w-[141px] cursor-pointer rounded-[30.5px] text-[16px] font-semibold transition-all duration-150 hover:bg-[#eef6ff] hover:text-[#1188f8] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1188f8] focus-visible:ring-offset-2"
+                      :class="activeTab === 'class' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.14)]' : 'text-black'"
                       @click="setTab('class')"
                     >
                       Class
                     </button>
                     <button
                       type="button"
-                      class="h-[47px] min-w-[141px] rounded-[30.5px] text-[16px] font-semibold"
-                      :class="activeTab === 'class-list' ? 'bg-white text-[#1188f8]' : 'text-[#373737]'"
+                      class="h-[47px] min-w-[141px] cursor-pointer rounded-[30.5px] text-[16px] font-semibold transition-all duration-150 hover:bg-[#eef6ff] hover:text-[#1188f8] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1188f8] focus-visible:ring-offset-2"
+                      :class="activeTab === 'class-list' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.14)]' : 'text-black'"
                       @click="setTab('class-list')"
                     >
                       Class List
                     </button>
                     <button
                       type="button"
-                      class="h-[47px] min-w-[141px] rounded-[30.5px] text-[16px] font-semibold"
-                      :class="activeTab === 'analytics' ? 'bg-white text-[#1188f8]' : 'text-[#373737]'"
+                      class="h-[47px] min-w-[141px] cursor-pointer rounded-[30.5px] text-[16px] font-semibold transition-all duration-150 hover:bg-[#eef6ff] hover:text-[#1188f8] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1188f8] focus-visible:ring-offset-2"
+                      :class="activeTab === 'analytics' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.14)]' : 'text-black'"
                       @click="setTab('analytics')"
                     >
                       Insights
@@ -562,8 +571,8 @@
                       v-for="card in studentInsightsSectionCards"
                       :key="card.id"
                       type="button"
-                      class="rounded-[22px] border px-5 py-4 text-left transition-all"
-                      :class="insightsSubview === card.id ? 'border-[#1188f8] bg-[#eef6ff] shadow-[0_10px_24px_rgba(17,136,248,0.12)]' : 'border-[#d8d8d8] bg-[#fbfbfb] hover:border-[#1188f8] hover:bg-[#f8fbff]'"
+                      class="cursor-pointer rounded-[22px] border px-5 py-4 text-left transition-all duration-150 hover:-translate-y-0.5 hover:border-[#1188f8] hover:bg-[#f8fbff] hover:shadow-[0_10px_24px_rgba(17,136,248,0.12)] active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1188f8] focus-visible:ring-offset-2"
+                      :class="insightsSubview === card.id ? 'border-[#1188f8] bg-[#eef6ff] shadow-[0_10px_24px_rgba(17,136,248,0.12)]' : 'border-[#d8d8d8] bg-[#fbfbfb]'"
                       @click="insightsSubview = card.id"
                     >
                       <div class="flex items-start justify-between gap-4">
@@ -631,7 +640,7 @@
                     </template>
 
                     <template v-else-if="insightsSubview === 'progress'">
-                      <div class="grid gap-[18px] xl:grid-cols-[minmax(0,1fr)_360px]">
+                      <div class="grid items-start gap-[18px] xl:grid-cols-[minmax(0,1fr)_360px]">
                         <section class="rounded-[28px] bg-[#f6f6f6] px-4 py-4 sm:px-6">
                           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
@@ -692,7 +701,7 @@
                     </template>
 
                     <template v-else-if="insightsSubview === 'comparison'">
-                      <div class="grid gap-[18px] xl:grid-cols-[minmax(0,1fr)_360px]">
+                      <div class="space-y-[18px]">
                         <section class="rounded-[28px] bg-[#f6f6f6] px-4 py-4 sm:px-6">
                           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
@@ -1504,7 +1513,7 @@ const setTab = (tab) => {
 }
 
 const openStudentSettings = () => {
-  router.push('/student/id')
+  router.push({ path: '/student/profile', query: { settings: 'open' } })
 }
 
 const openLogoutConfirm = () => {

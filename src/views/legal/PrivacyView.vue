@@ -1,5 +1,12 @@
 <template>
-  <div class="min-h-screen bg-[#f6f6f6] px-4 py-8 sm:px-6 lg:px-10">
+  <div class="app-page-shell min-h-screen bg-[#f6f6f6] px-4 py-8 sm:px-6 lg:px-10">
+    <div class="app-ambient-motion" aria-hidden="true">
+      <span class="app-ambient-object app-ambient-orb-one" />
+      <span class="app-ambient-object app-ambient-orb-two" />
+      <span class="app-ambient-object app-ambient-dot-one" />
+      <span class="app-ambient-object app-ambient-dot-two" />
+      <span class="app-ambient-object app-ambient-dot-three" />
+    </div>
     <div class="mx-auto w-full max-w-[980px] rounded-[32px] border border-[#d6e6fa] bg-white px-6 py-8 shadow-[0_16px_40px_rgba(17,136,248,0.06)] sm:px-8 lg:px-10">
       <div class="flex flex-col gap-4 border-b border-[#e6eef8] pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -16,7 +23,7 @@
 
         <button
           type="button"
-          class="inline-flex h-[46px] items-center justify-center rounded-full border border-[#1188f8] px-5 text-[15px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff]"
+          class="interactive-secondary-button inline-flex h-[46px] items-center justify-center rounded-full border border-[#1188f8] px-5 text-[15px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff]"
           @click="goBack"
         >
           Back

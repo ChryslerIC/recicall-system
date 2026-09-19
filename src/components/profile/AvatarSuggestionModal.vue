@@ -61,7 +61,7 @@
           </button>
           <button
             type="button"
-            class="h-[52px] w-full rounded-[22px] bg-[#1188f8] px-6 text-[17px] font-semibold text-white disabled:opacity-60 sm:w-auto sm:min-w-[172px]"
+            class="interactive-primary-button h-[52px] w-full rounded-[22px] bg-[#1188f8] px-6 text-[17px] font-semibold text-white disabled:opacity-60 sm:w-auto sm:min-w-[172px]"
             :disabled="saving"
             @click="$emit('save')"
           >

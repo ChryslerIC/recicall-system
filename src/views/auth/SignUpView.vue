@@ -99,7 +99,7 @@
 
       <button
         type="submit"
-        class="mt-1 flex h-[54px] w-full items-center justify-center rounded-full bg-[#1188f8] text-[18px] font-extrabold text-white shadow-[0_9px_8.8px_0_rgba(17,136,248,0.3)] transition hover:bg-[#0c78dd] disabled:cursor-not-allowed disabled:opacity-70 sm:mt-2 sm:h-[61px] sm:text-[20px]"
+        class="interactive-primary-button mt-1 flex h-[54px] w-full items-center justify-center rounded-full bg-[#1188f8] text-[18px] font-extrabold text-white shadow-[0_9px_8.8px_0_rgba(17,136,248,0.3)] transition hover:bg-[#0c78dd] disabled:cursor-not-allowed disabled:opacity-70 sm:mt-2 sm:h-[61px] sm:text-[20px]"
         :disabled="isSubmitting"
       >
         {{ isSubmitting ? 'Creating account...' : 'Sign up' }}

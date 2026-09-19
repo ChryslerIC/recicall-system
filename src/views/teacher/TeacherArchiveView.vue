@@ -1,5 +1,12 @@
 <template>
-  <div class="min-h-screen bg-[#f6f6f6] font-sans text-black">
+  <div class="app-page-shell min-h-screen bg-[#f6f6f6] font-sans text-black">
+    <div class="app-ambient-motion" aria-hidden="true">
+      <span class="app-ambient-object app-ambient-orb-one" />
+      <span class="app-ambient-object app-ambient-orb-two" />
+      <span class="app-ambient-object app-ambient-dot-one" />
+      <span class="app-ambient-object app-ambient-dot-two" />
+      <span class="app-ambient-object app-ambient-dot-three" />
+    </div>
     <div class="w-full">
       <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
@@ -134,7 +141,7 @@
                 <p class="mt-[8px] text-[20px] leading-none font-medium">Archived classes are stored here first.</p>
               </div>
 
-              <button type="button" class="mt-[2px] flex h-[78px] w-[250px] items-center rounded-[33.5px] bg-[#1188f8] pl-[32px] pr-[21px]" @click="router.push('/teacher')">
+              <button type="button" class="interactive-primary-button mt-[2px] flex h-[78px] w-[250px] items-center rounded-[33.5px] bg-[#1188f8] pl-[32px] pr-[21px]" @click="router.push('/teacher')">
                 <span class="grid h-[48px] w-[48px] place-items-center rounded-full bg-white text-[#1188f8]">
                   <AppIcon name="back" :size="24" />
                 </span>
@@ -159,7 +166,7 @@
               <article
                 v-for="classItem in classes"
                 :key="classItem.id"
-                class="relative h-[260px] w-full overflow-hidden rounded-[20px] border-2 border-[#bdbdbd] bg-white opacity-95"
+                class="relative h-[260px] w-full overflow-hidden rounded-[20px] border-2 border-white/70 bg-[linear-gradient(145deg,#ffffff_0%,#eef6ff_100%)] shadow-[0_14px_30px_rgba(23,76,160,0.08)] opacity-95"
                 :style="{ width: classCardWidth(classItem) }"
               >
                 <div class="relative mx-[5px] mt-[6px] h-[173px] overflow-hidden rounded-[17px]" :style="{ backgroundImage: classItem.gradient }">
@@ -406,7 +413,7 @@
                 <button type="button" class="h-[52px] w-full rounded-[24px] bg-[#c5c5c5] text-[18px] font-bold sm:h-[57px] sm:w-[151px] sm:rounded-[33.5px] sm:text-[20px]" @click="closeProfileModal">
                   Cancel
                 </button>
-                <button v-if="activeSettingsSection === 'profile'" type="submit" class="h-[52px] w-full rounded-[24px] bg-[#1188f8] text-[18px] font-bold text-white disabled:opacity-70 sm:h-[57px] sm:w-[151px] sm:rounded-[33.5px] sm:text-[20px]" :disabled="isSavingProfile">
+                <button v-if="activeSettingsSection === 'profile'" type="submit" class="interactive-primary-button h-[52px] w-full rounded-[24px] bg-[#1188f8] text-[18px] font-bold text-white disabled:opacity-70 sm:h-[57px] sm:w-[151px] sm:rounded-[33.5px] sm:text-[20px]" :disabled="isSavingProfile">
                   {{ isSavingProfile ? 'Saving...' : 'Save' }}
                 </button>
               </div>

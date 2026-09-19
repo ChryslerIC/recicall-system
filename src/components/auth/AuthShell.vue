@@ -1,8 +1,15 @@
 <template>
   <div
-    class="relative min-h-dvh overflow-hidden px-3 py-3 sm:px-6 sm:py-8 lg:flex lg:min-h-screen lg:items-center lg:justify-center"
+    class="app-page-shell relative min-h-dvh overflow-hidden px-3 py-3 sm:px-6 sm:py-8 lg:flex lg:min-h-screen lg:items-center lg:justify-center"
     :class="frameBackgroundSrc ? 'bg-[#fbfbfb]' : 'bg-[#515151]'"
   >
+    <div class="app-ambient-motion" aria-hidden="true">
+      <span class="app-ambient-object app-ambient-orb-one" />
+      <span class="app-ambient-object app-ambient-orb-two" />
+      <span class="app-ambient-object app-ambient-dot-one" />
+      <span class="app-ambient-object app-ambient-dot-two" />
+      <span class="app-ambient-object app-ambient-dot-three" />
+    </div>
     <img
       v-if="frameBackgroundSrc"
       :src="frameBackgroundSrc"
@@ -77,7 +84,7 @@
 
           <button
             type="button"
-            class="mt-4 flex h-[44px] w-full max-w-[281px] items-center justify-center gap-2 rounded-full bg-[#f6f6f6] px-6 text-[18px] font-bold text-black sm:mt-6 sm:h-[45px] sm:text-[20px]"
+            class="interactive-secondary-button mt-4 flex h-[44px] w-full max-w-[281px] items-center justify-center gap-2 rounded-full bg-[#f6f6f6] px-6 text-[18px] font-bold text-black sm:mt-6 sm:h-[45px] sm:text-[20px]"
             :disabled="googleDisabled"
             :class="{ 'cursor-not-allowed opacity-70': googleDisabled }"
             @click="$emit('google')"

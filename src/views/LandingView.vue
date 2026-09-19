@@ -1,5 +1,12 @@
 <template>
-  <div class="min-h-screen bg-[#f6f6f6] font-sans text-black">
+  <div class="app-page-shell min-h-screen bg-[#f6f6f6] font-sans text-black">
+    <div class="app-ambient-motion" aria-hidden="true">
+      <span class="app-ambient-object app-ambient-orb-one" />
+      <span class="app-ambient-object app-ambient-orb-two" />
+      <span class="app-ambient-object app-ambient-dot-one" />
+      <span class="app-ambient-object app-ambient-dot-two" />
+      <span class="app-ambient-object app-ambient-dot-three" />
+    </div>
     <section class="relative min-h-[78vh] overflow-hidden">
       <img
         :src="heroVisual"
@@ -24,7 +31,7 @@
             </RouterLink>
             <RouterLink
               to="/signup"
-              class="flex h-[44px] items-center justify-center rounded-full bg-[#1188f8] px-4 text-[15px] font-semibold text-white transition hover:bg-[#0c78dd] sm:px-5"
+              class="interactive-primary-button flex h-[44px] items-center justify-center rounded-full bg-[#1188f8] px-4 text-[15px] font-semibold text-white transition hover:bg-[#0c78dd] sm:px-5"
             >
               Create Account
             </RouterLink>
@@ -49,7 +56,7 @@
             <div class="mt-8 flex flex-col gap-3 sm:flex-row">
               <RouterLink
                 to="/signup"
-                class="flex h-[54px] min-w-[180px] items-center justify-center rounded-full bg-[#1188f8] px-7 text-[17px] font-bold text-white transition hover:bg-[#0c78dd]"
+                class="interactive-primary-button flex h-[54px] min-w-[180px] items-center justify-center rounded-full bg-[#1188f8] px-7 text-[17px] font-bold text-white transition hover:bg-[#0c78dd]"
               >
                 Start With ReciCall
               </RouterLink>

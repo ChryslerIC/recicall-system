@@ -1,5 +1,12 @@
 <template>
-  <div class="min-h-screen bg-[#f6f6f6] font-sans text-black">
+  <div class="app-page-shell min-h-screen bg-[#f6f6f6] font-sans text-black">
+    <div class="app-ambient-motion" aria-hidden="true">
+      <span class="app-ambient-object app-ambient-orb-one" />
+      <span class="app-ambient-object app-ambient-orb-two" />
+      <span class="app-ambient-object app-ambient-dot-one" />
+      <span class="app-ambient-object app-ambient-dot-two" />
+      <span class="app-ambient-object app-ambient-dot-three" />
+    </div>
     <div class="w-full">
       <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
@@ -137,7 +144,7 @@
 
               <button
               type="button"
-              class="mt-[2px] flex h-[72px] w-full max-w-[298px] items-center rounded-[33.5px] bg-[#1188f8] pl-[24px] pr-[18px] sm:h-[78px] sm:pl-[32px] sm:pr-[21px]"
+              class="interactive-primary-button mt-[2px] flex h-[72px] w-full max-w-[298px] items-center rounded-[33.5px] bg-[#1188f8] pl-[24px] pr-[18px] sm:h-[78px] sm:pl-[32px] sm:pr-[21px]"
               @click="openModal"
             >
               <span class="grid h-[42px] w-[46px] place-items-center rounded-full bg-white sm:h-[48px] sm:w-[53px]">
@@ -167,7 +174,7 @@
               <article
                 v-for="classItem in classes"
                 :key="classItem.id"
-                class="relative min-h-[292px] w-full cursor-pointer rounded-[20px] border-2 border-[#bdbdbd] bg-white transition-transform hover:-translate-y-0.5"
+                class="relative min-h-[292px] w-full cursor-pointer rounded-[20px] border-2 border-white/70 bg-[linear-gradient(145deg,#ffffff_0%,#eef6ff_100%)] shadow-[0_14px_30px_rgba(23,76,160,0.1)] transition-transform hover:-translate-y-0.5"
                 :style="{ width: classCardWidth(classItem) }"
                 @click="openClassroom(classItem.id)"
               >
@@ -444,7 +451,7 @@
                 <button type="button" class="h-[52px] w-full rounded-[24px] bg-[#c5c5c5] text-[18px] font-bold sm:h-[57px] sm:w-[151px] sm:rounded-[33.5px] sm:text-[20px]" @click="closeProfileModal">
                   Cancel
                 </button>
-                <button v-if="activeSettingsSection === 'profile'" type="submit" class="h-[52px] w-full rounded-[24px] bg-[#1188f8] text-[18px] font-bold text-white disabled:opacity-70 sm:h-[57px] sm:w-[151px] sm:rounded-[33.5px] sm:text-[20px]" :disabled="isSavingProfile">
+                <button v-if="activeSettingsSection === 'profile'" type="submit" class="interactive-primary-button h-[52px] w-full rounded-[24px] bg-[#1188f8] text-[18px] font-bold text-white disabled:opacity-70 sm:h-[57px] sm:w-[151px] sm:rounded-[33.5px] sm:text-[20px]" :disabled="isSavingProfile">
                   {{ isSavingProfile ? 'Saving...' : 'Save' }}
                 </button>
               </div>
@@ -627,7 +634,7 @@
                 </button>
                 <button
                   type="submit"
-                  class="h-[57px] w-full rounded-[33.5px] bg-[#1188f8] text-[20px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-[151px]"
+                  class="interactive-primary-button h-[57px] w-full rounded-[33.5px] bg-[#1188f8] text-[20px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-[151px]"
                   :disabled="isClassFormIncomplete || isSavingClass"
                 >
                   {{ isSavingClass ? (editingClassId ? 'Saving...' : 'Creating...') : (editingClassId ? 'Save' : 'Create') }}

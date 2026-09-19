@@ -22,7 +22,7 @@
           </button>
           <button
             type="button"
-            class="min-w-[120px] rounded-[24px] bg-[#1188f8] px-5 py-3 text-[16px] font-semibold text-white transition hover:bg-[#0c78dd] disabled:cursor-not-allowed disabled:opacity-70"
+            class="interactive-primary-button min-w-[120px] rounded-[24px] bg-[#1188f8] px-5 py-3 text-[16px] font-semibold text-white transition hover:bg-[#0c78dd] disabled:cursor-not-allowed disabled:opacity-70"
             :disabled="loading"
             @click="$emit('confirm')"
           >

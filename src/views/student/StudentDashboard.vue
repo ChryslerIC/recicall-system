@@ -1,5 +1,12 @@
 <template>
-  <div class="min-h-screen bg-[#f6f6f6] font-sans text-black">
+  <div class="app-page-shell min-h-screen bg-[#f6f6f6] font-sans text-black">
+    <div class="app-ambient-motion" aria-hidden="true">
+      <span class="app-ambient-object app-ambient-orb-one" />
+      <span class="app-ambient-object app-ambient-orb-two" />
+      <span class="app-ambient-object app-ambient-dot-one" />
+      <span class="app-ambient-object app-ambient-dot-two" />
+      <span class="app-ambient-object app-ambient-dot-three" />
+    </div>
     <div class="w-full">
       <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
@@ -16,10 +23,12 @@
           <p class="ml-3 mt-1 text-[28px] leading-none font-black tracking-[-0.03em] sm:ml-4 sm:mt-2 sm:text-[34px] lg:ml-[22px] lg:mt-[18px] lg:text-[40px]">ReciCall</p>
         </div>
 
-        <div class="ml-4 flex items-start sm:gap-5 lg:mr-[34px]">
-          <button type="button" class="mt-0 sm:mt-1 lg:mt-[12px]" aria-label="Profile" @click="openStudentSettings">
+        <div class="ml-4 flex flex-col items-center sm:gap-1 lg:mr-[34px]">
+          <button type="button" class="mt-0 sm:mt-1 lg:mt-[4px]" aria-label="Profile" @click="openStudentSettings">
             <img :src="studentAvatarSrc" alt="" class="h-[48px] w-[49px] rounded-full object-cover sm:h-[56px] sm:w-[57px] lg:h-[63px] lg:w-[64px]" />
           </button>
+          <p class="max-w-[150px] truncate text-center text-[13px] font-bold leading-none text-black sm:text-[14px] lg:text-[15px]">{{ studentProfile?.displayName || 'Student' }}</p>
+          <p class="text-[11px] font-medium leading-none text-[#5d5d5d] sm:text-[12px]">Student</p>
         </div>
       </header>
 
@@ -119,7 +128,7 @@
                 <p class="mt-[8px] text-[18px] leading-tight font-medium sm:text-[20px]">{{ dashboardSubtitle }}</p>
               </div>
 
-              <button type="button" class="mt-[2px] flex h-[72px] w-full max-w-[249px] items-center rounded-[33.5px] bg-[#1188f8] pl-[24px] pr-[18px] sm:h-[78px] sm:pl-[32px] sm:pr-[21px]" @click="openJoinModal">
+              <button type="button" class="interactive-primary-button mt-[2px] flex h-[72px] w-full max-w-[249px] items-center rounded-[33.5px] bg-[#1188f8] pl-[24px] pr-[18px] sm:h-[78px] sm:pl-[32px] sm:pr-[21px]" @click="openJoinModal">
                 <span class="grid h-[42px] w-[46px] place-items-center rounded-full bg-white sm:h-[48px] sm:w-[53px]">
                   <AppIcon name="plus" :size="28" class="text-[#1188f8]" />
                 </span>
@@ -269,7 +278,7 @@
                 </button>
                 <button
                   type="submit"
-                  class="h-[57px] w-[151px] rounded-[33.5px] bg-[#1188f8] text-[20px] font-bold text-white disabled:opacity-70"
+                  class="interactive-primary-button h-[57px] w-[151px] rounded-[33.5px] bg-[#1188f8] text-[20px] font-bold text-white disabled:opacity-70"
                   :disabled="isJoining"
                 >
                   {{ isJoining ? 'Joining...' : 'Join' }}
@@ -521,7 +530,7 @@ const openClassroom = (classId) => {
 }
 
 const openStudentSettings = () => {
-  router.push('/student/id')
+  router.push({ path: '/student/profile', query: { settings: 'open' } })
 }
 
 const handleJoinClass = async () => {

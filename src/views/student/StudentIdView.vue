@@ -1,5 +1,12 @@
 <template>
-  <div class="min-h-screen bg-[#f6f6f6] font-sans text-black">
+  <div class="app-page-shell min-h-screen bg-[#f6f6f6] font-sans text-black">
+    <div class="app-ambient-motion" aria-hidden="true">
+      <span class="app-ambient-object app-ambient-orb-one" />
+      <span class="app-ambient-object app-ambient-orb-two" />
+      <span class="app-ambient-object app-ambient-dot-one" />
+      <span class="app-ambient-object app-ambient-dot-two" />
+      <span class="app-ambient-object app-ambient-dot-three" />
+    </div>
     <div class="w-full">
       <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
@@ -20,14 +27,16 @@
           </p>
         </div>
 
-        <div class="ml-4 flex items-start sm:gap-5 lg:mr-[34px]">
-          <button type="button" class="mt-0 sm:mt-1 lg:mt-[12px]" aria-label="Profile" @click="openEditModal">
+        <div class="ml-4 flex flex-col items-center sm:gap-1 lg:mr-[34px]">
+          <button type="button" class="mt-0 sm:mt-1 lg:mt-[4px]" aria-label="Profile" @click="openEditModal">
             <img
               :src="studentAvatarSrc"
               alt=""
               class="h-[48px] w-[49px] rounded-full object-cover sm:h-[56px] sm:w-[57px] lg:h-[63px] lg:w-[64px]"
             />
           </button>
+          <p class="max-w-[150px] truncate text-center text-[13px] font-bold leading-none text-black sm:text-[14px] lg:text-[15px]">{{ displayName }}</p>
+          <p class="text-[11px] font-medium leading-none text-[#5d5d5d] sm:text-[12px]">Student</p>
         </div>
       </header>
 

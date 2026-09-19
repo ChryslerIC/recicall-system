@@ -1,5 +1,12 @@
 <template>
-  <div class="min-h-screen bg-[#f6f6f6] font-sans text-black">
+  <div class="app-page-shell min-h-screen bg-[#f6f6f6] font-sans text-black">
+    <div class="app-ambient-motion" aria-hidden="true">
+      <span class="app-ambient-object app-ambient-orb-one" />
+      <span class="app-ambient-object app-ambient-orb-two" />
+      <span class="app-ambient-object app-ambient-dot-one" />
+      <span class="app-ambient-object app-ambient-dot-two" />
+      <span class="app-ambient-object app-ambient-dot-three" />
+    </div>
     <div class="w-full">
       <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
@@ -171,8 +178,16 @@
               </div>
 
               <template v-if="currentTab === 'class'">
-              <div class="mt-[18px] flex min-h-[220px] flex-col overflow-hidden rounded-[17px] px-4 pb-4 pt-4 text-white sm:px-5 sm:pb-5 sm:pt-5 lg:min-h-[244px] lg:px-[24px] lg:pb-[20px] lg:pt-[18px]" :style="{ backgroundImage: classroom.gradient }">
-                <div class="flex items-start justify-between">
+              <div class="relative mt-[18px] flex min-h-[220px] flex-col overflow-hidden rounded-[17px] px-4 pb-4 pt-4 text-white shadow-[0_16px_34px_rgba(23,76,160,0.18)] sm:px-5 sm:pb-5 sm:pt-5 lg:min-h-[244px] lg:px-[24px] lg:pb-[20px] lg:pt-[18px]" :style="{ backgroundImage: classroom.gradient }">
+                <div class="pointer-events-none absolute inset-0 opacity-80" aria-hidden="true">
+                  <div class="absolute -right-[34px] -top-[48px] h-[180px] w-[260px] rounded-full border border-white/20 bg-white/10 blur-[1px]" />
+                  <div class="absolute -bottom-[82px] right-[18%] h-[180px] w-[180px] rounded-full border border-white/15 bg-white/10" />
+                  <div class="absolute bottom-[18px] left-[34%] h-[12px] w-[12px] rounded-full bg-white/30" />
+                  <div class="absolute right-[34%] top-[34px] h-[8px] w-[8px] rounded-full bg-white/35" />
+                  <div class="absolute bottom-[-24px] left-[10%] h-[82px] w-[190px] rotate-[-8deg] rounded-[28px] bg-black/10" />
+                </div>
+
+                <div class="relative z-10 flex items-start justify-between">
                 <div class="min-w-0">
                   <template v-if="isSessionActive">
                     <p class="text-[26px] font-semibold leading-none sm:text-[32px] lg:text-[36px]">{{ classroom.subject }}</p>
@@ -220,13 +235,13 @@
                   </div>
                 </div>
 
-                <div class="mt-[12px] flex flex-1 items-end justify-end">
+                <div class="relative z-10 mt-[12px] flex flex-1 items-end justify-end">
                   <div class="relative hidden h-[112px] w-[224px] opacity-90 sm:block">
                     <ClassThemeArt :theme-id="classroom.gradientId" variant="hero" />
                   </div>
                 </div>
 
-                <p class="mt-[10px] text-[20px] font-medium leading-none">
+                <p class="relative z-10 mt-[10px] text-[20px] font-medium leading-none">
                   {{ classroom.scheduleLabel }} &bull; {{ classroom.time }}
                 </p>
               </div>
@@ -235,7 +250,7 @@
                 <div class="w-full shrink-0 xl:w-[242px]">
                   <div class="relative h-[141px] w-full rounded-[23px] border border-[#bdbdbd] bg-white px-[14px] pt-[10px] xl:w-[242px]">
                     <div class="absolute right-[12px] top-[10px]">
-                      <AppIcon name="sparkles" :size="30" class="text-[#111]" />
+                      <AppIcon name="users" :size="30" class="text-[#1188f8]" />
                     </div>
                     <p class="text-[20px] font-bold leading-none text-black">Class</p>
                     <p class="mt-[18px] text-[40px] font-bold leading-none text-[#0084ff]">{{ classroom.students }}</p>
@@ -247,116 +262,111 @@
                   <div class="flex flex-col gap-4 md:flex-row md:flex-wrap xl:flex-nowrap xl:items-center xl:gap-[23px]">
                     <button
                       type="button"
-                      class="interactive-primary-button flex w-full items-center justify-center gap-[16px] rounded-[60px] bg-gradient-to-r from-[#1188f8] via-[#2490fa] to-[#57a5ff] font-bold text-white md:flex-1 xl:flex-none"
+                      class="interactive-primary-button group flex w-full items-center justify-center gap-[12px] rounded-[24px] border border-white/20 px-5 font-bold text-white md:flex-1 xl:flex-none"
                       :class="isSessionActive ? 'h-[82px] text-[18px] sm:text-[20px] xl:h-[95px] xl:w-[393px] xl:text-[22px]' : 'h-[72px] text-[18px] sm:text-[20px] xl:h-[76px] xl:w-[324px] xl:text-[24px]'"
                       @click="openScanModal"
                     >
-                      <AppIcon name="scan" :size="38" class="text-white" />
+                      <span class="grid h-[44px] w-[44px] shrink-0 place-items-center rounded-[15px] bg-white/15 ring-1 ring-white/20 transition-colors duration-200 group-hover:bg-white/25">
+                        <AppIcon name="scan" :size="30" class="text-white" />
+                      </span>
                       <span>Scan Participation</span>
                     </button>
 
                     <button
                       type="button"
-                      class="interactive-primary-button flex w-full items-center justify-center gap-[16px] rounded-[60px] bg-gradient-to-l from-[#1188f8] via-[#2490fa] to-[#57a5ff] font-bold text-white md:flex-1 xl:flex-none"
+                      class="interactive-secondary-button group flex w-full items-center justify-center gap-[12px] rounded-[24px] border px-5 font-bold md:flex-1 xl:flex-none"
                       :class="isSessionActive ? 'h-[82px] text-[18px] sm:text-[20px] xl:h-[95px] xl:w-[385px] xl:text-[22px]' : 'h-[72px] text-[18px] sm:text-[20px] xl:h-[76px] xl:w-[324px] xl:text-[20px]'"
                       @click="openPickNextStudentModal"
                     >
-                      <AppIcon name="pick-next" :size="36" class="text-white" />
+                      <span class="grid h-[44px] w-[44px] shrink-0 place-items-center rounded-[15px] bg-[#eaf4ff] transition-colors duration-200 group-hover:bg-[#dceeff]">
+                        <AppIcon name="pick-next" :size="30" class="text-[#1188f8]" />
+                      </span>
                       <span>Pick Next Student</span>
                     </button>
                   </div>
 
                   <template v-if="isSessionActive">
-                    <div class="mt-[16px] w-full rounded-[32px] bg-[#f6f6f6] px-4 py-4 sm:px-5 xl:px-[20px] xl:py-[18px]">
-                      <div class="grid grid-cols-1 gap-y-5 xl:grid-cols-[276px_minmax(0,1fr)] xl:gap-x-[22px] xl:gap-y-0">
-                        <div class="rounded-[24px] border-l-[4px] border-[#1188f8] bg-white/40 pl-[18px] pr-3 py-2">
-                          <div class="flex items-start gap-[12px]">
-                            <div class="grid h-[52px] w-[54px] place-items-center rounded-[14px] bg-[#50d24a]">
-                              <AppIcon name="sparkles" :size="26" class="text-[#072b10]" />
-                            </div>
-                            <div>
-                              <p class="text-[27px] font-bold leading-none text-black">{{ activeSessionTitle }}</p>
-                              <p class="mt-[8px] text-[20px] font-semibold leading-none text-[#4a4a4a]">{{ activeSessionDateLabel }}</p>
-                            </div>
-                          </div>
-
-                          <div class="mt-[18px] flex min-h-[61px] w-full max-w-[275px] items-center rounded-[12px] bg-[#d9d9d9] px-[14px] py-3 text-[18px] font-bold text-black sm:text-[20px]">
-                            <span>Student Participated:</span>
-                            <span class="ml-[8px] text-[#1188f8]">{{ activeSessionParticipantCount }}</span>
-                          </div>
+                    <div class="mt-[20px] w-full rounded-[24px] border border-[#d8e4f3] bg-white px-5 py-5 shadow-[0_10px_24px_rgba(23,76,160,0.08)] sm:px-7 xl:mt-[29px]">
+                      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="min-w-0">
+                          <p class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#35a64a]">
+                            <span class="h-2 w-2 rounded-full bg-[#35c759]" />
+                            Participation · Live
+                          </p>
+                          <p class="mt-2 truncate text-[24px] font-bold leading-none text-black sm:text-[28px]">{{ activeSessionTitle }}</p>
+                          <p class="mt-2 truncate text-[14px] font-medium text-[#5d5d5d] sm:text-[15px]">{{ activeSessionDateLabel }}</p>
+                          <p class="mt-2 text-[13px] font-semibold text-[#1188f8]">{{ activeSessionParticipantCount }} students participated</p>
                         </div>
 
-                        <div class="min-w-0 border-t border-[#d4dbe5] pt-4 xl:border-l xl:border-t-0 xl:pl-[24px] xl:pt-[4px]">
-                          <div class="flex items-center gap-[8px]">
-                            <button
-                              type="button"
-                              class="interactive-icon-button grid h-[28px] w-[28px] place-items-center rounded-full text-[#777] transition-colors hover:bg-[#e8edf3] hover:text-[#1188f8] disabled:cursor-not-allowed disabled:opacity-60"
-                              :disabled="isRefreshingRecentEngagement"
-                              aria-label="Refresh recent student engagement"
-                              @click="refreshRecentStudentEngagement"
-                            >
-                              <AppIcon
-                                name="refresh"
-                                :size="20"
-                                class="h-[20px] w-[20px]"
-                                :class="isRefreshingRecentEngagement ? 'animate-spin text-[#1188f8]' : ''"
-                              />
-                            </button>
-                            <p class="text-[18px] font-bold text-[#313131]">Recent Student Engagement</p>
-                          </div>
+                        <button
+                          type="button"
+                          class="interactive-secondary-button flex h-[42px] w-full shrink-0 items-center justify-center gap-2 rounded-[16px] border border-[#535353] bg-white px-5 text-[15px] font-semibold text-[#1188f8] disabled:cursor-not-allowed disabled:opacity-60 sm:w-[154px]"
+                          :disabled="isSavingSessionState"
+                          @click="endSession"
+                        >
+                          <span class="h-2 w-2 rounded-full bg-[#ef4444]" />
+                          {{ isSavingSessionState ? 'Ending...' : 'End Session' }}
+                        </button>
+                      </div>
 
-                          <div v-if="recentStudents.length" class="mt-[14px] space-y-[10px]">
-                            <div v-for="student in recentStudents" :key="student.id" class="flex min-h-[47px] items-center justify-between gap-3 rounded-[28px] border border-[#cccdce] bg-[#fdfdfd] px-[10px] py-2">
-                              <div class="flex min-w-0 items-center gap-[12px]">
-                                <img :src="student.avatarSrc" alt="" class="h-[30px] w-[30px] rounded-full border-2 border-black object-cover" />
-                                <span class="truncate text-[15px] font-medium text-black">{{ student.name }}</span>
-                              </div>
-                              <div class="flex items-center gap-2">
-                                <button
-                                  type="button"
-                                  class="rounded-[14px] border border-[#1188f8] bg-white px-3 py-2 text-[12px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff]"
-                                  @click="openStudentPerformanceAnalysis(student.studentId)"
-                                >
-                                  View performance
-                                </button>
-                                <div class="flex h-[35px] w-[73px] items-center justify-center rounded-[14px] bg-[#cfe3fb] text-[20px] font-bold text-black">
-                                  + {{ student.points }}
-                                </div>
+                      <div class="mt-5 border-t border-[#eef1f4] pt-4">
+                        <div class="flex items-center gap-2">
+                          <button
+                            type="button"
+                            class="interactive-icon-button grid h-[28px] w-[28px] place-items-center rounded-full text-[#777] transition-colors hover:bg-[#eef6ff] hover:text-[#1188f8] disabled:cursor-not-allowed disabled:opacity-60"
+                            :disabled="isRefreshingRecentEngagement"
+                            aria-label="Refresh recent student engagement"
+                            @click="refreshRecentStudentEngagement"
+                          >
+                            <AppIcon
+                              name="refresh"
+                              :size="20"
+                              class="h-[20px] w-[20px]"
+                              :class="isRefreshingRecentEngagement ? 'animate-spin text-[#1188f8]' : ''"
+                            />
+                          </button>
+                          <p class="text-[16px] font-bold text-[#313131]">Recent Student Engagement</p>
+                        </div>
+
+                        <div v-if="recentStudents.length" class="mt-3 max-h-[220px] space-y-2 overflow-y-auto overscroll-contain pr-1">
+                          <div v-for="student in recentStudents" :key="student.id" class="flex min-h-[47px] items-center justify-between gap-3 rounded-[16px] border border-[#e2e8f0] bg-[#fbfdff] px-3 py-2">
+                            <div class="flex min-w-0 items-center gap-3">
+                              <img :src="student.avatarSrc" alt="" class="h-[30px] w-[30px] rounded-full border-2 border-black object-cover" />
+                              <span class="truncate text-[14px] font-medium text-black">{{ student.name }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                              <button
+                                type="button"
+                                class="rounded-[12px] border border-[#1188f8] bg-white px-3 py-2 text-[12px] font-semibold text-[#1188f8] transition hover:bg-[#eef6ff]"
+                                @click="openStudentPerformanceAnalysis(student.studentId)"
+                              >
+                                View performance
+                              </button>
+                              <div class="flex h-[32px] min-w-[62px] items-center justify-center rounded-[12px] bg-[#e6f1ff] px-2 text-[17px] font-bold text-[#1188f8]">
+                                + {{ student.points }}
                               </div>
                             </div>
                           </div>
-                          <p v-else class="mt-[14px] text-[14px] font-medium text-[#666]">No students scanned in this session yet.</p>
-
-                          <div class="mt-[18px] flex justify-start xl:justify-end">
-                            <button
-                              type="button"
-                              class="interactive-secondary-button h-[42px] w-[154px] rounded-[16.5px] border border-[#535353] bg-white text-[15px] font-semibold text-[#1188f8] disabled:cursor-not-allowed disabled:opacity-60"
-                              :disabled="isSavingSessionState"
-                              @click="endSession"
-                            >
-                              {{ isSavingSessionState ? 'Ending...' : 'End Session' }}
-                            </button>
-                          </div>
                         </div>
+                        <p v-else class="mt-3 text-[13px] font-medium text-[#666]">No students scanned in this session yet.</p>
                       </div>
                     </div>
                   </template>
                   <template v-else>
-                    <div class="mt-[20px] w-full rounded-[32px] bg-[#f6f6f6] px-5 py-8 sm:px-8 xl:mt-[29px] xl:h-[191px] xl:px-[32px] xl:py-[25px]">
-                      <div class="flex h-full flex-col items-center justify-center">
-                        <AppIcon name="monitor" :size="42" class="text-[#111]" />
-                        <p class="mt-[14px] text-center text-[18px] font-medium text-[#202020] sm:text-[20px]">
+                    <div class="mt-[20px] flex w-full flex-col items-center justify-center rounded-[24px] border border-[#d8e4f3] bg-white px-5 py-6 text-center shadow-[0_10px_24px_rgba(23,76,160,0.06)] sm:px-8 sm:py-7 xl:mt-[29px]">
+                      <AppIcon name="monitor" :size="32" class="text-[#202020]" />
+                      <p class="mt-3 text-[14px] font-medium text-[#4a4a4a] sm:text-[15px]">
                           Click &quot;Start Session&quot; to begin tracking student engagement.
-                        </p>
-                        <button
-                          type="button"
-                          class="interactive-secondary-button mt-[10px] flex h-[42px] w-[194px] items-center justify-center rounded-[16.5px] border border-[#535353] bg-white text-[18px] font-semibold text-[#1188f8] sm:text-[20px]"
-                          :disabled="isSavingSessionState"
-                          @click="openSessionSetupModal"
-                        >
-                          {{ isSavingSessionState ? 'Starting...' : 'Start Session' }}
-                        </button>
-                      </div>
+                      </p>
+                      <button
+                        type="button"
+                        class="interactive-secondary-button mt-3 flex h-[38px] w-[150px] items-center justify-center gap-2 rounded-[14px] border border-[#535353] bg-white text-[14px] font-semibold text-[#1188f8] sm:text-[15px]"
+                        :disabled="isSavingSessionState"
+                        @click="openSessionSetupModal"
+                      >
+                        <span class="text-[12px]">▶</span>
+                        {{ isSavingSessionState ? 'Starting...' : 'Start Session' }}
+                      </button>
                     </div>
                   </template>
 
@@ -446,7 +456,7 @@
                               Session number
                               <input v-model="sessionExportNumber" type="number" min="1" class="h-[42px] w-[100px] rounded-[14px] border border-[#cccdce] px-3 outline-none focus:border-[#1188f8]" />
                             </label>
-                            <button type="button" class="rounded-[16px] bg-[#1188f8] px-4 py-3 text-[14px] font-semibold text-white disabled:opacity-60" :disabled="!filteredSessionReportSessions.length || isSavingSessionExportInfo" @click="downloadSessionExcelReport()">
+                            <button type="button" class="interactive-primary-button rounded-[16px] bg-[#1188f8] px-4 py-3 text-[14px] font-semibold text-white disabled:opacity-60" :disabled="!filteredSessionReportSessions.length || isSavingSessionExportInfo" @click="downloadSessionExcelReport()">
                               {{ isSavingSessionExportInfo ? 'Saving...' : 'Download Excel Session Record' }}
                             </button>
                           </div>
@@ -504,44 +514,21 @@
                           </div>
                         </div>
 
-                        <div v-if="filteredSessionReportSessions.length" class="mt-4 max-h-[320px] overflow-y-auto rounded-[22px] border border-[#d8e4f3] bg-white">
-                          <div
-                            v-for="row in filteredSessionReportSessions"
-                            :key="row.id"
-                            class="flex flex-col gap-3 border-b border-[#eef1f4] px-4 py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between"
-                          >
-                            <div class="min-w-0">
-                              <p class="truncate text-[17px] font-bold text-black">{{ row.title }}</p>
-                              <p v-if="row.topic" class="mt-1 text-[13px] font-semibold text-[#1188f8]">{{ row.topic }}</p>
-                              <p class="mt-1 text-[13px] font-medium text-[#5d5d5d]">{{ row.date }}</p>
-                              <p class="mt-1 text-[13px] font-medium text-[#5d5d5d]">Start: {{ row.started }}</p>
-                              <p class="mt-1 text-[13px] font-medium text-[#5d5d5d]">End: {{ row.ended }}</p>
-                            </div>
-                            <div class="flex items-center gap-3 sm:shrink-0">
-                              <div class="rounded-[14px] bg-[#f6f6f6] px-3 py-2 text-[13px] font-semibold text-[#4a4a4a]">
-                                {{ row.duration }}
-                              </div>
-                          <div class="rounded-[14px] bg-[#eef6ff] px-3 py-2 text-[13px] font-semibold text-[#174ca0]">
-                            {{ row.participantCount }} students
-                          </div>
-                          <div class="rounded-[14px] bg-[#fff5e9] px-3 py-2 text-[13px] font-semibold text-[#b66a00]">
-                            {{ row.recitationSummary.absentCount }} absent
-                          </div>
-                          <div class="rounded-[14px] bg-[#d8ebff] px-3 py-2 text-[16px] font-bold text-[#1188f8]">
-                            {{ row.points }} pts
-                          </div>
-                            </div>
-                          </div>
-                        </div>
-                        <p v-else class="mt-4 rounded-[22px] border border-dashed border-[#cccdce] bg-white px-4 py-5 text-[15px] font-medium text-[#5d5d5d]">
-                          No class records matched the selected date range.
-                        </p>
                       </div>
 
                       <div class="border-t border-[#d8e4f3] pt-6">
-                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <button
+                          type="button"
+                          class="flex w-full flex-col gap-3 rounded-[18px] text-left transition hover:bg-white/60 sm:flex-row sm:items-center sm:justify-between"
+                          :aria-expanded="isRecitationSessionsOpen"
+                          aria-controls="recitation-session-list"
+                          @click="isRecitationSessionsOpen = !isRecitationSessionsOpen"
+                        >
                           <div>
-                            <h3 class="text-[19px] font-bold leading-none text-black">View Recitation Sessions</h3>
+                            <div class="flex items-center gap-2">
+                              <h3 class="text-[19px] font-bold leading-none text-black">View Recitation Sessions</h3>
+                              <AppIcon name="chevron-down" :size="19" class="text-[#1188f8] transition-transform" :class="isRecitationSessionsOpen ? 'rotate-180' : ''" />
+                            </div>
                             <p class="mt-2 text-[14px] font-medium text-[#5d5d5d]">
                               Open any completed session to see who recited, who did not recite, and the scores given.
                             </p>
@@ -550,13 +537,14 @@
                             <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Sessions Recorded</p>
                             <p class="mt-1 text-[24px] font-bold leading-none text-[#1188f8]">{{ completedSessionRecords.length }}</p>
                           </div>
-                        </div>
+                        </button>
 
-                        <p v-if="sessionRecordsActionError" class="mt-4 text-[14px] font-semibold text-[#b81717]">
-                          {{ sessionRecordsActionError }}
-                        </p>
+                        <div v-if="isRecitationSessionsOpen" id="recitation-session-list" class="mt-4">
+                          <p v-if="sessionRecordsActionError" class="text-[14px] font-semibold text-[#b81717]">
+                            {{ sessionRecordsActionError }}
+                          </p>
 
-                        <div v-if="completedSessionRecords.length" class="mt-5 space-y-[14px]">
+                          <div v-if="completedSessionRecords.length" class="mt-5 space-y-[14px]">
                       <button
                         v-for="session in completedSessionRecords.slice().reverse()"
                         :key="session.id"
@@ -569,11 +557,17 @@
                             <p class="truncate text-[21px] font-bold text-black">{{ session.title }}</p>
                             <p v-if="session.topic" class="mt-2 truncate text-[14px] font-semibold text-[#1188f8]">{{ session.topic }}</p>
                             <p class="mt-2 text-[14px] font-medium text-[#5d5d5d]">{{ formatFullDate(session.startedAt) }}</p>
+                            <p class="mt-1 text-[13px] font-medium text-[#5d5d5d]">Start: {{ formatDateTime(session.startedAt) }}</p>
+                            <p class="mt-1 text-[13px] font-medium text-[#5d5d5d]">End: {{ formatDateTime(session.endedAt) }}</p>
                           </div>
 
-                          <div class="grid gap-3 sm:grid-cols-4 lg:min-w-[520px]">
+                          <div class="grid gap-3 sm:grid-cols-5 lg:min-w-[650px]">
+                            <div class="rounded-[18px] bg-[#f6f6f6] px-4 py-3">
+                              <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Duration</p>
+                              <p class="mt-2 text-[18px] font-bold leading-none text-[#4a4a4a]">{{ formatSessionDuration(session.startedAt, session.endedAt) }}</p>
+                            </div>
                             <div class="rounded-[18px] bg-white px-4 py-3">
-                              <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Recited</p>
+                              <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Students</p>
                               <p class="mt-2 text-[22px] font-bold leading-none text-[#1188f8]">{{ session.recitationSummary.recitedCount }}</p>
                             </div>
                             <div class="rounded-[18px] bg-[#fff8ef] px-4 py-3">
@@ -591,11 +585,12 @@
                           </div>
                         </div>
                       </button>
-                        </div>
+                          </div>
 
-                        <p v-else class="mt-5 rounded-[22px] border border-dashed border-[#cccdce] bg-white px-4 py-5 text-[15px] font-medium text-[#5d5d5d]">
-                          No completed recitation sessions yet. Start a session to create the first record.
-                        </p>
+                          <p v-else class="mt-5 rounded-[22px] border border-dashed border-[#cccdce] bg-white px-4 py-5 text-[15px] font-medium text-[#5d5d5d]">
+                            No completed recitation sessions yet. Start a session to create the first record.
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </section>
@@ -749,7 +744,7 @@
 
                       <div class="relative rounded-[23px] border border-[#bdbdbd] bg-white px-[18px] py-[12px]">
                         <div class="absolute right-[12px] top-[10px]">
-                          <AppIcon name="sparkles" :size="30" class="text-[#111]" />
+                          <AppIcon name="users" :size="30" class="text-[#1188f8]" />
                         </div>
                         <p class="text-[20px] font-bold text-black">Class</p>
                         <p class="mt-[10px] text-[40px] leading-none font-bold text-[#0084ff]">{{ classroom.students }}</p>
@@ -1006,7 +1001,7 @@
                               </div>
                             </div>
 
-                            <div v-if="priorityQueuePreview.length" class="mt-5 space-y-[10px]">
+                            <div v-if="priorityQueuePreview.length" class="mt-5 max-h-[min(520px,calc(100dvh-360px))] space-y-[10px] overflow-y-auto overscroll-contain pr-2">
                               <div
                                 v-for="student in priorityQueuePreview"
                                 :key="student.id"
@@ -1216,17 +1211,32 @@
                               </p>
                             </div>
                             <div class="rounded-[18px] bg-[#f6f6f6] px-4 py-3 text-right">
-                              <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Students reviewed</p>
-                              <p class="mt-1 text-[24px] font-bold leading-none text-[#1188f8]">{{ studentPerformanceAnalysisRows.length }}</p>
+                              <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#777]">Students in group</p>
+                              <p class="mt-1 text-[24px] font-bold leading-none text-[#1188f8]">{{ filteredPerformanceAnalysisRows.length }}</p>
                             </div>
                           </div>
 
                           <div v-if="studentPerformanceAnalysisRows.length" class="mt-5 grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
                             <aside class="rounded-[24px] border border-[#dce7f4] bg-[#f8fbff] px-3 py-3">
                               <p class="px-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">Select a student</p>
-                              <div class="mt-3 space-y-2">
+                              <p class="mt-2 px-2 text-[12px] font-medium text-[#6b7d91]">Group by priority score</p>
+                              <div class="mt-3 grid grid-cols-2 gap-2">
                                 <button
-                                  v-for="student in studentPerformanceAnalysisRows"
+                                  v-for="filter in performancePriorityFilters"
+                                  :key="filter.id"
+                                  type="button"
+                                  class="rounded-[12px] border px-2 py-2 text-[11px] font-bold transition-all"
+                                  :class="performancePriorityFilter === filter.id
+                                    ? 'border-[#1188f8] bg-[#1188f8] text-white shadow-[0_8px_16px_rgba(17,136,248,0.18)]'
+                                    : 'border-[#d8e7fb] bg-white text-[#4d647d] hover:border-[#1188f8] hover:bg-[#eef6ff] hover:text-[#1188f8]'"
+                                  @click="setPerformancePriorityFilter(filter.id)"
+                                >
+                                  {{ filter.label }}
+                                </button>
+                              </div>
+                              <div class="mt-3 min-h-0 max-h-[min(620px,calc(100dvh-250px))] space-y-2 overflow-y-auto overscroll-contain pr-2">
+                                <button
+                                  v-for="student in filteredPerformanceAnalysisRows"
                                   :key="`analysis-picker-${student.id}`"
                                   type="button"
                                   class="flex w-full items-center justify-between gap-3 rounded-[18px] border px-3 py-3 text-left transition-all"
@@ -1248,6 +1258,12 @@
                                   </div>
                                 </button>
                               </div>
+                              <p
+                                v-if="!filteredPerformanceAnalysisRows.length"
+                                class="mt-3 rounded-[14px] bg-white px-3 py-3 text-center text-[12px] font-medium text-[#6b7d91]"
+                              >
+                                No students in this priority group.
+                              </p>
                             </aside>
 
                             <article
@@ -1400,7 +1416,7 @@
                               <div>
                                 <h2 class="text-[24px] font-bold leading-none text-black">Best Times to Get Answers</h2>
                                 <p class="mt-2 text-[15px] font-medium text-[#5b5b5b]">
-                                  Use your recorded activity to see when the room tends to be more active or quieter.
+                                  Use your recorded activity to see when the room tends to be more active or inactive.
                                 </p>
                               </div>
                               <div class="rounded-[16px] bg-[#f6f6f6] px-4 py-3 text-right">
@@ -1422,7 +1438,7 @@
                               </div>
 
                               <div class="rounded-[20px] bg-[#f6f6f6] px-4 py-4">
-                                <p class="text-[13px] font-bold uppercase tracking-[0.08em] text-[#777]">Quietest Day</p>
+                                <p class="text-[13px] font-bold uppercase tracking-[0.08em] text-[#777]">Least Active Day</p>
                                 <p class="mt-3 text-[30px] font-bold leading-none text-black">{{ classAnalytics.timingInsights.quietDay.label }}</p>
                                 <p class="mt-2 text-[14px] font-medium text-[#4a4a4a]">
                                   {{ classAnalytics.timingInsights.quietDay.events }} events and
@@ -1440,7 +1456,7 @@
                               </div>
 
                               <div class="rounded-[20px] bg-[#f6f6f6] px-4 py-4">
-                                <p class="text-[13px] font-bold uppercase tracking-[0.08em] text-[#777]">Quietest Time</p>
+                                <p class="text-[13px] font-bold uppercase tracking-[0.08em] text-[#777]">Least Active Time</p>
                                 <p class="mt-3 text-[30px] font-bold leading-none text-black">{{ classAnalytics.timingInsights.quietHour.label }}</p>
                                 <p class="mt-2 text-[14px] font-medium text-[#4a4a4a]">
                                   {{ classAnalytics.timingInsights.quietHour.events }} events and
@@ -1454,7 +1470,7 @@
                         <article class="rounded-[28px] border border-[#cccdce] bg-white px-5 py-5">
                           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
-                              <h2 class="text-[24px] font-bold leading-none text-black">Quiet Class Sessions</h2>
+                              <h2 class="text-[24px] font-bold leading-none text-black">Less Active Class Sessions</h2>
                               <p class="mt-2 text-[15px] font-medium text-[#5b5b5b]">
                                 Sessions with the fewest participation events, useful when reviewing what to improve next.
                               </p>
@@ -1478,7 +1494,7 @@
                                 </p>
                               </div>
                               <span class="shrink-0 rounded-full bg-white px-3 py-2 text-[12px] font-bold uppercase tracking-[0.08em] text-[#b81717]">
-                                quieter session
+                                less active session
                               </span>
                             </div>
                           </div>
@@ -1521,12 +1537,16 @@
                                   :style="{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }"
                                 >
                                   <div
-                                    v-for="seat in row"
-                                    :key="seat.id"
-                                    class="flex min-h-[98px] min-w-0 flex-col items-center rounded-[14px] border px-2 py-2 text-center"
+                                  v-for="seat in row"
+                                  :key="seat.id"
+                                    class="flex min-h-[98px] min-w-0 flex-col items-center rounded-[14px] border px-2 py-2 text-center transition-all"
                                     :style="seat.student ? getHeatmapSeatStyle(seat.heatScore) : undefined"
-                                    :class="seat.student ? 'cursor-pointer' : 'border-[#d7d7d7] bg-[#fafafa]'"
-                                    @click="seat.student ? openStudentPerformanceAnalysis(seat.student.id) : null"
+                                    :class="seat.student ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_8px_16px_rgba(17,136,248,0.18)] focus:outline-none focus:ring-2 focus:ring-[#1188f8]' : 'border-[#d7d7d7] bg-[#fafafa]'"
+                                    :role="seat.student ? 'button' : undefined"
+                                    :tabindex="seat.student ? 0 : -1"
+                                    @click="seat.student ? openStudentPerformanceModal(seat.student.id) : null"
+                                    @keydown.enter="seat.student ? openStudentPerformanceModal(seat.student.id) : null"
+                                    @keydown.space.prevent="seat.student ? openStudentPerformanceModal(seat.student.id) : null"
                                   >
                                     <template v-if="seat.student">
                                       <div class="flex w-full items-start justify-between gap-2">
@@ -1557,12 +1577,16 @@
                                   :style="{ gridTemplateColumns: `repeat(${Math.max(row.length, 1)}, minmax(0, 1fr))` }"
                                 >
                                   <div
-                                    v-for="seat in row"
-                                    :key="seat.id"
-                                    class="flex min-h-[98px] min-w-0 flex-col items-center rounded-[14px] border px-2 py-2 text-center"
+                                  v-for="seat in row"
+                                  :key="seat.id"
+                                    class="flex min-h-[98px] min-w-0 flex-col items-center rounded-[14px] border px-2 py-2 text-center transition-all"
                                     :style="seat.student ? getHeatmapSeatStyle(seat.heatScore) : undefined"
-                                    :class="seat.student ? 'cursor-pointer' : 'border-[#d7d7d7] bg-[#fafafa]'"
-                                    @click="seat.student ? openStudentPerformanceAnalysis(seat.student.id) : null"
+                                    :class="seat.student ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_8px_16px_rgba(17,136,248,0.18)] focus:outline-none focus:ring-2 focus:ring-[#1188f8]' : 'border-[#d7d7d7] bg-[#fafafa]'"
+                                    :role="seat.student ? 'button' : undefined"
+                                    :tabindex="seat.student ? 0 : -1"
+                                    @click="seat.student ? openStudentPerformanceModal(seat.student.id) : null"
+                                    @keydown.enter="seat.student ? openStudentPerformanceModal(seat.student.id) : null"
+                                    @keydown.space.prevent="seat.student ? openStudentPerformanceModal(seat.student.id) : null"
                                   >
                                     <template v-if="seat.student">
                                       <div class="flex w-full items-start justify-between gap-2">
@@ -1701,6 +1725,80 @@
         @cancel="closeRemoveStudentConfirm"
         @confirm="handleRemoveSelectedStudent"
       />
+
+      <transition name="fade">
+        <div
+          v-if="isStudentPerformanceModalOpen && selectedPerformanceStudent"
+          class="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-[rgba(12,18,28,0.45)] px-3 py-4 backdrop-blur-[2px] sm:items-center sm:px-4 sm:py-8"
+          @click.self="closeStudentPerformanceModal"
+        >
+          <article class="relative max-h-[calc(100dvh-2rem)] w-full max-w-[720px] overflow-y-auto rounded-[28px] bg-white px-5 py-5 shadow-[0_22px_52px_rgba(0,0,0,0.22)] sm:max-h-[calc(100dvh-4rem)] sm:px-7 sm:py-7">
+            <button
+              type="button"
+              class="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full text-[#4a4a4a] transition hover:bg-[#eef6ff] hover:text-[#1188f8]"
+              aria-label="Close student performance"
+              @click="closeStudentPerformanceModal"
+            >
+              <AppIcon name="x" :size="22" />
+            </button>
+
+            <div class="flex items-start gap-3 pr-10">
+              <img :src="selectedPerformanceStudent.avatarSrc" alt="" class="h-[58px] w-[58px] rounded-full border border-[#d8e4f3] object-cover" />
+              <div class="min-w-0">
+                <p class="text-[12px] font-bold uppercase tracking-[0.1em] text-[#1188f8]">Student Participation Insights</p>
+                <h2 class="mt-1 truncate text-[24px] font-bold leading-none text-black">{{ selectedPerformanceStudent.name }}</h2>
+                <p class="mt-2 text-[13px] font-medium text-[#5d6b7f]">
+                  {{ selectedPerformanceStudent.studentNumber || selectedPerformanceStudent.email || 'Joined student' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-4">
+              <div class="rounded-[18px] bg-[#eef6ff] px-4 py-3">
+                <p class="text-[11px] font-bold uppercase tracking-[0.08em] text-[#6d7f97]">Participation Score</p>
+                <p class="mt-2 text-[26px] font-bold leading-none text-[#1188f8]">{{ selectedPerformanceStudent.score }}%</p>
+              </div>
+              <div class="rounded-[18px] bg-[#f6f6f6] px-4 py-3">
+                <p class="text-[11px] font-bold uppercase tracking-[0.08em] text-[#777]">Points</p>
+                <p class="mt-2 text-[26px] font-bold leading-none text-black">{{ selectedPerformanceStudent.points }}</p>
+              </div>
+              <div class="rounded-[18px] bg-[#f6f6f6] px-4 py-3">
+                <p class="text-[11px] font-bold uppercase tracking-[0.08em] text-[#777]">Sessions Joined</p>
+                <p class="mt-2 text-[26px] font-bold leading-none text-black">{{ selectedPerformanceStudent.sessions }}</p>
+              </div>
+              <div class="rounded-[18px] bg-[#eef6ff] px-4 py-3">
+                <p class="text-[11px] font-bold uppercase tracking-[0.08em] text-[#6d7f97]">Priority Score</p>
+                <p class="mt-2 text-[26px] font-bold leading-none text-[#1188f8]">{{ Math.round(selectedPerformanceStudent.priorityScore) }}</p>
+              </div>
+            </div>
+
+            <div class="mt-4 grid gap-3 sm:grid-cols-2">
+              <div class="rounded-[18px] border border-[#d8e7fb] bg-[#fbfdff] px-4 py-4">
+                <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">Predictive Insight</p>
+                <p class="mt-2 text-[18px] font-bold leading-[1.2]" :class="selectedPerformanceStudent.predictionTone">{{ selectedPerformanceStudent.predictionLabel }}</p>
+                <p class="mt-2 text-[13px] font-medium leading-[1.35] text-[#4d5c70]">{{ selectedPerformanceStudent.riskLevel }} support level based on current participation activity.</p>
+              </div>
+              <div class="rounded-[18px] border border-[#d8e7fb] bg-[#fbfdff] px-4 py-4">
+                <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">Recommended Action</p>
+                <p class="mt-2 text-[16px] font-bold leading-[1.3] text-black">{{ selectedPerformanceStudent.recommendation }}</p>
+                <p class="mt-2 text-[13px] font-medium leading-[1.35] text-[#4d5c70]">Seat: {{ selectedPerformanceStudent.seatZoneLabel || 'Seat not assigned' }}</p>
+              </div>
+            </div>
+
+            <div v-if="selectedPerformanceStudent.priorityFormulaNumbers" class="mt-4 rounded-[18px] border border-[#d8e7fb] bg-white px-4 py-4">
+              <p class="text-[12px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">Priority Score Calculation</p>
+              <p class="mt-2 text-[17px] font-bold leading-[1.35] text-black">{{ selectedPerformanceStudent.priorityFormulaNumbers }}</p>
+              <div v-if="selectedPerformanceStudent.priorityBreakdown?.length" class="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+                <div v-for="factor in selectedPerformanceStudent.priorityBreakdown" :key="`modal-factor-${factor.key}`" class="rounded-[14px] bg-[#f8fbff] px-3 py-3">
+                  <p class="text-[11px] font-bold uppercase tracking-[0.08em] text-[#7b8aa0]">{{ factor.label }}</p>
+                  <p class="mt-2 text-[19px] font-bold leading-none text-[#1188f8]">+{{ formatScoreValue(factor.value) }}</p>
+                  <p class="mt-2 text-[12px] font-medium leading-[1.35] text-[#4d5c70]">{{ factor.source }}</p>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </transition>
 
       <transition name="fade">
         <div
@@ -2633,6 +2731,7 @@ const isDeletingAllSessions = ref(false)
 const isRemoveStudentConfirmOpen = ref(false)
 const isRemovingStudent = ref(false)
 const isClassRecordsOpen = ref(true)
+const isRecitationSessionsOpen = ref(true)
 const seatLayoutSaveStatus = ref('')
 const seatLayoutSaveError = ref(false)
 const sessionReportStartDate = ref('')
@@ -2663,6 +2762,7 @@ const sessionRecordsActionError = ref('')
 const classListActionError = ref('')
 const scannedPayload = ref(null)
 const scannerInstance = ref(null)
+const scannerRunId = ref(0)
 const profileName = ref('')
 const profileAvatarKey = ref(defaultTeacherAvatarKey)
 const profilePhotoFile = ref(null)
@@ -2681,6 +2781,8 @@ const pendingDeleteSessionId = ref('')
 const selectedFeedbackStudentId = ref('')
 const selectedStudentRemovalId = ref('')
 const selectedPerformanceStudentId = ref('')
+const performancePriorityFilter = ref('all')
+const isStudentPerformanceModalOpen = ref(false)
 const studentFeedbackDraft = ref('')
 const rawClassroom = ref(null)
 const loadError = ref('')
@@ -2808,6 +2910,16 @@ const openStudentPerformanceAnalysis = async (studentId = '') => {
   selectedPerformanceStudentId.value = studentId
   analyticsSubview.value = 'students'
   await setTab('analytics')
+}
+
+const openStudentPerformanceModal = (studentId = '') => {
+  if (!studentId) return
+  selectedPerformanceStudentId.value = studentId
+  isStudentPerformanceModalOpen.value = true
+}
+
+const closeStudentPerformanceModal = () => {
+  isStudentPerformanceModalOpen.value = false
 }
 
 const toggleClassOptions = () => {
@@ -3704,10 +3816,42 @@ const studentPerformanceAnalysisRows = computed(() =>
       return left.name.localeCompare(right.name)
     }),
 )
+
+const performancePriorityFilters = [
+  { id: 'all', label: 'All' },
+  { id: 'low', label: 'Low Priority' },
+  { id: 'medium', label: 'Medium Priority' },
+  { id: 'high', label: 'High Priority' },
+]
+
+const getPerformancePriorityGroup = (priorityScore = 0) => {
+  const score = Number(priorityScore) || 0
+  if (score >= 67) return 'high'
+  if (score >= 34) return 'medium'
+  return 'low'
+}
+
+const filteredPerformanceAnalysisRows = computed(() => {
+  if (performancePriorityFilter.value === 'all') return studentPerformanceAnalysisRows.value
+
+  return studentPerformanceAnalysisRows.value.filter(
+    (student) => getPerformancePriorityGroup(student.priorityScore) === performancePriorityFilter.value,
+  )
+})
+
+const setPerformancePriorityFilter = (filterId) => {
+  performancePriorityFilter.value = filterId
+  const visibleStudents = filteredPerformanceAnalysisRows.value
+
+  if (visibleStudents.length && !visibleStudents.some((student) => student.id === selectedPerformanceStudentId.value)) {
+    selectedPerformanceStudentId.value = visibleStudents[0].id
+  }
+}
+
 const selectedPerformanceStudent = computed(
   () =>
-    studentPerformanceAnalysisRows.value.find((student) => student.id === selectedPerformanceStudentId.value) ||
-    studentPerformanceAnalysisRows.value[0] ||
+    filteredPerformanceAnalysisRows.value.find((student) => student.id === selectedPerformanceStudentId.value) ||
+    filteredPerformanceAnalysisRows.value[0] ||
     null,
 )
 
@@ -3778,7 +3922,7 @@ const analyticsSectionCards = computed(() => [
   },
   {
     id: 'students',
-    title: 'Student Focus',
+    title: 'Student Participation Insights',
     description: 'See who has higher turn priority.',
     value: `${classAnalytics.value.atRiskStudents}`,
     caption: 'students to watch',
@@ -3792,7 +3936,7 @@ const analyticsSectionCards = computed(() => [
   },
   {
     id: 'seating',
-    title: 'Seat View',
+    title: 'Seat Map',
     description: 'Match the room with student priority.',
     value: `${analyticsHeatmapStudents.value.length}`,
     caption: 'assigned students',
@@ -4925,23 +5069,24 @@ const formatCameraError = (error) => {
 }
 
 const stopScanner = async () => {
-  if (!scannerInstance.value) return
+  scannerRunId.value += 1
+  const scanner = scannerInstance.value
+  scannerInstance.value = null
+  if (!scanner) return
 
   try {
-    if (scannerInstance.value.isScanning) {
-      await scannerInstance.value.stop()
+    if (scanner.isScanning) {
+      await scanner.stop()
     }
   } catch (error) {
     console.error(error)
   }
 
   try {
-    await scannerInstance.value.clear()
+    await scanner.clear()
   } catch (error) {
     console.error(error)
   }
-
-  scannerInstance.value = null
 }
 
 const handleScanSuccess = async (decodedText) => {
@@ -4969,11 +5114,14 @@ const handleScanSuccess = async (decodedText) => {
 
     scannedPayload.value = payload
     scanError.value = ''
-    await stopScanner()
 
     if (!isQueueScanMode.value && scanConfirmationMode.value === 'automatic') {
-      await confirmScannedAward({ keepModalOpen: true, restartAfterSave: true })
+      // Keep the active camera stream alive for continuous automatic scanning.
+      await confirmScannedAward({ keepModalOpen: true })
+      return
     }
+
+    await stopScanner()
   } catch (error) {
     console.error(error)
     scanError.value = 'This QR code is not a valid student participation ID.'
@@ -4981,8 +5129,14 @@ const handleScanSuccess = async (decodedText) => {
 }
 
 const startScanner = async () => {
+  if (scannerInstance.value?.isScanning || isStartingScanner.value) return
+
+  const runId = scannerRunId.value + 1
+  scannerRunId.value = runId
   resetScanState({ keepSelectedScore: true, keepScanContext: true })
   isStartingScanner.value = true
+
+  const isCancelled = () => runId !== scannerRunId.value || !isScanModalOpen.value
 
   try {
     if (!navigator.mediaDevices) {
@@ -4990,6 +5144,8 @@ const startScanner = async () => {
     }
 
     await nextTick()
+    if (isCancelled()) return
+
     const scannerNode = document.getElementById(scannerElementId)
 
     if (!scannerNode) {
@@ -5006,6 +5162,11 @@ const startScanner = async () => {
       console.error(cameraListError)
     }
 
+    if (isCancelled()) {
+      await scanner.clear()
+      return
+    }
+
     if (!cameras.length) {
       const permissionStream = await navigator.mediaDevices.getUserMedia({
         video: true,
@@ -5015,12 +5176,22 @@ const startScanner = async () => {
       cameras = await Html5Qrcode.getCameras()
     }
 
+    if (isCancelled()) {
+      await scanner.clear()
+      return
+    }
+
     if (!cameras.length) {
       throw new Error('No camera devices found.')
     }
 
     const preferredCamera =
       cameras.find((camera) => /back|rear|environment/i.test(camera.label)) || cameras[0]
+
+    if (isCancelled()) {
+      await scanner.clear()
+      return
+    }
 
     await scanner.start(
       preferredCamera.id,
@@ -5045,6 +5216,7 @@ const startScanner = async () => {
 }
 
 const openScanModal = async () => {
+  await stopScanner()
   resetScanState()
   isScanModalOpen.value = true
   await startScanner()
@@ -5059,7 +5231,9 @@ const closeScanModal = async () => {
 const restartScanner = async () => {
   scanStatusMessage.value = ''
   await stopScanner()
-  await startScanner()
+  if (isScanModalOpen.value) {
+    await startScanner()
+  }
 }
 
 const persistParticipationAward = async (studentPayload, points) => {
@@ -5190,7 +5364,7 @@ const persistStudentAbsence = async (studentPayload) => {
   return { ok: true }
 }
 
-const confirmScannedAward = async ({ keepModalOpen = false, restartAfterSave = false } = {}) => {
+const confirmScannedAward = async ({ keepModalOpen = false } = {}) => {
   if (!scannedPayload.value || selectedScanScore.value === null || selectedScanScore.value === undefined) return
 
   isSavingScanAward.value = true
@@ -5214,9 +5388,6 @@ const confirmScannedAward = async ({ keepModalOpen = false, restartAfterSave = f
   scanError.value = ''
   scannedPayload.value = null
 
-  if (restartAfterSave) {
-    await restartScanner()
-  }
 }
 
 const openQueueScanModal = async () => {
@@ -5236,6 +5407,7 @@ const openQueueScanModal = async () => {
   scannedPayload.value = null
   scanError.value = ''
   isPickNextStudentModalOpen.value = false
+  await stopScanner()
   isScanModalOpen.value = true
   await startScanner()
 }
