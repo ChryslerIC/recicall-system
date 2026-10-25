@@ -1,0 +1,13 @@
+session_id,session_number,expected_student_id,expected_student_name,algorithm_selected_id,algorithm_selected_name,algorithm_priority_score,expected_queue_position,top_1_correct,top_3_correct,true_wait_sessions,algorithm_wait_value,formula_errors_in_queue,capped_scores_in_queue,review_note
+S01,1,S006,Faye Torres,S001,Ari Santos,100,6,NO,NO,0,1,0,7,No previous participation
+S02,2,S007,Gabe Mendoza,S003,Carlo Reyes,100,5,NO,NO,1,2,0,6,No previous participation
+S03,3,S008,Hana Villanueva,S004,Dina Lopez,100,5,NO,NO,2,4,0,5,No previous participation
+S04,4,S006,Faye Torres,S005,Eli Garcia,100,2,NO,YES,3,6,0,4,No previous participation and missed called turn
+S05,5,S008,Hana Villanueva,S006,Faye Torres,100,3,NO,YES,4,8,0,3,No previous participation
+S06,6,S007,Gabe Mendoza,S006,Faye Torres,100,2,NO,YES,5,10,0,3,No previous participation
+S07,7,S008,Hana Villanueva,S006,Faye Torres,100,3,NO,YES,6,12,0,3,No previous participation
+S08,8,S006,Faye Torres,S007,Gabe Mendoza,100,6,NO,NO,7,14,0,2,Missed called turn
+S09,9,S007,Gabe Mendoza,S008,Hana Villanueva,100,8,NO,NO,8,16,0,3,Long wait since last participation
+S10,10,S008,Hana Villanueva,S008,Hana Villanueva,100,1,YES,YES,9,18,0,2,Missed called turn
+S11,11,S006,Faye Torres,S008,Hana Villanueva,100,7,NO,NO,10,20,0,1,Long wait since last participation
+S12,12,S007,Gabe Mendoza,S008,Hana Villanueva,100,8,NO,NO,11,22,0,3,Long wait since last participation

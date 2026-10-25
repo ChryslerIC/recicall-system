@@ -8,7 +8,7 @@
       <span class="app-ambient-object app-ambient-dot-three" />
     </div>
     <div class="w-full">
-      <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
+      <header class="relative z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:sticky lg:top-0 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
           <button
             type="button"
@@ -397,6 +397,18 @@
           Remaining lifetime changes: {{ remainingNameChanges }}
         </p>
 
+        <label class="mt-5 block text-[16px] font-medium" for="student-id-gender">Gender</label>
+        <select
+          id="student-id-gender"
+          v-model="editGender"
+          class="mt-3 h-[50px] w-full rounded-[16px] border-2 border-black bg-white px-4 text-[17px] outline-none focus:border-[#1188f8]"
+          :disabled="isSavingName"
+        >
+          <option disabled value="">Select gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+
         <div class="mt-6">
           <div class="flex items-center justify-between gap-4">
             <p class="text-[16px] font-medium">Student Avatar</p>
@@ -561,6 +573,7 @@ import {
   resolveStudentAvatar,
   studentAvatarOptions,
 } from '../../utils/studentAvatarOptions'
+import { splitStudentName } from '../../utils/studentName'
 const router = useRouter()
 const route = useRoute()
 const isLoggingOut = ref(false)
@@ -575,6 +588,7 @@ const isSidebarExpanded = ref(false)
 const isEditModalOpen = ref(false)
 const activeSettingsSection = ref('profile')
 const editNameValue = ref('')
+const editGender = ref('')
 const editAvatarKey = ref(defaultStudentAvatarKey)
 const editPhotoFile = ref(null)
 const editPhotoPreviewUrl = ref('')
@@ -591,18 +605,16 @@ const qrImageUrl = ref('')
 const desktopIdCardRef = ref(null)
 const mobileIdCardRef = ref(null)
 
-const nameParts = computed(() => displayName.value.trim().split(/\s+/).filter(Boolean))
-const firstNameValue = computed(() => {
-  if (nameParts.value.length <= 1) return displayName.value
-  return nameParts.value.slice(0, -1).join(' ')
-})
-const lastNameValue = computed(() => {
-  if (nameParts.value.length <= 1) return displayName.value
-  return nameParts.value.at(-1)
-})
+const studentNameParts = computed(() => splitStudentName(studentProfileRecord.value || {}, displayName.value))
+const firstNameValue = computed(() => studentNameParts.value.firstName)
+const lastNameValue = computed(() => studentNameParts.value.lastName)
 const remainingNameChanges = computed(() => Math.max(0, maxNameChanges - nameChangeCount.value))
 const canEditName = computed(() => remainingNameChanges.value > 0)
 const normalizedEditName = computed(() => editNameValue.value.trim().replace(/\s+/g, ' '))
+const normalizedProfileGender = computed(() => {
+  const gender = String(studentProfileRecord.value?.gender || '').trim().toLocaleLowerCase()
+  return gender === 'male' ? 'Male' : gender === 'female' ? 'Female' : ''
+})
 const fallbackStudentPhotoURL = computed(() => studentProfileRecord.value?.photoURL || '')
 const studentAvatarSrc = computed(() =>
   resolveStudentAvatar(avatarKey.value, fallbackStudentPhotoURL.value),
@@ -614,6 +626,7 @@ const signedInEmail = computed(() => auth.currentUser?.email || 'No email availa
 const hasProfileChanges = computed(
   () =>
     normalizedEditName.value !== displayName.value ||
+    editGender.value !== normalizedProfileGender.value ||
     editAvatarKey.value !== avatarKey.value ||
     Boolean(editPhotoFile.value),
 )
@@ -657,6 +670,7 @@ const buildSettingsReturnTo = (section = activeSettingsSection.value) =>
 
 const prefillStudentSettings = () => {
   editNameValue.value = displayName.value
+  editGender.value = normalizedProfileGender.value
   editAvatarKey.value = avatarKey.value
   editPhotoFile.value = null
   editPhotoPreviewUrl.value = fallbackStudentPhotoURL.value || ''
@@ -884,6 +898,7 @@ const saveProfileChanges = async () => {
 
   const trimmedName = normalizedEditName.value
   const nameWasChanged = trimmedName !== displayName.value
+  const genderWasChanged = editGender.value !== normalizedProfileGender.value
   const avatarWasChanged = editAvatarKey.value !== avatarKey.value
   const photoWasChanged = Boolean(editPhotoFile.value)
 
@@ -892,12 +907,17 @@ const saveProfileChanges = async () => {
     return
   }
 
+  if (!['Male', 'Female'].includes(editGender.value)) {
+    editError.value = 'Select Male or Female for your profile.'
+    return
+  }
+
   if (nameWasChanged && !canEditName.value) {
     editError.value = `You have already used all ${maxNameChanges} lifetime name changes.`
     return
   }
 
-  if (!nameWasChanged && !avatarWasChanged && !photoWasChanged) {
+  if (!nameWasChanged && !genderWasChanged && !avatarWasChanged && !photoWasChanged) {
     closeEditModal(true)
     return
   }
@@ -909,6 +929,7 @@ const saveProfileChanges = async () => {
     const hasCustomPhoto = Boolean(editPhotoFile.value)
     const nextAvatarKey = editAvatarKey.value || (hasCustomPhoto || fallbackStudentPhotoURL.value ? '' : defaultStudentAvatarKey)
     const shouldKeepExistingPhoto = !hasCustomPhoto && !nextAvatarKey
+    const nextNameParts = nameWasChanged ? splitStudentName({}, trimmedName) : null
     let updatedCount = nameChangeCount.value
 
     const updatedAccount = (nameWasChanged || photoWasChanged || !shouldKeepExistingPhoto)
@@ -924,6 +945,7 @@ const saveProfileChanges = async () => {
     const nextPhotoURL = updatedAccount?.photoURL ?? (shouldKeepExistingPhoto ? fallbackStudentPhotoURL.value : '')
 
     await upsertUserProfile(studentUid.value, {
+      gender: editGender.value,
       avatarKey: nextAvatarKey,
       avatarPromptSeen: true,
       photoURL: nextPhotoURL,
@@ -933,6 +955,8 @@ const saveProfileChanges = async () => {
       ...(nameWasChanged
         ? {
             displayName: trimmedName,
+            firstName: nextNameParts.firstName,
+            lastName: nextNameParts.lastName,
             nameChangeCount: updatedCount,
           }
         : {}),
@@ -940,6 +964,9 @@ const saveProfileChanges = async () => {
 
     await syncStudentProfileAcrossClasses(studentUid.value, {
       displayName: nameWasChanged ? trimmedName : displayName.value,
+      firstName: nameWasChanged ? nextNameParts.firstName : studentProfileRecord.value?.firstName,
+      lastName: nameWasChanged ? nextNameParts.lastName : studentProfileRecord.value?.lastName,
+      gender: editGender.value,
       avatarKey: nextAvatarKey,
       photoURL: nextPhotoURL || undefined,
       email: studentProfileRecord.value?.email || auth.currentUser?.email || undefined,
@@ -955,6 +982,8 @@ const saveProfileChanges = async () => {
     studentProfileRecord.value = {
       ...(studentProfileRecord.value || {}),
       displayName: nameWasChanged ? trimmedName : displayName.value,
+      gender: editGender.value,
+      ...(nextNameParts || {}),
       avatarKey: nextAvatarKey,
       nameChangeCount: updatedCount,
       photoURL: nextPhotoURL,

@@ -1,0 +1,13 @@
+session_id,session_number,selected_student_id,selected_student_name,priority_score,queue_position
+S01,1,S001,Ari Santos,100,1
+S02,2,S002,Bea Cruz,100,1
+S03,3,S003,Carlo Reyes,100,1
+S04,4,S004,Dina Lopez,100,1
+S05,5,S005,Eli Garcia,100,1
+S06,6,S006,Faye Torres,100,1
+S07,7,S007,Gabe Mendoza,100,1
+S08,8,S008,Hana Villanueva,100,1
+S09,9,S005,Eli Garcia,99.7,1
+S10,10,S006,Faye Torres,100,1
+S11,11,S003,Carlo Reyes,94.2,1
+S12,12,S004,Dina Lopez,94.2,1

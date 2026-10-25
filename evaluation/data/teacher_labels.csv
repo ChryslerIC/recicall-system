@@ -1,0 +1,13 @@
+session_id,session_number,session_date,teacher_expected_student_id,review_note
+S01,1,2026-01-05,S006,No previous participation
+S02,2,2026-01-06,S007,No previous participation
+S03,3,2026-01-07,S008,No previous participation
+S04,4,2026-01-08,S006,No previous participation and missed called turn
+S05,5,2026-01-09,S008,No previous participation
+S06,6,2026-01-10,S007,No previous participation
+S07,7,2026-01-11,S008,No previous participation
+S08,8,2026-01-12,S006,Missed called turn
+S09,9,2026-01-13,S007,Long wait since last participation
+S10,10,2026-01-14,S008,Missed called turn
+S11,11,2026-01-15,S006,Long wait since last participation
+S12,12,2026-01-16,S007,Long wait since last participation

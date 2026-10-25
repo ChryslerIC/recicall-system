@@ -1,0 +1,9 @@
+student_id,student_name,seat_side,seat_row,seat_index
+S001,Ari Santos,left,0,0
+S002,Bea Cruz,left,0,1
+S003,Carlo Reyes,left,1,0
+S004,Dina Lopez,left,1,1
+S005,Eli Garcia,left,2,0
+S006,Faye Torres,left,2,1
+S007,Gabe Mendoza,right,0,0
+S008,Hana Villanueva,right,1,0

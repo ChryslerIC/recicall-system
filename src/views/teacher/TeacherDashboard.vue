@@ -8,7 +8,7 @@
       <span class="app-ambient-object app-ambient-dot-three" />
     </div>
     <div class="w-full">
-      <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
+      <header class="relative z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:sticky lg:top-0 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
           <button
             type="button"

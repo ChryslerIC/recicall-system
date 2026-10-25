@@ -8,7 +8,7 @@
       <span class="app-ambient-object app-ambient-dot-three" />
     </div>
     <div class="w-full">
-      <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
+      <header class="relative z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:sticky lg:top-0 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
           <button
             type="button"
@@ -148,11 +148,11 @@
             <div v-else-if="!classroom" class="px-4 py-8 text-[18px] font-medium text-[#b81717]">We couldn't find that class.</div>
 
             <template v-else>
-              <div class="sticky top-[96px] z-10 w-fit max-w-full pb-3 pt-[18px] lg:top-[112px]">
-                <div class="flex h-auto w-full max-w-[458px] items-center gap-2 overflow-x-auto rounded-[30.5px] bg-[#f6f6f6] p-[11px] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)]">
+              <div class="relative z-10 w-full max-w-full pb-3 pt-[18px] lg:sticky lg:top-[112px] lg:w-fit">
+                <div class="flex h-auto w-full max-w-[458px] items-center gap-1 rounded-[30.5px] bg-[#f6f6f6] p-[6px] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)] sm:gap-2 sm:p-[11px]">
                   <button
                     type="button"
-                    class="interactive-tab-button h-[47px] min-w-[120px] rounded-[30.5px] px-4 text-[16px] font-semibold sm:min-w-[141px]"
+                    class="interactive-tab-button h-[44px] min-w-0 flex-1 rounded-[30.5px] px-2 text-[13px] font-semibold sm:h-[47px] sm:min-w-[141px] sm:flex-none sm:px-4 sm:text-[16px]"
                     :class="currentTab === 'class' ? 'bg-white text-[#1188f8] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)]' : 'text-[#373737]'"
                     @click="setTab('class')"
                   >
@@ -160,7 +160,7 @@
                   </button>
                   <button
                     type="button"
-                    class="interactive-tab-button h-[47px] min-w-[120px] rounded-[30.5px] px-4 text-[16px] font-semibold sm:min-w-[146px]"
+                    class="interactive-tab-button h-[44px] min-w-0 flex-1 rounded-[30.5px] px-2 text-[13px] font-semibold sm:h-[47px] sm:min-w-[146px] sm:flex-none sm:px-4 sm:text-[16px]"
                     :class="currentTab === 'class-list' ? 'bg-white text-[#1188f8] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)]' : 'text-[#373737]'"
                     @click="setTab('class-list')"
                   >
@@ -168,7 +168,7 @@
                   </button>
                   <button
                     type="button"
-                    class="interactive-tab-button h-[47px] min-w-[120px] rounded-[30.5px] px-4 text-[16px] font-semibold"
+                    class="interactive-tab-button h-[44px] min-w-0 flex-1 rounded-[30.5px] px-2 text-[13px] font-semibold sm:h-[47px] sm:min-w-[120px] sm:flex-none sm:px-4 sm:text-[16px]"
                     :class="currentTab === 'analytics' ? 'bg-white text-[#1188f8] shadow-[0_4px_6.1px_-4px_rgba(0,0,0,0.25)]' : 'text-[#373737]'"
                     @click="setTab('analytics')"
                   >
@@ -623,12 +623,18 @@
                                 v-for="seat in row"
                                 :key="seat.id"
                                 class="flex h-[69px] min-w-0 flex-col items-center justify-start rounded-[12px] border border-[#cccdce] bg-[#f8f8f8] pt-[2px] transition"
-                                :class="isSeatEditMode && !isLayoutLocked ? 'cursor-move hover:border-[#1188f8] hover:bg-[#eef6ff]' : ''"
+                                :class="[
+                                  isSeatEditMode && !isLayoutLocked ? 'cursor-move hover:border-[#1188f8] hover:bg-[#eef6ff]' : '',
+                                  draggedSeatPayload?.type === 'seat' && draggedSeatPayload.side === 'left' && draggedSeatPayload.rowIndex === rowIndex && draggedSeatPayload.seatIndex === row.indexOf(seat)
+                                    ? 'ring-2 ring-[#1188f8] ring-offset-2'
+                                    : '',
+                                ]"
                                 :draggable="isSeatEditMode && !isLayoutLocked && !!seat.studentId"
                                 @dragstart="handleSeatDragStart(seat, 'left', rowIndex, row.indexOf(seat))"
                                 @dragend="clearDraggedSeat"
                                 @dragover.prevent
                                 @drop="handleSeatDrop('left', rowIndex, row.indexOf(seat))"
+                                @click="handleSeatTouchTap($event, seat, 'left', rowIndex, row.indexOf(seat))"
                               >
                                 <template v-if="seat.studentId">
                                   <img :src="getSeatStudent(seat)?.avatarSrc || resolveStudentAvatar()" alt="" class="h-[41px] w-[43px] rounded-full object-cover" />
@@ -649,12 +655,18 @@
                                 v-for="seat in row"
                                 :key="seat.id"
                                 class="flex h-[69px] min-w-0 flex-col items-center justify-start rounded-[12px] border border-[#cccdce] bg-[#f8f8f8] pt-[2px] transition"
-                                :class="isSeatEditMode && !isLayoutLocked ? 'cursor-move hover:border-[#1188f8] hover:bg-[#eef6ff]' : ''"
+                                :class="[
+                                  isSeatEditMode && !isLayoutLocked ? 'cursor-move hover:border-[#1188f8] hover:bg-[#eef6ff]' : '',
+                                  draggedSeatPayload?.type === 'seat' && draggedSeatPayload.side === 'right' && draggedSeatPayload.rowIndex === rowIndex && draggedSeatPayload.seatIndex === row.indexOf(seat)
+                                    ? 'ring-2 ring-[#1188f8] ring-offset-2'
+                                    : '',
+                                ]"
                                 :draggable="isSeatEditMode && !isLayoutLocked && !!seat.studentId"
                                 @dragstart="handleSeatDragStart(seat, 'right', rowIndex, row.indexOf(seat))"
                                 @dragend="clearDraggedSeat"
                                 @dragover.prevent
                                 @drop="handleSeatDrop('right', rowIndex, row.indexOf(seat))"
+                                @click="handleSeatTouchTap($event, seat, 'right', rowIndex, row.indexOf(seat))"
                               >
                                 <template v-if="seat.studentId">
                                   <img :src="getSeatStudent(seat)?.avatarSrc || resolveStudentAvatar()" alt="" class="h-[41px] w-[43px] rounded-full object-cover" />
@@ -701,7 +713,7 @@
                     v-if="isSeatEditMode"
                     class="rounded-[28px] bg-[#f6f6f6] px-[18px] py-[16px]"
                   >
-                    <div class="grid gap-[10px] md:grid-cols-2 xl:grid-cols-5">
+                    <div class="grid gap-[10px] md:grid-cols-2 xl:grid-cols-4">
                       <button type="button" class="flex h-[56px] w-full items-center rounded-[28px] bg-[#fdfdfd] px-[22px] text-left shadow-[0_1px_4px_rgba(0,0,0,0.05)]" @click="addDesk">
                         <span class="inline-flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[#2bc848] text-white">
                           <AppIcon name="plus" :size="14" />
@@ -722,9 +734,11 @@
                         <AppIcon :name="isLayoutLocked ? 'unlock' : 'lock'" :size="24" :class="isLayoutLocked ? 'text-[#1188f8]' : 'text-[#707070]'" />
                         <span class="ml-[14px] text-[20px] font-semibold text-black">{{ isLayoutLocked ? 'Unlock Layout' : 'Lock Layout' }}</span>
                       </button>
-                      <div class="flex h-[56px] items-center rounded-[28px] bg-[#fdfdfd] px-[22px] text-left shadow-[0_1px_4px_rgba(0,0,0,0.05)]">
-                        <AppIcon name="pencil" :size="24" class="text-[#1188f8]" />
-                        <span class="ml-[14px] text-[20px] font-semibold text-black">{{ isLayoutLocked ? 'Layout Locked' : 'Drag students to move seats' }}</span>
+                      <div class="flex min-h-[56px] min-w-0 items-center gap-3 rounded-[28px] bg-[#fdfdfd] px-4 py-2 text-left shadow-[0_1px_4px_rgba(0,0,0,0.05)]">
+                        <AppIcon name="pencil" :size="22" class="shrink-0 text-[#1188f8]" />
+                        <span class="min-w-0 break-words text-[14px] font-semibold leading-[1.15] text-black sm:text-[16px]">
+                          Drag or tap a student to move seats
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -759,15 +773,21 @@
                         <article
                           v-for="student in alphabetizedClassListStudents"
                           :key="student.id"
-                          class="rounded-[22px] border border-[#d7d7d7] bg-[#fafafa] px-[16px] py-[14px]"
+                          class="rounded-[22px] border border-[#d7d7d7] bg-[#fafafa] px-3 py-3 sm:px-[16px] sm:py-[14px]"
                         >
-                          <div class="flex items-start justify-between gap-3">
+                          <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div
                               class="flex min-w-0 items-center gap-[12px]"
-                              :class="isSeatEditMode && !isLayoutLocked ? 'cursor-grab' : ''"
+                              :class="[
+                                isSeatEditMode && !isLayoutLocked ? 'cursor-grab touch-manipulation' : '',
+                                draggedSeatPayload?.type === 'roster' && draggedSeatPayload.studentId === student.id
+                                  ? 'rounded-xl bg-[#eaf3ff] ring-2 ring-[#1188f8] ring-offset-2'
+                                  : '',
+                              ]"
                               :draggable="isSeatEditMode && !isLayoutLocked"
                               @dragstart="handleRosterDragStart(student)"
                               @dragend="clearDraggedSeat"
+                              @click="handleRosterTouchTap($event, student)"
                             >
                               <img :src="student.avatarSrc" alt="" class="h-[46px] w-[46px] rounded-full object-cover" />
                               <div class="min-w-0">
@@ -778,10 +798,10 @@
                               </div>
                             </div>
 
-                            <div class="flex shrink-0 flex-col gap-2">
+                            <div class="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:shrink-0 sm:flex-col">
                               <button
                                 type="button"
-                                class="rounded-[18px] border border-[#1188f8] bg-[#1188f8] px-3 py-2 text-[13px] font-semibold text-white transition hover:bg-[#0d79de]"
+                                class="col-span-2 rounded-[18px] border border-[#1188f8] bg-[#1188f8] px-3 py-2 text-[13px] font-semibold text-white transition hover:bg-[#0d79de] sm:col-span-1"
                                 @click="openStudentPerformanceAnalysis(student.id)"
                               >
                                 View performance
@@ -815,11 +835,13 @@
                             </p>
                           </div>
 
-                          <p
-                            v-if="isSeatEditMode && !isLayoutLocked"
-                            class="mt-3 text-[12px] font-medium text-[#5d5d5d]"
-                          >
-                            Drag this student card onto a seat to place them in the layout.
+                          <p v-if="isSeatEditMode && !isLayoutLocked" class="mt-3 text-[12px] font-medium text-[#5d5d5d]">
+                            <template v-if="draggedSeatPayload?.type === 'roster' && draggedSeatPayload.studentId === student.id">
+                              Selected. Scroll up and tap a seat to place this student. Tap again to cancel.
+                            </template>
+                            <template v-else>
+                              Drag this student onto a seat, or tap the student and then a seat on your phone.
+                            </template>
                           </p>
                         </article>
                       </div>
@@ -2680,6 +2702,7 @@ import {
   filterParticipationEventsByDate,
 } from '../../utils/participationReports'
 import { resolveStudentAvatar } from '../../utils/studentAvatarOptions'
+import { splitStudentName } from '../../utils/studentName'
 import {
   formatScoreValue,
   parseCustomScoreValue,
@@ -3009,6 +3032,9 @@ const classroom = computed(() => {
 const buildSessionRosterStudent = (student = {}, index = 0) => ({
   id: student.studentId || student.id || `student-${index}`,
   name: student.displayName || student.name || student.email || `Student ${index + 1}`,
+  firstName: student.firstName || '',
+  lastName: student.lastName || '',
+  gender: student.gender || '',
   email: student.email || '',
   studentNumber: student.studentNumber || '',
   avatarKey: student.avatarKey || '',
@@ -3714,6 +3740,9 @@ const classListStudents = computed(() =>
   (classroom.value?.enrolledStudents || []).map((student, index) => ({
     id: student.studentId || student.id || `student-${index}`,
     name: student.displayName || student.email || `Student ${index + 1}`,
+    firstName: student.firstName || '',
+    lastName: student.lastName || '',
+    gender: student.gender || '',
     email: student.email,
     gradeLevel: student.gradeLevel,
     studentNumber: student.studentNumber,
@@ -4260,6 +4289,7 @@ const removeDesk = async () => {
 const resetDeskLayout = async () => {
   initializeDeskLayout({ useSaved: false })
   isSeatEditMode.value = false
+  draggedSeatPayload.value = null
   await persistSeatLayout()
 }
 
@@ -4268,12 +4298,17 @@ const toggleLayoutLock = () => {
 
   if (isLayoutLocked.value) {
     isSeatEditMode.value = false
+    draggedSeatPayload.value = null
   }
 }
 
 const toggleSeatEditMode = () => {
   if (isLayoutLocked.value) return
   isSeatEditMode.value = !isSeatEditMode.value
+
+  if (!isSeatEditMode.value) {
+    draggedSeatPayload.value = null
+  }
 }
 
 const studentMap = computed(() =>
@@ -4308,6 +4343,52 @@ const handleRosterDragStart = (student) => {
   draggedSeatPayload.value = {
     type: 'roster',
     studentId: student.id,
+  }
+}
+
+const isTouchSeatInput = (event) => {
+  if (event?.pointerType) {
+    return event.pointerType === 'touch' || event.pointerType === 'pen'
+  }
+
+  return window.matchMedia?.('(pointer: coarse)').matches || navigator.maxTouchPoints > 0
+}
+
+const handleRosterTouchTap = (event, student) => {
+  if (!isTouchSeatInput(event) || !isSeatEditMode.value || isLayoutLocked.value) return
+
+  event.preventDefault()
+  const currentSelection = draggedSeatPayload.value
+
+  if (currentSelection?.type === 'roster' && currentSelection.studentId === student.id) {
+    draggedSeatPayload.value = null
+    return
+  }
+
+  draggedSeatPayload.value = {
+    type: 'roster',
+    studentId: student.id,
+  }
+}
+
+const handleSeatTouchTap = async (event, seat, side, rowIndex, seatIndex) => {
+  if (!isTouchSeatInput(event) || !isSeatEditMode.value || isLayoutLocked.value) return
+
+  event.preventDefault()
+
+  if (draggedSeatPayload.value) {
+    await handleSeatDrop(side, rowIndex, seatIndex)
+    return
+  }
+
+  if (!seat.studentId) return
+
+  draggedSeatPayload.value = {
+    type: 'seat',
+    studentId: seat.studentId,
+    side,
+    rowIndex,
+    seatIndex,
   }
 }
 
@@ -4369,6 +4450,11 @@ const handleSeatDrop = async (side, rowIndex, seatIndex) => {
   }
 
   const source = draggedSeatPayload.value
+  if (source.side === side && source.rowIndex === rowIndex && source.seatIndex === seatIndex) {
+    draggedSeatPayload.value = null
+    return
+  }
+
   const sourceRows = source.side === 'left' ? leftRows : rightRows
   const sourceSeat = sourceRows[source.rowIndex]?.[source.seatIndex]
 
@@ -4682,6 +4768,42 @@ const downloadSessionExcelReport = async (sessions = null) => {
 
   sessionExportError.value = ''
 
+  const roster = rawClassroom.value?.enrolledStudents || []
+  const getGender = (student) => String(student.gender || '').trim().toLocaleLowerCase()
+  const missingGenderStudents = roster.filter((student) => !['male', 'female'].includes(getGender(student)))
+  if (missingGenderStudents.length) {
+    const names = missingGenderStudents
+      .slice(0, 5)
+      .map((student) => student.displayName || student.name || student.email || 'Student')
+    const remainingCount = missingGenderStudents.length - names.length
+    sessionExportError.value = `Set gender in these students' Student ID profiles: ${names.join(', ')}${remainingCount > 0 ? `, and ${remainingCount} more` : ''}.`
+    return
+  }
+
+  const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true })
+  const getStudentParts = (student) =>
+    splitStudentName(student, student.displayName || student.name || student.email || '')
+  const sortStudentsAlphabetically = (students) =>
+    [...students].sort((left, right) => {
+      const leftParts = getStudentParts(left)
+      const rightParts = getStudentParts(right)
+      return (
+        collator.compare(leftParts.lastName || leftParts.firstName, rightParts.lastName || rightParts.firstName) ||
+        collator.compare(leftParts.firstName, rightParts.firstName) ||
+        collator.compare(left.displayName || left.name || '', right.displayName || right.name || '')
+      )
+    })
+  const maleRoster = sortStudentsAlphabetically(roster.filter((student) => getGender(student) === 'male'))
+  const femaleRoster = sortStudentsAlphabetically(roster.filter((student) => getGender(student) === 'female'))
+  if (maleRoster.length > 50 || femaleRoster.length > 50) {
+    sessionExportError.value = 'The template allows up to 50 students in each gender group.'
+    return
+  }
+  const exportedRoster = [
+    ...maleRoster.map((student, index) => ({ student, rowNumber: 13 + index })),
+    ...femaleRoster.map((student, index) => ({ student, rowNumber: 64 + index })),
+  ]
+
   const info = sessionExportSchoolInfo.value
   const sessionNumber = session.sessionNumber || requestedSessionNumber
   const sessionRows = exportSessions.flatMap((sessionItem, sessionIndex) => {
@@ -4734,7 +4856,7 @@ const downloadSessionExcelReport = async (sessions = null) => {
     type: 'array',
     cellStyles: true,
     cellFormula: true,
-    sheetRows: 80,
+    sheetRows: 130,
   })
   const termSheet = workbook.Sheets['TERM 1']
   const inputSheet = workbook.Sheets['INPUT DATA']
@@ -4752,9 +4874,12 @@ const downloadSessionExcelReport = async (sessions = null) => {
   }
   const exportColumns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB']
   ;[10, 11].forEach((rowNumber) => exportColumns.forEach((column) => setCell(termSheet, `${column}${rowNumber}`, '')))
-  for (let rowNumber = 13; rowNumber <= 80; rowNumber += 1) {
+  for (let rowNumber = 13; rowNumber <= 113; rowNumber += 1) {
+    if (rowNumber === 63) continue
     exportColumns.forEach((column) => setCell(termSheet, `${column}${rowNumber}`, ''))
   }
+  setCell(termSheet, 'A12', 'MALE')
+  setCell(termSheet, 'A63', 'FEMALE')
 
   setCell(termSheet, 'F4', 'DISTRICT / DIVISION')
   setCell(termSheet, 'G4', info.districtDivision || '')
@@ -4799,18 +4924,15 @@ const downloadSessionExcelReport = async (sessions = null) => {
     studentsByName.set(key, current)
   })
   const analyticsById = new Map((classAnalytics.value.students || []).map((student) => [student.id, student]))
-  const roster = rawClassroom.value?.enrolledStudents || []
-  const templateColumns = exportColumns
-  for (let rowNumber = 13; rowNumber <= 80; rowNumber += 1) {
-    templateColumns.forEach((column) => setCell(termSheet, `${column}${rowNumber}`, ''))
-  }
-  roster.forEach((student, index) => {
-    const rowNumber = 13 + index
+  const rosterDataRows = []
+  exportedRoster.forEach(({ student, rowNumber }) => {
     const studentName = student.displayName || student.name || student.email || ''
+    rosterDataRows.push(rowNumber)
     const analyticsStudent = analyticsById.get(student.studentId || student.id) || null
     const studentSessions = studentsByName.get(String(studentName).toLowerCase()) || []
     const sessionRow = studentSessions[0]
-    setCell(termSheet, `A${rowNumber}`, index + 1)
+    const sectionPosition = rowNumber < 63 ? rowNumber - 12 : rowNumber - 63
+    setCell(termSheet, `A${rowNumber}`, sectionPosition)
     setCell(termSheet, `B${rowNumber}`, studentName)
     setCell(termSheet, `F${rowNumber}`, sessionRow?.['Participation Status'] === 'Participated' ? sessionRow['Points Earned'] : '')
     setCell(termSheet, `K${rowNumber}`, Number(analyticsStudent?.points) || 0)
@@ -4854,10 +4976,10 @@ const downloadSessionExcelReport = async (sessions = null) => {
   }
   ;['A9', 'F9', 'N9', 'T9', 'Z9', 'AA9', 'AB9'].forEach((address) => applyStyle(termSheet, address, headerStyle))
   ;['A10', 'B10', 'F10', 'G10', 'H10', 'I10', 'J10', 'K10', 'L10', 'M10', 'N10', 'O10', 'P10', 'Q10', 'R10', 'S10', 'T10', 'U10', 'V10', 'W10', 'Z10', 'AA10', 'AB10'].forEach((address) => applyStyle(termSheet, address, subheaderStyle))
-  for (let rowNumber = 13; rowNumber <= 12 + roster.length; rowNumber += 1) {
+  rosterDataRows.forEach((rowNumber) => {
     ;['A', 'B', 'F', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Z', 'AA', 'AB'].forEach((column) => applyStyle(termSheet, `${column}${rowNumber}`, dataStyle))
     if (termSheet[`AA${rowNumber}`]) termSheet[`AA${rowNumber}`].z = '0.0'
-  }
+  })
   termSheet['!cols'] = [
     { wch: 6 }, { wch: 30 }, { wch: 11 }, { wch: 11 }, { wch: 11 },
     { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 },
@@ -5252,6 +5374,9 @@ const persistParticipationAward = async (studentPayload, points) => {
   const recentEntry = {
     studentId: studentPayload.uid,
     displayName: studentName,
+    firstName: existingStudent?.firstName || studentPayload.firstName || '',
+    lastName: existingStudent?.lastName || studentPayload.lastName || '',
+    gender: existingStudent?.gender || studentPayload.gender || '',
     studentNumber: studentPayload.studentNumber,
     avatarKey: studentPayload.avatarKey,
     latestPoints: points,

@@ -1,0 +1,4 @@
+dataset,sessions,top_1_accuracy_percent,top_3_accuracy_percent,average_selected_wait_sessions,formula_checks_passed,formula_errors,capped_candidate_scores,fairness_score,selection_gap,participation_coverage_percent
+historical_teacher_labels,12,8.33,41.67,5.5,96,0,42,80,3,100
+algorithm_replay,12,,,,,,,83,1,100
+round_robin_baseline,12,,,,,,,83,1,100

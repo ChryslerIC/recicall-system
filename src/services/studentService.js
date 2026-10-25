@@ -97,6 +97,9 @@ export const enrollStudentInClass = async (studentId, classData, studentProfile 
   const mirroredStudentPayload = removeUndefinedValues({
     studentId,
     displayName: studentProfile.displayName,
+    firstName: studentProfile.firstName,
+    lastName: studentProfile.lastName,
+    gender: studentProfile.gender,
     gradeLevel: studentProfile.gradeLevel,
     photoURL: studentProfile.photoURL,
     avatarKey: studentProfile.avatarKey,
@@ -141,6 +144,9 @@ export const syncStudentProfileAcrossClasses = async (studentId, studentProfile 
   const mirroredStudentPayload = removeUndefinedValues({
     studentId,
     displayName: studentProfile.displayName,
+    firstName: studentProfile.firstName,
+    lastName: studentProfile.lastName,
+    gender: studentProfile.gender,
     gradeLevel: studentProfile.gradeLevel,
     photoURL: studentProfile.photoURL,
     avatarKey: studentProfile.avatarKey,

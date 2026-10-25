@@ -8,7 +8,7 @@
       <span class="app-ambient-object app-ambient-dot-three" />
     </div>
     <div class="w-full">
-      <header class="sticky top-0 z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:px-[30px] lg:pt-[13px]">
+      <header class="relative z-20 flex items-start justify-between bg-[#f6f6f6]/95 px-4 pb-3 pt-4 backdrop-blur-[10px] sm:px-6 lg:sticky lg:top-0 lg:px-[30px] lg:pt-[13px]">
         <div class="flex items-start">
           <button
             type="button"
@@ -141,12 +141,12 @@
             </div>
 
             <template v-else>
-              <div class="sticky top-[96px] z-30 isolate w-fit max-w-full bg-transparent pb-3 pt-1 lg:top-[112px]">
-                <div class="overflow-hidden rounded-[30.5px] border border-[#e3e9f1] bg-white px-[10px] py-[8px] shadow-[0_4px_10px_-4px_rgba(0,0,0,0.18)] sm:w-fit">
-                  <div class="flex flex-wrap gap-2 sm:flex-nowrap">
+              <div class="relative z-10 w-full max-w-full bg-transparent pb-3 pt-1 lg:sticky lg:top-[112px] lg:z-30 lg:w-fit">
+                <div class="w-full max-w-[480px] rounded-[30.5px] border border-[#e3e9f1] bg-white px-[6px] py-[6px] shadow-[0_4px_10px_-4px_rgba(0,0,0,0.18)] sm:w-fit sm:px-[10px] sm:py-[8px]">
+                  <div class="flex w-full gap-1 sm:w-fit sm:flex-nowrap sm:gap-2">
                     <button
                       type="button"
-                      class="h-[47px] min-w-[141px] cursor-pointer rounded-[30.5px] text-[16px] font-semibold transition-all duration-150 hover:bg-[#eef6ff] hover:text-[#1188f8] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1188f8] focus-visible:ring-offset-2"
+                      class="h-[44px] min-w-0 flex-1 cursor-pointer rounded-[30.5px] px-2 text-[13px] font-semibold transition-all duration-150 hover:bg-[#eef6ff] hover:text-[#1188f8] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1188f8] focus-visible:ring-offset-2 sm:h-[47px] sm:min-w-[141px] sm:flex-none sm:px-4 sm:text-[16px]"
                       :class="activeTab === 'class' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.14)]' : 'text-black'"
                       @click="setTab('class')"
                     >
@@ -154,7 +154,7 @@
                     </button>
                     <button
                       type="button"
-                      class="h-[47px] min-w-[141px] cursor-pointer rounded-[30.5px] text-[16px] font-semibold transition-all duration-150 hover:bg-[#eef6ff] hover:text-[#1188f8] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1188f8] focus-visible:ring-offset-2"
+                      class="h-[44px] min-w-0 flex-1 cursor-pointer rounded-[30.5px] px-2 text-[13px] font-semibold transition-all duration-150 hover:bg-[#eef6ff] hover:text-[#1188f8] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1188f8] focus-visible:ring-offset-2 sm:h-[47px] sm:min-w-[141px] sm:flex-none sm:px-4 sm:text-[16px]"
                       :class="activeTab === 'class-list' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.14)]' : 'text-black'"
                       @click="setTab('class-list')"
                     >
@@ -162,7 +162,7 @@
                     </button>
                     <button
                       type="button"
-                      class="h-[47px] min-w-[141px] cursor-pointer rounded-[30.5px] text-[16px] font-semibold transition-all duration-150 hover:bg-[#eef6ff] hover:text-[#1188f8] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1188f8] focus-visible:ring-offset-2"
+                      class="h-[44px] min-w-0 flex-1 cursor-pointer rounded-[30.5px] px-2 text-[13px] font-semibold transition-all duration-150 hover:bg-[#eef6ff] hover:text-[#1188f8] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1188f8] focus-visible:ring-offset-2 sm:h-[47px] sm:min-w-[141px] sm:flex-none sm:px-4 sm:text-[16px]"
                       :class="activeTab === 'analytics' ? 'bg-white text-[#1188f8] shadow-[0_8px_18px_rgba(17,136,248,0.14)]' : 'text-black'"
                       @click="setTab('analytics')"
                     >
@@ -953,6 +953,7 @@ import {
   defaultStudentAvatarKey,
   resolveStudentAvatar,
 } from '../../utils/studentAvatarOptions'
+import { splitStudentName } from '../../utils/studentName'
 import { PARTICIPATION_SCORE_EXPLANATION } from '../../utils/scoring'
 import { defaultTeacherAvatarKey, resolveTeacherAvatar, sanitizeTeacherAvatarKey } from '../../utils/teacherAvatarOptions'
 
@@ -969,6 +970,7 @@ const loadError = ref('')
 const teacherName = ref('Maam. Anderson')
 const teacherAvatarKey = ref(defaultTeacherAvatarKey)
 const displayName = ref('Alonso Von Leopard')
+const studentProfile = ref(null)
 const studentNumber = ref('20232023')
 const studentUid = ref('')
 const studentPhotoURL = ref('')
@@ -1044,15 +1046,9 @@ const studentAvatarSrc = computed(() =>
   resolveStudentAvatar(avatarKey.value, studentPhotoURL.value || ''),
 )
 
-const nameParts = computed(() => displayName.value.trim().split(/\s+/).filter(Boolean))
-const firstNameValue = computed(() => {
-  if (nameParts.value.length <= 1) return displayName.value
-  return nameParts.value.slice(0, -1).join(' ')
-})
-const lastNameValue = computed(() => {
-  if (nameParts.value.length <= 1) return displayName.value
-  return nameParts.value.at(-1)
-})
+const studentNameParts = computed(() => splitStudentName(studentProfile.value || {}, displayName.value))
+const firstNameValue = computed(() => studentNameParts.value.firstName)
+const lastNameValue = computed(() => studentNameParts.value.lastName)
 
 const currentStudentEnrollment = computed(
   () =>
@@ -1565,6 +1561,7 @@ onMounted(async () => {
       getStudentClasses(user.uid),
     ])
 
+    studentProfile.value = profile || {}
     if (profile?.displayName) displayName.value = profile.displayName
     else if (user.displayName) displayName.value = user.displayName
     studentPhotoURL.value = profile?.photoURL || ''

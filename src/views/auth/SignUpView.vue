@@ -34,6 +34,19 @@
         </label>
       </div>
 
+      <label v-if="selectedRole === 'student'" class="block">
+        <span class="sr-only">Gender</span>
+        <select
+          v-model="gender"
+          required
+          class="h-12 w-full rounded-[15px] border border-black bg-white px-4 text-[15px] font-medium text-black outline-none transition focus:border-[#1188f8] sm:h-14 sm:text-[16px]"
+        >
+          <option disabled value="">Select gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </label>
+
       <label class="block">
         <span class="sr-only">Email or Username</span>
         <div class="flex h-12 items-center rounded-[15px] border border-black px-4 sm:h-14">
@@ -124,6 +137,7 @@ const router = useRouter()
 
 const firstName = ref('')
 const lastName = ref('')
+const gender = ref('')
 const email = ref('')
 const password = ref('')
 const selectedRole = ref('teacher')
@@ -171,6 +185,11 @@ const handleSignUp = async () => {
     return
   }
 
+  if (selectedRole.value === 'student' && !gender.value) {
+    errorMessage.value = 'Select your gender to create a student account.'
+    return
+  }
+
   if (!acceptedTerms.value || !acceptedPrivacy.value) {
     errorMessage.value = 'You need to agree to both the Terms of Service and Privacy Policy to continue.'
     return
@@ -187,6 +206,7 @@ const handleSignUp = async () => {
       lastName: lastName.value,
       email: email.value,
       role: selectedRole.value,
+      ...(selectedRole.value === 'student' ? { gender: gender.value } : {}),
       displayName: `${firstName.value} ${lastName.value}`.trim(),
       createdAt: new Date().toISOString(),
       ...buildRoleProfileDefaults(selectedRole.value),
@@ -207,6 +227,11 @@ const handleGoogleAuth = async () => {
 
   if (!acceptedTerms.value || !acceptedPrivacy.value) {
     errorMessage.value = 'Please agree to both the Terms of Service and Privacy Policy before signing up with Google.'
+    return
+  }
+
+  if (selectedRole.value === 'student' && !gender.value) {
+    errorMessage.value = 'Select your gender before signing up with Google.'
     return
   }
 
@@ -237,6 +262,7 @@ const handleGoogleAuth = async () => {
       lastName: derivedLastName,
       email: user.email || email.value,
       role: selectedRole.value,
+      ...(selectedRole.value === 'student' ? { gender: gender.value } : {}),
       displayName: user.displayName || `${derivedFirstName} ${derivedLastName}`.trim(),
       createdAt: new Date().toISOString(),
       ...buildRoleProfileDefaults(selectedRole.value),
