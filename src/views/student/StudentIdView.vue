@@ -384,15 +384,33 @@
         </div>
 
       <div v-if="activeSettingsSection === 'profile'" class="mt-6">
-        <label class="text-[16px] font-medium" for="student-id-name">Full Name</label>
-        <input
-          id="student-id-name"
-          v-model="editNameValue"
-          type="text"
-          class="mt-3 w-full rounded-[16px] border-2 border-black px-4 py-3 text-[18px] outline-none sm:text-[20px]"
-          :disabled="isSavingName || !canEditName"
-          maxlength="60"
-        />
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label class="block text-[16px] font-medium" for="student-id-first-name">
+            First Name
+            <input
+              id="student-id-first-name"
+              v-model="editFirstNameValue"
+              type="text"
+              placeholder="First name"
+              class="mt-3 w-full rounded-[16px] border-2 border-black px-4 py-3 text-[18px] outline-none sm:text-[20px]"
+              :disabled="isSavingName || !canEditName"
+              maxlength="60"
+            />
+          </label>
+          <label class="block text-[16px] font-medium" for="student-id-last-name">
+            Surname
+            <input
+              id="student-id-last-name"
+              v-model="editLastNameValue"
+              type="text"
+              placeholder="Surname"
+              class="mt-3 w-full rounded-[16px] border-2 border-black px-4 py-3 text-[18px] outline-none sm:text-[20px]"
+              :disabled="isSavingName || !canEditName"
+              maxlength="60"
+            />
+          </label>
+        </div>
+        <p class="mt-3 text-[13px] text-[#666]">Enter your full surname, including spaces (for example, Dela Cruz).</p>
         <p class="mt-3 text-[14px] text-[#666]">
           Remaining lifetime changes: {{ remainingNameChanges }}
         </p>
@@ -587,7 +605,8 @@ const studentProfileRecord = ref(null)
 const isSidebarExpanded = ref(false)
 const isEditModalOpen = ref(false)
 const activeSettingsSection = ref('profile')
-const editNameValue = ref('')
+const editFirstNameValue = ref('')
+const editLastNameValue = ref('')
 const editGender = ref('')
 const editAvatarKey = ref(defaultStudentAvatarKey)
 const editPhotoFile = ref(null)
@@ -610,7 +629,19 @@ const firstNameValue = computed(() => studentNameParts.value.firstName)
 const lastNameValue = computed(() => studentNameParts.value.lastName)
 const remainingNameChanges = computed(() => Math.max(0, maxNameChanges - nameChangeCount.value))
 const canEditName = computed(() => remainingNameChanges.value > 0)
-const normalizedEditName = computed(() => editNameValue.value.trim().replace(/\s+/g, ' '))
+const normalizeName = (value) => String(value || '').trim().replace(/\s+/g, ' ')
+const normalizedEditFirstName = computed(() => normalizeName(editFirstNameValue.value))
+const normalizedEditLastName = computed(() => normalizeName(editLastNameValue.value))
+const normalizedProfileFirstName = computed(() => normalizeName(studentNameParts.value.firstName))
+const normalizedProfileLastName = computed(() => normalizeName(studentNameParts.value.lastName))
+const profileNameWasChanged = computed(
+  () =>
+    normalizedEditFirstName.value !== normalizedProfileFirstName.value ||
+    normalizedEditLastName.value !== normalizedProfileLastName.value,
+)
+const normalizedEditName = computed(
+  () => [normalizedEditFirstName.value, normalizedEditLastName.value].filter(Boolean).join(' '),
+)
 const normalizedProfileGender = computed(() => {
   const gender = String(studentProfileRecord.value?.gender || '').trim().toLocaleLowerCase()
   return gender === 'male' ? 'Male' : gender === 'female' ? 'Female' : ''
@@ -625,7 +656,7 @@ const editAvatarPreview = computed(() =>
 const signedInEmail = computed(() => auth.currentUser?.email || 'No email available')
 const hasProfileChanges = computed(
   () =>
-    normalizedEditName.value !== displayName.value ||
+    profileNameWasChanged.value ||
     editGender.value !== normalizedProfileGender.value ||
     editAvatarKey.value !== avatarKey.value ||
     Boolean(editPhotoFile.value),
@@ -669,7 +700,8 @@ const buildSettingsReturnTo = (section = activeSettingsSection.value) =>
   }).fullPath
 
 const prefillStudentSettings = () => {
-  editNameValue.value = displayName.value
+  editFirstNameValue.value = studentNameParts.value.firstName
+  editLastNameValue.value = studentNameParts.value.lastName
   editGender.value = normalizedProfileGender.value
   editAvatarKey.value = avatarKey.value
   editPhotoFile.value = null
@@ -896,14 +928,21 @@ const closeDeleteAccountConfirm = () => {
 const saveProfileChanges = async () => {
   if (isSavingName.value) return
 
+  const firstName = normalizedEditFirstName.value
+  const lastName = normalizedEditLastName.value
   const trimmedName = normalizedEditName.value
-  const nameWasChanged = trimmedName !== displayName.value
+  const nameWasChanged = profileNameWasChanged.value
   const genderWasChanged = editGender.value !== normalizedProfileGender.value
   const avatarWasChanged = editAvatarKey.value !== avatarKey.value
   const photoWasChanged = Boolean(editPhotoFile.value)
 
-  if (!trimmedName) {
-    editError.value = 'Please enter your full name.'
+  if (!firstName) {
+    editError.value = 'Please enter your first name.'
+    return
+  }
+
+  if (!lastName) {
+    editError.value = 'Please enter your surname.'
     return
   }
 
@@ -929,7 +968,7 @@ const saveProfileChanges = async () => {
     const hasCustomPhoto = Boolean(editPhotoFile.value)
     const nextAvatarKey = editAvatarKey.value || (hasCustomPhoto || fallbackStudentPhotoURL.value ? '' : defaultStudentAvatarKey)
     const shouldKeepExistingPhoto = !hasCustomPhoto && !nextAvatarKey
-    const nextNameParts = nameWasChanged ? splitStudentName({}, trimmedName) : null
+    const nextNameParts = nameWasChanged ? { firstName, lastName } : null
     let updatedCount = nameChangeCount.value
 
     const updatedAccount = (nameWasChanged || photoWasChanged || !shouldKeepExistingPhoto)
