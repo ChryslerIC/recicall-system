@@ -5337,6 +5337,11 @@ const startScanner = async () => {
 }
 
 const openScanModal = async () => {
+  if (!isSessionActive.value) {
+    openSessionSetupModal()
+    return
+  }
+
   await stopScanner()
   resetScanState()
   isScanModalOpen.value = true
