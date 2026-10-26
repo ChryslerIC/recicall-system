@@ -4870,7 +4870,7 @@ const downloadSessionExcelReport = async (sessions = null) => {
     }
   }
   const setFormula = (sheet, address, formula) => {
-    sheet[address] = { t: 'n', f: formula, v: 0 }
+    sheet[address] = { t: 'n', f: formula.replace(/^=/, ''), v: 0 }
   }
   const exportColumns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB']
   ;[10, 11].forEach((rowNumber) => exportColumns.forEach((column) => setCell(termSheet, `${column}${rowNumber}`, '')))
@@ -4990,11 +4990,10 @@ const downloadSessionExcelReport = async (sessions = null) => {
   ]
   termSheet['!rows'] = [{}, {}, {}, {}, {}, {}, {}, {}, { hpt: 30 }, { hpt: 34 }, { hpt: 24 }]
 
-  // Keep the exported workbook focused on the single ReciCall session record.
-  workbook.SheetNames.filter((sheetName) => sheetName !== 'TERM 1').forEach((sheetName) => {
-    delete workbook.Sheets[sheetName]
-  })
-  workbook.SheetNames = ['TERM 1']
+  const termSheetIndex = workbook.SheetNames.indexOf('TERM 1')
+  if (termSheetIndex > 0) {
+    workbook.SheetNames.unshift(workbook.SheetNames.splice(termSheetIndex, 1)[0])
+  }
   if (workbook.Workbook?.Views?.[0]) workbook.Workbook.Views[0].activeTab = 0
 
   XLSX.writeFile(
